@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lume - Jogo Educativo IALUME</title>
+    
+    <!--
+    ╔════════════════════════════════════════════════════════════════╗
+    ║  🎮 JOGO LUME - CONFIGURADO PARA IALUME                       ║
+    ║  ⚠️ IMPORTANTE: SUBSTITUA A API KEY ANTES DE USAR!            ║
+    ║                                                                ║
+    ║  📍 Onde configurar:                                          ║
+    ║     → Procure por "🔴SUBSTITUA" no código JavaScript         ║
+    ║     → Linha aproximada: 500-510                              ║
+    ║                                                                ║
+    ║  🔑 API Key atual: 88e05eb46922dfdd80c8bce8a7fea***          ║
+    ║     → COMPLETE OS ASTERISCOS COM A CHAVE REAL!               ║
+    ║                                                                ║
+    ║  🌐 URL Bubble: https://ialume.bubbleapps.io                 ║
+    ║  📊 Tipos: Resultado_Jogo, Ganho_de_Cristal                  ║
+    ╚════════════════════════════════════════════════════════════════╝
+    -->
+    
+    <style>
+        /* ===== BASE STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            margin: 0;
+        }
+
+        #game-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 1200px;
+            width: 100%;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #score-panel {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .score-item {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .score-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffd43b;
+        }
+
+        #welcome-screen {
+            text-align: center;
+            padding: 60px 40px;
+        }
+
+        .lume-mascot {
+            font-size: 8rem;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        h1 {
+            font-size: 3rem;
+            color: #212529;
+            margin-bottom: 20px;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: #6c757d;
+            margin-bottom: 40px;
+        }
+
+        .start-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .start-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        .phase {
+            display: none;
+            padding: 40px;
+            min-height: 500px;
+        }
+
+        .phase.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .phase-title {
+            font-size: 2rem;
+            color: #495057;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        .feedback-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px 60px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            z-index: 1000;
+            display: none;
+        }
+
+        .feedback-message.correct {
+            color: #51cf66;
+            border: 5px solid #51cf66;
+        }
+
+        .feedback-message.wrong {
+            color: #ff6b6b;
+            border: 5px solid #ff6b6b;
+        }
+
+        .feedback-message.show {
+            display: block;
+            animation: popIn 0.3s ease;
+        }
+
+        @keyframes popIn {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        /* Loading */
+        #loading-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px;
+        }
+
+        .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #667eea;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Quiz */
+        .quiz-option {
+            background: white;
+            border: 3px solid #dee2e6;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .quiz-option:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .quiz-letter {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .quiz-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #212529;
+        }
+
+        /* True/False */
+        .tf-button {
+            background: white;
+            border: 4px solid #dee2e6;
+            border-radius: 20px;
+            padding: 40px;
+            font-size: 2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .tf-button:hover {
+            transform: scale(1.05);
+            border-color: #667eea;
+        }
+
+        .tf-button.verdadeiro { color: #51cf66; }
+        .tf-button.falso { color: #ff6b6b; }
+
+        /* Fill Blanks */
+        .fb-input {
+            font-size: 1.5rem;
+            padding: 15px 20px;
+            border: 3px solid #dee2e6;
+            border-radius: 10px;
+            text-align: center;
+            width: 200px;
+            font-weight: 600;
+        }
+
+        .fb-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            border-radius: 15px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        /* Sequence */
+        .seq-item {
+            background: white;
+            border: 3px solid #dee2e6;
+            border-radius: 15px;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            cursor: grab;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+
+        .seq-item:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .seq-item.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+
+        .seq-number {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .seq-text {
+            flex: 1;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #212529;
+        }
+
+        .seq-drag-icon {
+            font-size: 1.5rem;
+            color: #adb5bd;
+            cursor: grab;
+        }
+
+        .seq-button {
+            width: 100%;
+            padding: 20px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        /* Correct/Wrong states */
+        .correct-state {
+            background: linear-gradient(135deg, #d3f9d8, #b2f2bb) !important;
+            border-color: #51cf66 !important;
+        }
+
+        .wrong-state {
+            background: linear-gradient(135deg, #ffe0e0, #ffc9c9) !important;
+            border-color: #ff6b6b !important;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-5px); }
+        }
+
+        /* ===== RESPONSIVIDADE MOBILE ===== */
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+                align-items: flex-start;
+            }
+            
+            #game-container {
+                border-radius: 0;
+                min-height: 100vh;
+                max-width: 100%;
+                box-shadow: none;
+            }
+            
+            #score-panel {
+                padding: 15px 20px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .score-item {
+                font-size: 1rem;
+            }
+            
+            .score-number {
+                font-size: 1.3rem;
+            }
+            
+            .lume-mascot {
+                font-size: 5rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .start-button {
+                padding: 15px 40px;
+                font-size: 1.2rem;
+            }
+            
+            .phase {
+                padding: 20px 15px;
+            }
+            
+            .phase-title {
+                font-size: 1.5rem;
+                margin-bottom: 20px;
+            }
+            
+            .quiz-option {
+                padding: 15px;
+            }
+            
+            .quiz-letter {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+            
+            .quiz-text {
+                font-size: 1rem;
+            }
+            
+            .tf-button {
+                font-size: 1.3rem;
+                padding: 25px 15px;
+            }
+            
+            .fb-input {
+                font-size: 1.2rem;
+                width: 150px;
+                padding: 12px 15px;
+            }
+            
+            .fb-button {
+                padding: 12px 30px;
+                font-size: 1.1rem;
+            }
+            
+            .seq-item {
+                padding: 12px 15px;
+            }
+            
+            .seq-number {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+            
+            .seq-text {
+                font-size: 1rem;
+            }
+            
+            .feedback-message {
+                padding: 30px 40px;
+                font-size: 1.2rem;
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <!-- ╔═══════════════════════════════════════════════════════════╗ -->
+        <!-- ║  DATA INJECTION: Bubble substitui estes atributos        ║ -->
+        <!-- ║  JavaScript lê os atributos e injeta no CONFIG           ║ -->
+        <!-- ╚═══════════════════════════════════════════════════════════╝ -->
+        <div id="bubble-data" style="display: none;"
+             data-pagina-id="<Parent group's Pagina's unique id>"
+             data-sessao-id="<Parent group's Pagina's sessao's unique id>"
+             data-aluno-id="<Parent group's Pagina's aluno's unique id>">
+        </div>
+        
+        <!-- Score Panel -->
+        <div id="score-panel" style="display: none;">
+            <div class="score-item">
+                Pontos: <span class="score-number" id="score-display">0</span>
+            </div>
+            <div class="score-item">
+                Acertos: <span class="score-number" id="correct-display">0</span>
+            </div>
+        </div>
+
+        <!-- Loading Screen -->
+        <div id="loading-screen">
+            <div class="spinner"></div>
+            <p style="font-size: 1.2rem; color: #495057;">Carregando jogo...</p>
+        </div>
+
+        <!-- Welcome Screen -->
+        <div id="welcome-screen" style="display: none;">
+            <div class="lume-mascot">🌟</div>
+            <h1>Olá, eu sou o Lume!</h1>
+            <p class="subtitle">Estou aqui para tornar o aprendizado mais divertido!</p>
+            <button class="start-button" onclick="startAdventure()">🚀 COMEÇAR!</button>
+        </div>
+
+        <!-- Game Phases -->
+        <div id="phase-1" class="phase"></div>
+        <div id="phase-2" class="phase"></div>
+        <div id="phase-3" class="phase"></div>
+        <div id="phase-4" class="phase"></div>
+
+        <!-- Feedback Message -->
+        <div id="feedback-message" class="feedback-message"></div>
+    </div>
+
+    <script>
+        // Encapsular tudo em IIFE para evitar conflitos com variáveis globais do Bubble
+        (function() {
+            'use strict';
+            
+        // ===== CONFIGURAÇÃO =====
+        // ⚠️⚠️⚠️ ATENÇÃO: SUBSTITUA A API KEY COMPLETA ABAIXO! ⚠️⚠️⚠️
+        const CONFIG = {
+            bubbleApiUrl: 'https://ialume.bubbleapps.io/api/1.1',
+            bubbleApiKey: '88e05eb46922dfdd80c8bce8a7fea914',
+            paginaId: null,
+            sessaoId: null,
+            alunoId: null
+        };
+        // ⚠️ A API Key está incompleta propositalmente!
+        // ⚠️ Vá em Bubble → Settings → API → Copie a chave completa
+        // ⚠️ Cole aqui substituindo os asteriscos (***)
+
+        // ⚠️ IMPORTANTE: 
+        // 1. Substitua a bubbleApiKey acima pela chave real (procure pelo emoji 🔴)
+        // 2. Os IDs (paginaId, sessaoId, alunoId) serão preenchidos automaticamente via Bubble
+        // 3. Não altere bubbleApiUrl, está correto para seu app
+
+        // ===== GAME STATE =====
+        let currentPhase = 0;
+        let totalPhases = 4;
+        let score = 0;
+        let correctAnswers = 0;
+        let gameData = null;
+        let gameResults = [];
+
+        // ===== INICIALIZAÇÃO =====
+        function init() {
+            console.log('🎮 Inicializando jogo IALUME...');
+            
+            // ⚠️ VERIFICAR API KEY
+            if (CONFIG.bubbleApiKey.includes('***') || CONFIG.bubbleApiKey.includes('🔴')) {
+                console.error('❌ API KEY NÃO CONFIGURADA!');
+                console.error('⚠️ Substitua a chave em CONFIG.bubbleApiKey');
+            } else {
+                console.log('✅ API configurada');
+            }
+            
+            tryLoadParams(0);
+        }
+
+        function tryLoadParams(attempt) {
+            const params = getURLParams();
+            console.log('📋 Tentativa ' + (attempt + 1) + ' - Parâmetros da URL:', params);
+            
+            const hasParams = Object.keys(params).length > 0;
+            
+            if (hasParams) {
+                applyParams(params);
+            } else if (attempt < 3) {
+                const delay = (attempt + 1) * 300; // 300ms, 600ms, 900ms
+                console.warn('⚠️ URL params vazios, tentando novamente em ' + delay + 'ms...');
+                setTimeout(function() {
+                    tryLoadParams(attempt + 1);
+                }, delay);
+            } else {
+                console.warn('⚠️ Após 3 tentativas, nenhum parâmetro encontrado');
+                console.log('ℹ️ Rodando em modo demo');
+                applyParams({});
+            }
+        }
+
+        function applyParams(params) {
+            // Configurar IDs da URL
+            if (params.pagina_id) {
+                CONFIG.paginaId = params.pagina_id;
+                console.log('✅ paginaId configurado da URL:', CONFIG.paginaId);
+            }
+            if (params.sessao_id) {
+                CONFIG.sessaoId = params.sessao_id;
+                console.log('✅ sessaoId configurado da URL:', CONFIG.sessaoId);
+            }
+            if (params.aluno_id) {
+                CONFIG.alunoId = params.aluno_id;
+                console.log('✅ alunoId configurado da URL:', CONFIG.alunoId);
+            }
+            
+            // Configurar API (se vier da URL)
+            if (params.bubble_api_url) CONFIG.bubbleApiUrl = params.bubble_api_url;
+            if (params.bubble_api_key) CONFIG.bubbleApiKey = params.bubble_api_key;
+            
+            // Mostrar CONFIG final
+            console.log('📊 CONFIG final:', {
+                paginaId: CONFIG.paginaId,
+                sessaoId: CONFIG.sessaoId,
+                alunoId: CONFIG.alunoId
+            });
+
+            // Carregar jogo
+            if (params.jogo_json) {
+                try {
+                    gameData = JSON.parse(decodeURIComponent(params.jogo_json));
+                    loadGame(gameData);
+                } catch (e) {
+                    console.error('❌ Erro ao parsear JSON:', e);
+                    showError('Erro ao carregar jogo. JSON inválido.');
+                }
+            } else {
+                // Modo de teste (sem parâmetros)
+                loadDemoGame();
+            }
+        }
+
+        function getURLParams() {
+            // Detectar se está em iframe
+            const inIframe = window.self !== window.top;
+            
+            let search = '';
+            
+            try {
+                if (inIframe) {
+                    // Tentar ler da janela pai
+                    console.log('🔍 Detectado iframe, lendo URL da janela pai');
+                    search = window.parent.location.search;
+                    console.log('📍 URL pai:', window.parent.location.href);
+                } else {
+                    search = window.location.search;
+                }
+            } catch (e) {
+                console.warn('⚠️ Erro ao acessar parent (cross-origin?):', e.message);
+                // Fallback: tentar ler da URL atual
+                search = window.location.search;
+            }
+            
+            // Se ainda vazio, tentar extrair da URL completa
+            if (!search || search === '') {
+                try {
+                    const href = inIframe ? window.parent.location.href : window.location.href;
+                    const questionMarkIndex = href.indexOf('?');
+                    if (questionMarkIndex !== -1) {
+                        search = href.substring(questionMarkIndex);
+                        console.log('🔍 Extraindo params da URL completa:', search);
+                    }
+                } catch (e) {
+                    console.warn('⚠️ Não conseguiu extrair params:', e.message);
+                }
+            }
+            
+            const params = new URLSearchParams(search);
+            const result = {};
+            for (const [key, value] of params) {
+                if (value && value !== '') {  // Só adiciona se tiver valor
+                    result[key] = value;
+                }
+            }
+            
+            console.log('🎯 Params extraídos:', result);
+            return result;
+        }
+
+        function loadGame(data) {
+            console.log('📦 Carregando jogo:', data);
+            
+            gameData = data;
+            totalPhases = data.fases.length;
+
+            // Injetar fases
+            data.fases.forEach((fase, index) => {
+                injectPhase(index + 1, fase);
+            });
+
+            // Mostrar welcome
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('welcome-screen').style.display = 'block';
+        }
+
+        function loadDemoGame() {
+            console.log('🎪 Carregando jogo demo...');
+            
+            const demoGame = {
+                tema: "Matemática Básica",
+                fases: [
+                    {
+                        modalidade: "quiz",
+                        dados: {
+                            pergunta: "Quanto é 5 × 3?",
+                            alternativas: ["12", "15", "18", "20"],
+                            correta: 1,
+                            feedback_correto: "Perfeito! 5 × 3 = 15",
+                            feedback_errado: "Ops! Revise a tabuada do 5."
+                        }
+                    },
+                    {
+                        modalidade: "true-false",
+                        dados: {
+                            afirmacao: "10 ÷ 2 = 5",
+                            correta: true,
+                            feedback_correto: "Correto! 10 ÷ 2 = 5",
+                            feedback_errado: "Ops! 10 ÷ 2 = 5 sim!"
+                        }
+                    },
+                    {
+                        modalidade: "fill-blanks",
+                        dados: {
+                            frase: "8 + 7 = ____",
+                            resposta: "15",
+                            feedback_correto: "Isso! 8 + 7 = 15",
+                            feedback_errado: "Era 15!"
+                        }
+                    },
+                    {
+                        modalidade: "sequence",
+                        dados: {
+                            instrucao: "Ordene do menor ao maior:",
+                            itens: ["10", "3", "7", "1"],
+                            ordem_correta: ["1", "3", "7", "10"],
+                            feedback_correto: "Perfeito! Ordem crescente!",
+                            feedback_errado: "Ops! Veja a ordem correta."
+                        }
+                    }
+                ]
+            };
+            
+            loadGame(demoGame);
+        }
+
+        function injectPhase(phaseNumber, faseConfig) {
+            const container = document.getElementById('phase-' + phaseNumber);
+            
+            if (!container) {
+                console.error('Container phase-' + phaseNumber + ' não encontrado');
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="phase-title">FASE ${phaseNumber}: DESCOBERTA</div>
+                <div id="phase-${phaseNumber}-content"></div>
+            `;
+
+            const content = document.getElementById('phase-' + phaseNumber + '-content');
+
+            // Renderizar modalidade
+            if (faseConfig.modalidade === 'quiz') {
+                renderQuiz(content, faseConfig.dados, phaseNumber);
+            } else if (faseConfig.modalidade === 'true-false') {
+                renderTrueFalse(content, faseConfig.dados, phaseNumber);
+            } else if (faseConfig.modalidade === 'fill-blanks') {
+                renderFillBlanks(content, faseConfig.dados, phaseNumber);
+            } else if (faseConfig.modalidade === 'sequence') {
+                renderSequence(content, faseConfig.dados, phaseNumber);
+            }
+        }
+
+        // ===== MODALIDADES =====
+
+        function renderQuiz(container, data, phaseNum) {
+            const html = `
+                <div style="max-width: 700px; margin: 0 auto;">
+                    <div style="background: linear-gradient(135deg, #e3f2fd, #bbdefb); border-radius: 20px; padding: 40px; margin-bottom: 30px; text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 20px;">❓</div>
+                        <h2 style="font-size: 1.8rem; color: #1e88e5;">${data.pergunta}</h2>
+                    </div>
+                    <div id="quiz-options-${phaseNum}">
+                        ${data.alternativas.map((alt, idx) => `
+                            <div class="quiz-option" data-index="${idx}" onclick="checkQuizAnswer(${phaseNum}, ${idx}, ${data.correta})">
+                                <div class="quiz-letter">${String.fromCharCode(65 + idx)}</div>
+                                <div class="quiz-text">${alt}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        function checkQuizAnswer(phaseNum, selected, correct) {
+            const options = document.querySelectorAll('#quiz-options-' + phaseNum + ' .quiz-option');
+            options.forEach(opt => opt.style.pointerEvents = 'none');
+
+            const isCorrect = selected === correct;
+            
+            if (isCorrect) {
+                options[selected].classList.add('correct-state');
+            } else {
+                options[selected].classList.add('wrong-state');
+                setTimeout(() => {
+                    options[correct].classList.add('correct-state');
+                }, 1000);
+            }
+
+            const feedback = gameData.fases[phaseNum - 1].dados[isCorrect ? 'feedback_correto' : 'feedback_errado'];
+            showFeedback(feedback, isCorrect ? 'correct' : 'wrong');
+
+            recordResult(phaseNum, isCorrect);
+            
+            setTimeout(() => {
+                nextPhase();
+            }, isCorrect ? 2500 : 4000);
+        }
+
+        function renderTrueFalse(container, data, phaseNum) {
+            const html = `
+                <div style="max-width: 700px; margin: 0 auto;">
+                    <div style="background: linear-gradient(135deg, #fff3e0, #ffe0b2); border-radius: 20px; padding: 40px; margin-bottom: 30px; text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 20px;">🤔</div>
+                        <h2 style="font-size: 1.8rem; color: #f57c00;">${data.afirmacao}</h2>
+                    </div>
+                    <div style="display: flex; gap: 20px;">
+                        <div class="tf-button verdadeiro" onclick="checkTrueFalse(${phaseNum}, true, ${data.correta})">
+                            ✓ VERDADEIRO
+                        </div>
+                        <div class="tf-button falso" onclick="checkTrueFalse(${phaseNum}, false, ${data.correta})">
+                            ✗ FALSO
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        function checkTrueFalse(phaseNum, selected, correct) {
+            const buttons = document.querySelectorAll('.tf-button');
+            buttons.forEach(btn => btn.style.pointerEvents = 'none');
+
+            const isCorrect = selected === correct;
+            const selectedBtn = buttons[selected ? 0 : 1];
+            const correctBtn = buttons[correct ? 0 : 1];
+
+            if (isCorrect) {
+                selectedBtn.classList.add('correct-state');
+            } else {
+                selectedBtn.classList.add('wrong-state');
+                setTimeout(() => {
+                    correctBtn.classList.add('correct-state');
+                }, 1000);
+            }
+
+            const feedback = gameData.fases[phaseNum - 1].dados[isCorrect ? 'feedback_correto' : 'feedback_errado'];
+            showFeedback(feedback, isCorrect ? 'correct' : 'wrong');
+
+            recordResult(phaseNum, isCorrect);
+            
+            setTimeout(() => {
+                nextPhase();
+            }, isCorrect ? 2500 : 4000);
+        }
+
+        function renderFillBlanks(container, data, phaseNum) {
+            const html = `
+                <div style="max-width: 700px; margin: 0 auto; text-align: center;">
+                    <div style="background: linear-gradient(135deg, #f3e5f5, #e1bee7); border-radius: 20px; padding: 40px; margin-bottom: 30px;">
+                        <div style="font-size: 3rem; margin-bottom: 20px;">✏️</div>
+                        <h2 style="font-size: 2rem; color: #8e24aa;">${data.frase.replace('____', '<input type="text" id="fb-input-' + phaseNum + '" class="fb-input" />')}</h2>
+                    </div>
+                    <button class="fb-button" onclick="checkFillBlanks(${phaseNum}, '${data.resposta}')">VERIFICAR</button>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        function checkFillBlanks(phaseNum, resposta) {
+            const input = document.getElementById('fb-input-' + phaseNum);
+            const userAnswer = input.value.trim().toLowerCase();
+            const correctAnswer = resposta.toLowerCase();
+            
+            const isCorrect = userAnswer === correctAnswer;
+
+            input.disabled = true;
+            input.classList.add(isCorrect ? 'correct-state' : 'wrong-state');
+            
+            if (!isCorrect) {
+                setTimeout(() => {
+                    input.value = resposta;
+                    input.classList.remove('wrong-state');
+                    input.classList.add('correct-state');
+                }, 1000);
+            }
+
+            const feedback = gameData.fases[phaseNum - 1].dados[isCorrect ? 'feedback_correto' : 'feedback_errado'];
+            showFeedback(feedback, isCorrect ? 'correct' : 'wrong');
+
+            recordResult(phaseNum, isCorrect);
+            
+            setTimeout(() => {
+                nextPhase();
+            }, isCorrect ? 2500 : 4000);
+        }
+
+        function renderSequence(container, data, phaseNum) {
+            const shuffled = shuffle([...data.itens]);
+            
+            const html = `
+                <div style="max-width: 700px; margin: 0 auto;">
+                    <div style="background: linear-gradient(135deg, #e8f5e9, #c8e6c9); border-radius: 20px; padding: 30px; margin-bottom: 30px; text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 10px;">🔢</div>
+                        <h3 style="font-size: 1.5rem; color: #388e3c;">${data.instrucao}</h3>
+                    </div>
+                    <div id="seq-list-${phaseNum}">
+                        ${shuffled.map((item, idx) => `
+                            <div class="seq-item" draggable="true" data-index="${idx}">
+                                <div class="seq-number">${idx + 1}</div>
+                                <div class="seq-text">${item}</div>
+                                <div class="seq-drag-icon">☰</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button class="seq-button" onclick="checkSequence(${phaseNum}, ${JSON.stringify(data.ordem_correta).replace(/"/g, '&quot;')})">CONFIRMAR ORDEM</button>
+                </div>
+            `;
+            container.innerHTML = html;
+
+            // Setup drag and drop
+            setupDragDrop(phaseNum);
+        }
+
+        function shuffle(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        let draggedElement = null;
+
+        function setupDragDrop(phaseNum) {
+            const items = document.querySelectorAll('#seq-list-' + phaseNum + ' .seq-item');
+            
+            items.forEach(item => {
+                item.addEventListener('dragstart', function(e) {
+                    draggedElement = this;
+                    this.classList.add('dragging');
+                });
+
+                item.addEventListener('dragend', function() {
+                    this.classList.remove('dragging');
+                });
+
+                item.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                });
+
+                item.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    if (draggedElement !== this) {
+                        const allItems = [...document.querySelectorAll('#seq-list-' + phaseNum + ' .seq-item')];
+                        const draggedIndex = allItems.indexOf(draggedElement);
+                        const droppedIndex = allItems.indexOf(this);
+
+                        if (draggedIndex < droppedIndex) {
+                            this.parentNode.insertBefore(draggedElement, this.nextSibling);
+                        } else {
+                            this.parentNode.insertBefore(draggedElement, this);
+                        }
+
+                        // Atualizar números
+                        document.querySelectorAll('#seq-list-' + phaseNum + ' .seq-number').forEach((num, idx) => {
+                            num.textContent = idx + 1;
+                        });
+                    }
+                });
+            });
+        }
+
+        function checkSequence(phaseNum, ordemCorreta) {
+            const items = document.querySelectorAll('#seq-list-' + phaseNum + ' .seq-item');
+            const currentOrder = Array.from(items).map(item => item.querySelector('.seq-text').textContent);
+            
+            const isCorrect = JSON.stringify(currentOrder) === JSON.stringify(ordemCorreta);
+
+            items.forEach(item => {
+                item.draggable = false;
+                item.style.cursor = 'default';
+                item.classList.add(isCorrect ? 'correct-state' : 'wrong-state');
+            });
+
+            if (!isCorrect) {
+                setTimeout(() => {
+                    const list = document.getElementById('seq-list-' + phaseNum);
+                    list.innerHTML = ordemCorreta.map((item, idx) => `
+                        <div class="seq-item correct-state">
+                            <div class="seq-number">${idx + 1}</div>
+                            <div class="seq-text">${item}</div>
+                            <div class="seq-drag-icon">☰</div>
+                        </div>
+                    `).join('');
+                }, 1000);
+            }
+
+            const feedback = gameData.fases[phaseNum - 1].dados[isCorrect ? 'feedback_correto' : 'feedback_errado'];
+            showFeedback(feedback, isCorrect ? 'correct' : 'wrong');
+
+            recordResult(phaseNum, isCorrect);
+            
+            setTimeout(() => {
+                nextPhase();
+            }, isCorrect ? 2500 : 4000);
+        }
+
+        // ===== NAVEGAÇÃO =====
+        function startAdventure() {
+            document.getElementById('welcome-screen').style.display = 'none';
+            document.getElementById('score-panel').style.display = 'flex';
+            currentPhase = 1;
+            goToPhase(1);
+        }
+        
+        // Expor funções no escopo global para onclick do HTML
+        window.startAdventure = startAdventure;
+        window.checkQuizAnswer = checkQuizAnswer;
+        window.checkTrueFalse = checkTrueFalse;
+        window.checkFillBlanks = checkFillBlanks;
+        window.checkSequence = checkSequence;
+
+        function goToPhase(n) {
+            document.querySelectorAll('.phase').forEach(p => p.classList.remove('active'));
+            const phase = document.getElementById('phase-' + n);
+            if (phase) {
+                phase.classList.add('active');
+            }
+        }
+
+        function nextPhase() {
+            currentPhase++;
+            if (currentPhase <= totalPhases) {
+                goToPhase(currentPhase);
+            } else {
+                finishGame();
+            }
+        }
+
+        // ===== FEEDBACK =====
+        function showFeedback(message, type) {
+            const feedback = document.getElementById('feedback-message');
+            feedback.textContent = message;
+            feedback.className = 'feedback-message ' + type + ' show';
+            
+            setTimeout(() => {
+                feedback.classList.remove('show');
+            }, 2000);
+        }
+
+        function updateScore() {
+            document.getElementById('score-display').textContent = score;
+            document.getElementById('correct-display').textContent = correctAnswers;
+        }
+
+        function recordResult(phaseNum, isCorrect) {
+            if (isCorrect) {
+                score += 100;
+                correctAnswers++;
+                updateScore();
+            }
+
+            gameResults.push({
+                fase: phaseNum,
+                acertou: isCorrect,
+                pontos: isCorrect ? 100 : 0
+            });
+        }
+
+        // ===== FINALIZAR =====
+        function finishGame() {
+            const resultado = {
+                pagina_id: CONFIG.paginaId,
+                sessao_id: CONFIG.sessaoId,
+                aluno_id: CONFIG.alunoId,
+                pontos: score,
+                acertos: correctAnswers,
+                erros: totalPhases - correctAnswers,
+                percentual: Math.round((correctAnswers / totalPhases) * 100),
+                detalhes: gameResults,
+                timestamp: new Date().toISOString()
+            };
+
+            console.log('🏁 Jogo finalizado:', resultado);
+
+            // Enviar para Bubble
+            sendResultToBubble(resultado);
+
+            // Mostrar tela final
+            showFinalScreen(resultado);
+        }
+
+        function sendResultToBubble(resultado) {
+            if (!CONFIG.bubbleApiUrl || !CONFIG.bubbleApiKey) {
+                console.warn('⚠️ API Bubble não configurada');
+                console.log('Resultado (não enviado):', resultado);
+                return;
+            }
+
+            // Formatar dados pro formato do Bubble
+            const bubbleData = {
+                pagina: resultado.pagina_id,
+                sessao: resultado.sessao_id,
+                aluno: resultado.aluno_id,
+                pontos: resultado.pontos,
+                acertos: resultado.acertos,
+                erros: resultado.erros,
+                percentual: resultado.percentual,
+                total_fases: resultado.detalhes.length,
+                detalhes: JSON.stringify(resultado.detalhes),
+                data_jogo: resultado.timestamp
+            };
+
+            console.log('📤 Enviando para Bubble:', bubbleData);
+
+            fetch(CONFIG.bubbleApiUrl + '/obj/resultado_jogo', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + CONFIG.bubbleApiKey
+                },
+                body: JSON.stringify(bubbleData)
+            })
+            .then(response => {
+                console.log('📥 Resposta HTTP:', response.status);
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('✅ Resultado salvo no Bubble!', data);
+            })
+            .catch(error => {
+                console.error('❌ Erro ao enviar resultado:', error);
+            });
+        }
+
+        function showFinalScreen(resultado) {
+            const container = document.getElementById('phase-' + totalPhases);
+            container.innerHTML = `
+                <div style="text-align: center; padding: 60px 40px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 20px; color: white;">
+                    <h1 style="font-size: 3rem; margin-bottom: 20px;">🎉 PARABÉNS!</h1>
+                    <div style="font-size: 4rem; font-weight: 700; margin-bottom: 30px;">
+                        ${resultado.pontos} PONTOS
+                    </div>
+                    <div style="font-size: 1.5rem; margin-bottom: 20px;">
+                        ✅ ${resultado.acertos} acertos | ❌ ${resultado.erros} erros
+                    </div>
+                    <div style="font-size: 2rem; font-weight: 600; margin-bottom: 40px;">
+                        ${resultado.percentual}% de aproveitamento
+                    </div>
+                    
+                    <!-- BOTÃO VOLTAR -->
+                    <button id="btn-voltar"
+                            style="
+                                background: white;
+                                color: #667eea;
+                                border: none;
+                                padding: 20px 50px;
+                                font-size: 1.5rem;
+                                font-weight: 700;
+                                border-radius: 50px;
+                                cursor: pointer;
+                                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                                transition: all 0.2s;
+                                margin-bottom: 30px;
+                            ">
+                        🏠 VOLTAR
+                    </button>
+                    
+                    <!-- COUNTDOWN AUTO-REDIRECT -->
+                    <div id="countdown" style="font-size: 1rem; opacity: 0.6;">
+                        Voltando automaticamente em <span id="seconds">10</span>s
+                    </div>
+                </div>
+            `;
+            
+            // Event listener para o botão VOLTAR
+            const btnVoltar = document.getElementById('btn-voltar');
+            
+            btnVoltar.addEventListener('click', function() {
+                console.log('🏠 Botão VOLTAR clicado');
+                window.location.href = '/index/7';
+            });
+            
+            // Efeito hover
+            btnVoltar.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05)';
+                this.style.boxShadow = '0 15px 40px rgba(0,0,0,0.3)';
+            });
+            btnVoltar.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+                this.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
+            });
+            
+            // Auto-redirect após 10 segundos
+            let seconds = 10;
+            const countdownInterval = setInterval(function() {
+                seconds--;
+                const secondsEl = document.getElementById('seconds');
+                if (secondsEl) {
+                    secondsEl.textContent = seconds;
+                }
+                
+                if (seconds <= 0) {
+                    clearInterval(countdownInterval);
+                    console.log('⏱️ Tempo esgotado - redirecionando para /index/7');
+                    window.location.href = '/index/7';
+                }
+            }, 1000);
+        }
+
+        function showError(message) {
+            document.getElementById('loading-screen').innerHTML = `
+                <div style="text-align: center;">
+                    <div style="font-size: 4rem; margin-bottom: 20px;">❌</div>
+                    <p style="font-size: 1.3rem; color: #f03e3e; font-weight: 600;">${message}</p>
+                </div>
+            `;
+        }
+
+        // Auto-inicializar
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+        
+        })(); // Fim da IIFE - encapsulamento completo
+
+    </script>
+</body>
+</html>

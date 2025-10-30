@@ -1,0 +1,254 @@
+/* ===== PALETA LUME ===== */
+:root {
+    --lume-primary: #ffd700;
+    --lume-glow: #fff8dc;
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --correct: #51cf66;
+    --wrong: #ff6b6b;
+}
+
+/* ===== RESET ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: var(--primary-gradient);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* ===== CONTAINER ===== */
+.game-container {
+    background: white;
+    border-radius: 30px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    max-width: 800px;
+    width: 100%;
+    min-height: 500px;
+    overflow: hidden;
+    position: relative;
+}
+
+/* ===== HEADER ===== */
+.header {
+    background: linear-gradient(to bottom, #fff, #f8f9fa);
+    padding: 20px;
+    text-align: center;
+    border-bottom: 2px solid #dee2e6;
+}
+
+#phase-title {
+    color: #212529;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* ===== CONTEÚDO ===== */
+#content-area {
+    padding: 40px;
+    text-align: center;
+}
+
+.phase {
+    display: none;
+}
+
+.phase.active {
+    display: block;
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== LUME (flutua) ===== */
+.lume-char {
+    font-size: 6rem;
+    display: inline-block;
+    animation: float 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 30px var(--lume-glow));
+    margin-bottom: 20px;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+/* ===== STORY BOX ===== */
+.story-box {
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 20px;
+    padding: 40px;
+    margin-bottom: 30px;
+}
+
+.story-box h1 {
+    color: #212529;
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+.story-box p {
+    font-size: 1.2rem;
+    color: #6c757d;
+    line-height: 1.8;
+}
+
+/* ===== QUESTION BOX ===== */
+.question-box {
+    background: rgba(102, 126, 234, 0.05);
+    border: 2px solid #dee2e6;
+    border-radius: 20px;
+    padding: 40px;
+    margin-bottom: 30px;
+}
+
+.question-box h2 {
+    color: #212529;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+}
+
+.question-box p {
+    font-size: 1.1rem;
+    color: #6c757d;
+    margin-bottom: 20px;
+}
+
+/* ===== BOTÕES ===== */
+.btn {
+    padding: 15px 40px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+.btn:active {
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+/* ===== FEEDBACK ===== */
+#feedback-zone {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 20px 30px;
+    border-radius: 15px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.5s ease;
+    z-index: 1000;
+}
+
+#feedback-zone.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+#feedback-zone.correct {
+    background: var(--correct);
+    color: white;
+}
+
+#feedback-zone.wrong {
+    background: var(--wrong);
+    color: white;
+}
+
+/* ===== SCORE ===== */
+.score-container {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 15px 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.score-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #212529;
+}
+
+.score-item:last-child {
+    margin-bottom: 0;
+}
+
+#score, #correct-count {
+    color: var(--lume-primary);
+    transition: transform 0.2s;
+}
+
+/* ===== RESPONSIVO ===== */
+@media (max-width: 768px) {
+    .game-container {
+        border-radius: 15px;
+        min-height: 400px;
+    }
+    
+    .lume-char {
+        font-size: 4rem;
+    }
+    
+    #content-area {
+        padding: 20px;
+    }
+    
+    .story-box, .question-box {
+        padding: 25px;
+    }
+    
+    .story-box h1, .question-box h2 {
+        font-size: 1.5rem;
+    }
+    
+    .btn {
+        padding: 12px 30px;
+        font-size: 1rem;
+    }
+    
+    .score-container {
+        top: 10px;
+        left: 10px;
+        padding: 10px 15px;
+        font-size: 0.9rem;
+    }
+    
+    #feedback-zone {
+        top: 10px;
+        right: 10px;
+        padding: 15px 20px;
+        font-size: 1rem;
+    }
+}

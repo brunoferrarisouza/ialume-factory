@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lume - Jogo Educativo</title>
+    <style>
+        /* ===== PALETA LUME ===== */
+:root {
+    --lume-primary: #ffd700;
+    --lume-glow: #fff8dc;
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --correct: #51cf66;
+    --wrong: #ff6b6b;
+}
+
+/* ===== RESET ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: var(--primary-gradient);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* ===== CONTAINER ===== */
+.game-container {
+    background: white;
+    border-radius: 30px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    max-width: 800px;
+    width: 100%;
+    min-height: 500px;
+    overflow: hidden;
+    position: relative;
+}
+
+/* ===== HEADER ===== */
+.header {
+    background: linear-gradient(to bottom, #fff, #f8f9fa);
+    padding: 20px;
+    text-align: center;
+    border-bottom: 2px solid #dee2e6;
+}
+
+#phase-title {
+    color: #212529;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* ===== CONTEÚDO ===== */
+#content-area {
+    padding: 40px;
+    text-align: center;
+}
+
+.phase {
+    display: none;
+}
+
+.phase.active {
+    display: block;
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== LUME (flutua) ===== */
+.lume-char {
+    font-size: 6rem;
+    display: inline-block;
+    animation: float 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 30px var(--lume-glow));
+    margin-bottom: 20px;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+/* ===== STORY BOX ===== */
+.story-box {
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 20px;
+    padding: 40px;
+    margin-bottom: 30px;
+}
+
+.story-box h1 {
+    color: #212529;
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+.story-box p {
+    font-size: 1.2rem;
+    color: #6c757d;
+    line-height: 1.8;
+}
+
+/* ===== QUESTION BOX ===== */
+.question-box {
+    background: rgba(102, 126, 234, 0.05);
+    border: 2px solid #dee2e6;
+    border-radius: 20px;
+    padding: 40px;
+    margin-bottom: 30px;
+}
+
+.question-box h2 {
+    color: #212529;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+}
+
+.question-box p {
+    font-size: 1.1rem;
+    color: #6c757d;
+    margin-bottom: 20px;
+}
+
+/* ===== BOTÕES ===== */
+.btn {
+    padding: 15px 40px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+.btn:active {
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+/* ===== FEEDBACK ===== */
+#feedback-zone {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 20px 30px;
+    border-radius: 15px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.5s ease;
+    z-index: 1000;
+}
+
+#feedback-zone.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+#feedback-zone.correct {
+    background: var(--correct);
+    color: white;
+}
+
+#feedback-zone.wrong {
+    background: var(--wrong);
+    color: white;
+}
+
+/* ===== SCORE ===== */
+.score-container {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 15px 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.score-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #212529;
+}
+
+.score-item:last-child {
+    margin-bottom: 0;
+}
+
+#score, #correct-count {
+    color: var(--lume-primary);
+    transition: transform 0.2s;
+}
+
+/* ===== RESPONSIVO ===== */
+@media (max-width: 768px) {
+    .game-container {
+        border-radius: 15px;
+        min-height: 400px;
+    }
+    
+    .lume-char {
+        font-size: 4rem;
+    }
+    
+    #content-area {
+        padding: 20px;
+    }
+    
+    .story-box, .question-box {
+        padding: 25px;
+    }
+    
+    .story-box h1, .question-box h2 {
+        font-size: 1.5rem;
+    }
+    
+    .btn {
+        padding: 12px 30px;
+        font-size: 1rem;
+    }
+    
+    .score-container {
+        top: 10px;
+        left: 10px;
+        padding: 10px 15px;
+        font-size: 0.9rem;
+    }
+    
+    #feedback-zone {
+        top: 10px;
+        right: 10px;
+        padding: 15px 20px;
+        font-size: 1rem;
+    }
+}
+
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Header -->
+        <div class="header">
+            <h1 id="phase-title">BEM-VINDO!</h1>
+        </div>
+
+        <!-- Score -->
+        <div class="score-container">
+            <div class="score-item">
+                Pontos: <span id="score">0</span>
+            </div>
+            <div class="score-item">
+                Acertos: <span id="correct-count">0</span>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div id="content-area">
+            <!-- Fase 0: Boas-vindas -->
+            <div id="phase-0" class="phase active">
+                <div class="lume-char">🌟</div>
+                <div class="story-box">
+                    <h1>Matemática Básica - TESTE</h1>
+                    <p>Teste do assembler corrigido!</p>
+                    <button class="btn btn-primary" onclick="startAdventure()">
+                        COMEÇAR AVENTURA
+                    </button>
+                </div>
+            </div>
+
+            <!-- Fases dinâmicas -->
+            
+            <!-- Fase 1 -->
+            <div id="phase-1" class="phase">
+                <!-- Conteúdo será injetado dinamicamente pelo Game Engine -->
+            </div>
+            
+        </div>
+
+        <!-- Feedback Zone -->
+        <div id="feedback-zone"></div>
+    </div>
+
+    <script>
+        
+            // ========== BASE SCRIPTS ==========
+            
+// ===== base.js =====
+// ESTADO DO JOGO
+let gameState = {
+    currentPhase: 0,
+    score: 0,
+    correctAnswers: 0,
+    startTime: Date.now(),
+    totalPhases: 4
+};
+
+// WEB AUDIO API
+let audioContext;
+
+function initAudio() {
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+}
+
+function playSound(type) {
+    initAudio();
+    
+    const frequencies = {
+        success: [523.25, 659.25, 783.99],
+        error: [349.23, 293.66],
+        victory: [523.25, 659.25, 783.99, 1046.50],
+        click: [440]
+    };
+    
+    const notes = frequencies[type] || frequencies.click;
+    
+    notes.forEach((freq, index) => {
+        setTimeout(() => {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = freq;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.3);
+        }, index * 100);
+    });
+}
+
+// NAVEGACAO ENTRE FASES
+function goToPhase(phaseNumber) {
+    const phases = document.querySelectorAll('.phase');
+    phases.forEach(phase => {
+        phase.classList.remove('active');
+    });
+    
+    const targetPhase = document.getElementById('phase-' + phaseNumber);
+    if (targetPhase) {
+        targetPhase.classList.add('active');
+        gameState.currentPhase = phaseNumber;
+        updatePhaseTitle(phaseNumber);
+    } else {
+        console.error('Fase ' + phaseNumber + ' nao encontrada!');
+    }
+}
+
+function updatePhaseTitle(phaseNumber) {
+    const titleElement = document.getElementById('phase-title');
+    const titles = [
+        'BEM-VINDO!',
+        'FASE 1: DESCOBERTA',
+        'FASE 2: COMPREENSAO',
+        'FASE 3: APLICACAO',
+        'FASE 4: CRIACAO'
+    ];
+    
+    if (titleElement && titles[phaseNumber]) {
+        titleElement.textContent = titles[phaseNumber];
+    }
+}
+
+// FEEDBACK VISUAL
+function showFeedback(message, type) {
+    const feedbackZone = document.getElementById('feedback-zone');
+    
+    feedbackZone.textContent = message;
+    feedbackZone.className = 'feedback ' + type + ' show';
+    
+    playSound(type === 'correct' ? 'success' : 'error');
+    
+    setTimeout(() => {
+        feedbackZone.classList.remove('show');
+    }, 3000);
+}
+
+// SISTEMA DE SCORE
+function addScore(points) {
+    gameState.score += points;
+    const scoreElement = document.getElementById('score');
+    if (scoreElement) {
+        scoreElement.textContent = gameState.score;
+        scoreElement.style.transform = 'scale(1.5)';
+        setTimeout(() => {
+            scoreElement.style.transform = 'scale(1)';
+        }, 200);
+    }
+}
+
+function incrementCorrect() {
+    gameState.correctAnswers++;
+    const correctElement = document.getElementById('correct-count');
+    if (correctElement) {
+        correctElement.textContent = gameState.correctAnswers;
+    }
+}
+
+// ACOES DO JOGO - CORRIGIDO
+function startAdventure() {
+    playSound('click');
+    console.log('🚀 Aventura iniciada!');
+    
+    // Escalada já foi inicializada pelo Game Engine
+    // Apenas ir para fase 1
+    setTimeout(() => {
+        goToPhase(1);
+    }, 1500);
+}
+
+function nextPhase() {
+    playSound('click');
+    const nextPhaseNumber = gameState.currentPhase + 1;
+    
+    console.log('nextPhase chamado. Fase atual:', gameState.currentPhase, 'Proxima:', nextPhaseNumber);
+    console.log('totalPhases:', gameState.totalPhases);
+    
+    if (nextPhaseNumber <= gameState.totalPhases) {
+        // Apenas ir para próxima fase (o quiz já subiu o Lume)
+        goToPhase(nextPhaseNumber);
+    } else {
+        console.log('Fim do jogo! Mostrando vitoria...');
+        
+        setTimeout(() => {
+            showVictory();
+        }, 1000);
+    }
+}
+
+function showVictory() {
+    playSound('victory');
+    
+    const contentArea = document.getElementById('content-area');
+    if (contentArea) {
+        contentArea.style.display = 'none';
+    }
+    
+    const gameContainer = document.querySelector('.game-container');
+    
+    const victoryHTML = `
+        <div id="victory-overlay" style="
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 40px;
+            animation: fadeIn 0.5s ease;
+        ">
+            <div style="
+                background: white;
+                border-radius: 30px;
+                padding: 60px;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                text-align: center;
+                max-width: 600px;
+                animation: scaleIn 0.5s ease;
+            ">
+                <div style="font-size: 6rem; margin-bottom: 20px;">
+                    🏆
+                </div>
+                <h1 style="
+                    font-size: 3rem;
+                    color: #ffd700;
+                    margin-bottom: 20px;
+                    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+                ">
+                    VITORIA!
+                </h1>
+                <p style="
+                    font-size: 1.5rem;
+                    color: #212529;
+                    margin-bottom: 30px;
+                ">
+                    Voce completou todas as fases!
+                </p>
+                <div style="
+                    background: rgba(102, 126, 234, 0.1);
+                    border-radius: 15px;
+                    padding: 30px;
+                    margin-bottom: 30px;
+                ">
+                    <div style="margin-bottom: 15px;">
+                        <span style="font-size: 1.2rem; font-weight: bold;">Pontos finais:</span>
+                        <span style="font-size: 2rem; color: #ffd700; margin-left: 10px;">
+                            ${gameState.score}
+                        </span>
+                    </div>
+                    <div>
+                        <span style="font-size: 1.2rem; font-weight: bold;">Acertos:</span>
+                        <span style="font-size: 2rem; color: #51cf66; margin-left: 10px;">
+                            ${gameState.correctAnswers}
+                        </span>
+                    </div>
+                </div>
+                <button onclick="location.reload()" style="
+                    padding: 20px 50px;
+                    font-size: 1.2rem;
+                    font-weight: bold;
+                    background: linear-gradient(135deg, #667eea, #764ba2);
+                    color: white;
+                    border: none;
+                    border-radius: 50px;
+                    cursor: pointer;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                    transition: transform 0.3s ease;
+                ">
+                    JOGAR NOVAMENTE
+                </button>
+            </div>
+        </div>
+        
+        <style>
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            
+            @keyframes scaleIn {
+                from { transform: scale(0.8); opacity: 0; }
+                to { transform: scale(1); opacity: 1; }
+            }
+            
+            #victory-overlay button:hover {
+                transform: translateY(-3px) scale(1.05);
+            }
+        </style>
+    `;
+    
+    gameContainer.insertAdjacentHTML('beforeend', victoryHTML);
+    
+    console.log('Jogo completo!');
+    console.log('Score final:', gameState.score);
+    console.log('Acertos:', gameState.correctAnswers);
+}
+
+function concludeGame() {
+    console.log('Concluindo jogo...');
+    
+    if (window.ESCALADA && ESCALADA.currentStep < ESCALADA.totalSteps - 1) {
+        console.log('Subindo Lume para o topo...');
+        ESCALADA.climb();
+        
+        setTimeout(() => {
+            showVictory();
+        }, 1500);
+    } else {
+        console.log('Lume ja esta no topo!');
+        showVictory();
+    }
+}
+
+// VALIDACAO DE RESPOSTA GENERICA
+function checkAnswer(userAnswer, correctAnswer, tolerance) {
+    tolerance = tolerance || 0;
+    let isCorrect = false;
+    
+    if (typeof userAnswer === 'number' && typeof correctAnswer === 'number') {
+        isCorrect = Math.abs(userAnswer - correctAnswer) <= tolerance;
+    } else {
+        isCorrect = userAnswer === correctAnswer;
+    }
+    
+    if (isCorrect) {
+        showFeedback('Correto! Muito bem!', 'correct');
+        addScore(100);
+        incrementCorrect();
+        
+        if (window.ESCALADA) {
+            ESCALADA.onCorrect();
+        }
+        
+        setTimeout(() => {
+            nextPhase();
+        }, 2000);
+    } else {
+        showFeedback('Ops! Tente novamente.', 'wrong');
+        
+        if (window.ESCALADA) {
+            ESCALADA.onWrong();
+        }
+    }
+    
+    return isCorrect;
+}
+
+
+// ===== game-engine.js =====
+// ===== MOTOR DO JOGO - GAME ENGINE (CORRIGIDO) =====
+// Recebe configuração JSON e monta jogo automaticamente
+
+const GAME_ENGINE = {
+    config: null,
+    currentPhaseIndex: 0,
+    results: [],
+    
+    // Inicializar jogo com configuração
+    init: function(gameConfig) {
+        console.log('🎮 Iniciando Game Engine...', gameConfig);
+        
+        this.config = gameConfig;
+        this.currentPhaseIndex = 0;
+        this.results = [];
+        
+        // Validar configuração
+        if (!this.validateConfig(gameConfig)) {
+            console.error('❌ Configuração inválida!');
+            return false;
+        }
+        
+        // Configurar sistema base
+        window.totalPhases = gameConfig.fases.length;
+        
+        // Configurar escalada (se existir) - ANTES de injetar fases
+        if (window.ESCALADA && gameConfig.mecanica === 'escalada') {
+            console.log('🏔️ Inicializando escalada com', gameConfig.fases.length, 'andares');
+            ESCALADA.init({
+                totalSteps: gameConfig.fases.length + 1 // +1 para incluir fase 0
+            });
+        }
+        
+        // Injetar todas as fases
+        this.injectAllPhases();
+        
+        console.log('✅ Game Engine inicializado!');
+        return true;
+    },
+    
+    // Validar configuração
+    validateConfig: function(config) {
+        if (!config) {
+            console.error('Config é null/undefined');
+            return false;
+        }
+        
+        if (!config.fases || !Array.isArray(config.fases)) {
+            console.error('Fases não é um array');
+            return false;
+        }
+        
+        if (config.fases.length === 0) {
+            console.error('Nenhuma fase definida');
+            return false;
+        }
+        
+        // Validar cada fase
+        for (let i = 0; i < config.fases.length; i++) {
+            const fase = config.fases[i];
+            
+            if (!fase.modalidade) {
+                console.error('Fase ' + (i+1) + ' sem modalidade');
+                return false;
+            }
+            
+            if (!this.getModalidade(fase.modalidade)) {
+                console.error('Modalidade não existe: ' + fase.modalidade);
+                return false;
+            }
+        }
+        
+        return true;
+    },
+    
+    // Injetar todas as fases
+    injectAllPhases: function() {
+        console.log('📦 Injetando fases...');
+        
+        this.config.fases.forEach((faseConfig, index) => {
+            const numeroFase = index + 1;
+            this.injectPhase(numeroFase, faseConfig);
+        });
+        
+        console.log('✅ Todas as fases injetadas!');
+    },
+    
+    // Injetar uma fase específica
+    injectPhase: function(numeroFase, faseConfig) {
+        const faseElement = document.getElementById('phase-' + numeroFase);
+        
+        if (!faseElement) {
+            console.error('Elemento phase-' + numeroFase + ' não encontrado!');
+            return;
+        }
+        
+        // Limpar fase
+        faseElement.innerHTML = '';
+        
+        // Obter modalidade
+        const Modalidade = this.getModalidade(faseConfig.modalidade);
+        
+        if (!Modalidade) {
+            console.error('Modalidade não encontrada: ' + faseConfig.modalidade);
+            faseElement.innerHTML = '<p style="color:red;">Erro: Modalidade não encontrada</p>';
+            return;
+        }
+        
+        // Criar UI da modalidade
+        const ui = Modalidade.createUI(faseConfig.dados);
+        faseElement.appendChild(ui);
+        
+        console.log('✅ Fase ' + numeroFase + ' injetada (' + faseConfig.modalidade + ')');
+    },
+    
+    // Obter objeto da modalidade
+    getModalidade: function(nome) {
+        const modalidades = {
+            'quiz': window.QUIZ,
+            'true-false': window.TRUE_FALSE,
+            'verdadeiro-falso': window.TRUE_FALSE,
+            'fill-blanks': window.FILL_BLANKS,
+            'lacunas': window.FILL_BLANKS,
+            'sequence': window.SEQUENCE,
+            'sequencia': window.SEQUENCE
+        };
+        
+        return modalidades[nome.toLowerCase()];
+    },
+    
+    // Registrar resultado de uma fase
+    recordResult: function(phaseNumber, correct, points) {
+        this.results.push({
+            fase: phaseNumber,
+            acertou: correct,
+            pontos: points,
+            timestamp: new Date().toISOString()
+        });
+        
+        console.log('📊 Resultado registrado:', this.results[this.results.length - 1]);
+    },
+    
+    // Obter resultado final
+    getFinalResult: function() {
+        const totalFases = this.results.length;
+        const acertos = this.results.filter(r => r.acertou).length;
+        const pontosTotais = this.results.reduce((sum, r) => sum + r.pontos, 0);
+        
+        return {
+            tema: this.config.tema || 'Sem tema',
+            totalFases: totalFases,
+            acertos: acertos,
+            erros: totalFases - acertos,
+            pontosTotais: pontosTotais,
+            percentualAcerto: Math.round((acertos / totalFases) * 100),
+            detalhes: this.results,
+            timestamp: new Date().toISOString()
+        };
+    },
+    
+    // Finalizar jogo
+    finish: function() {
+        const resultado = this.getFinalResult();
+        
+        console.log('🏁 JOGO FINALIZADO!', resultado);
+        
+        // Salvar no localStorage (temporário)
+        localStorage.setItem('ultimo_resultado', JSON.stringify(resultado));
+        
+        // Callback para Bubble (se existir)
+        if (window.sendResultToBubble) {
+            window.sendResultToBubble(resultado);
+        }
+        
+        // Mostrar tela final
+        this.showFinalScreen(resultado);
+        
+        return resultado;
+    },
+    
+    // Mostrar tela final
+    showFinalScreen: function(resultado) {
+        const container = document.getElementById('phase-' + window.totalPhases);
+        
+        if (!container) return;
+        
+        container.innerHTML = `
+            <div style="text-align: center; padding: 40px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 20px; color: white;">
+                <h1 style="font-size: 2.5rem; margin-bottom: 20px;">🎉 PARABÉNS!</h1>
+                <h2 style="font-size: 1.8rem; margin-bottom: 30px;">${resultado.tema}</h2>
+                
+                <div style="background: rgba(255,255,255,0.2); border-radius: 15px; padding: 30px; margin-bottom: 30px;">
+                    <div style="font-size: 3rem; font-weight: 700; margin-bottom: 10px;">
+                        ${resultado.pontosTotais} PONTOS
+                    </div>
+                    <div style="font-size: 1.3rem;">
+                        ✅ ${resultado.acertos} acertos | ❌ ${resultado.erros} erros
+                    </div>
+                    <div style="font-size: 1.5rem; margin-top: 15px; font-weight: 600;">
+                        ${resultado.percentualAcerto}% de aproveitamento
+                    </div>
+                </div>
+                
+                <button onclick="location.reload()" style="
+                    padding: 20px 40px;
+                    font-size: 1.3rem;
+                    font-weight: 700;
+                    background: white;
+                    color: #667eea;
+                    border: none;
+                    border-radius: 15px;
+                    cursor: pointer;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                ">
+                    🔄 JOGAR NOVAMENTE
+                </button>
+            </div>
+        `;
+    }
+};
+
+// Expor globalmente
+window.GAME_ENGINE = GAME_ENGINE;
+
+console.log('🎮 game-engine.js carregado!');
+
+
+// ===== questoes.js =====
+// ===== BANCO DE QUESTOES =====
+
+// QUIZ - Multipla Escolha
+const QUESTOES_MATEMATICA = [
+    {
+        pergunta: "Quanto e 5 x 3?",
+        alternativas: ["12", "15", "18", "20"],
+        correta: 1,
+        feedback_correto: "Perfeito! 5 x 3 = 15",
+        feedback_errado: "Ops! Revise a tabuada do 5."
+    },
+    {
+        pergunta: "Quanto e 20 / 4?",
+        alternativas: ["3", "4", "5", "6"],
+        correta: 2,
+        feedback_correto: "Isso mesmo! 20 / 4 = 5",
+        feedback_errado: "Tente dividir novamente!"
+    },
+    {
+        pergunta: "Quanto e 8 + 7?",
+        alternativas: ["13", "14", "15", "16"],
+        correta: 2,
+        feedback_correto: "Excelente! 8 + 7 = 15",
+        feedback_errado: "Quase la! Some de novo."
+    },
+    {
+        pergunta: "Quanto e 12 - 5?",
+        alternativas: ["5", "6", "7", "8"],
+        correta: 2,
+        feedback_correto: "Parabens! 12 - 5 = 7",
+        feedback_errado: "Revise a subtracao!"
+    }
+];
+
+// VERDADEIRO OU FALSO
+const QUESTOES_VERD_FALSO = [
+    {
+        afirmacao: "A agua ferve a 100 graus ao nivel do mar.",
+        correta: true,
+        feedback_correto: "Correto! A 100 graus ao nivel do mar",
+        feedback_errado: "Na verdade, a agua ferve a 100 graus ao nivel do mar!"
+    },
+    {
+        afirmacao: "O Sol gira em torno da Terra.",
+        correta: false,
+        feedback_correto: "Exato! A Terra gira em torno do Sol",
+        feedback_errado: "Ops! A Terra que gira em torno do Sol!"
+    },
+    {
+        afirmacao: "O coracao humano tem 4 camaras.",
+        correta: true,
+        feedback_correto: "Isso mesmo! 2 atrios e 2 ventriculos",
+        feedback_errado: "Na verdade, o coracao tem SIM 4 camaras!"
+    },
+    {
+        afirmacao: "A capital do Brasil e Sao Paulo.",
+        correta: false,
+        feedback_correto: "Correto! A capital e Brasilia",
+        feedback_errado: "Ops! A capital do Brasil e Brasilia!"
+    }
+];
+
+// PREENCHER LACUNAS
+const QUESTOES_LACUNAS = [
+    {
+        frase: "O Brasil foi descoberto em ____.",
+        resposta: "1500",
+        variacoes_aceitas: ["1500"],
+        dica: "Seculo XVI",
+        feedback_correto: "Isso mesmo! Em 1500 por Pedro Alvares Cabral",
+        feedback_errado: "O Brasil foi descoberto em 1500!"
+    },
+    {
+        frase: "A capital do Brasil e ____.",
+        resposta: "Brasilia",
+        variacoes_aceitas: ["Brasilia", "brasilia"],
+        dica: "Fica no Distrito Federal",
+        feedback_correto: "Correto! Brasilia, inaugurada em 1960",
+        feedback_errado: "A capital do Brasil e Brasilia!"
+    },
+    {
+        frase: "A agua e composta por hidrogenio e ____.",
+        resposta: "oxigenio",
+        variacoes_aceitas: ["oxigenio", "O2"],
+        dica: "H2O - O elemento O",
+        feedback_correto: "Exato! H2O = 2 hidrogenios + 1 oxigenio",
+        feedback_errado: "A agua e H2O: hidrogenio e oxigenio!"
+    },
+    {
+        frase: "O maior planeta do Sistema Solar e ____.",
+        resposta: "Jupiter",
+        variacoes_aceitas: ["Jupiter", "jupiter"],
+        dica: "Gigante gasoso",
+        feedback_correto: "Isso! Jupiter e enorme!",
+        feedback_errado: "O maior planeta e Jupiter!"
+    }
+];
+
+// ORDENAR SEQUENCIA
+const QUESTOES_SEQUENCIA = [
+    {
+        instrucao: "Ordene os planetas do mais proximo ao mais distante do Sol:",
+        itens: ["Mercurio", "Venus", "Terra", "Marte"],
+        ordem_correta: ["Mercurio", "Venus", "Terra", "Marte"],
+        feedback_correto: "Perfeito! Essa e a ordem correta dos planetas!",
+        feedback_errado: "Ops! Veja a ordem correta dos planetas."
+    },
+    {
+        instrucao: "Ordene os numeros do menor para o maior:",
+        itens: ["10", "3", "7", "1"],
+        ordem_correta: ["1", "3", "7", "10"],
+        feedback_correto: "Exato! Ordem crescente correta!",
+        feedback_errado: "Quase! A ordem crescente e diferente."
+    }
+];
+
+// Funcao para injetar quiz em uma fase
+function injetarQuizNaFase(numeroFase, questao) {
+    const fase = document.getElementById('phase-' + numeroFase);
+    if (!fase) {
+        console.error('Fase ' + numeroFase + ' nao encontrada!');
+        return;
+    }
+    
+    fase.innerHTML = '';
+    const quizUI = QUIZ.createUI(questao);
+    fase.appendChild(quizUI);
+    
+    console.log('Quiz injetado na Fase ' + numeroFase);
+}
+
+// Expor globalmente
+window.QUESTOES_MATEMATICA = QUESTOES_MATEMATICA;
+window.QUESTOES_VERD_FALSO = QUESTOES_VERD_FALSO;
+window.QUESTOES_LACUNAS = QUESTOES_LACUNAS;
+window.QUESTOES_SEQUENCIA = QUESTOES_SEQUENCIA;
+window.injetarQuizNaFase = injetarQuizNaFase;
+
+console.log('questoes.js carregado!');
+
+
+            
+            // ========== MECHANIC ==========
+            // ===== MECÂNICA: ESCALADA =====
+// Lume sobe uma montanha/torre conforme completa as fases
+
+const ESCALADA = {
+    name: 'escalada',
+    currentStep: 0,
+    totalSteps: 5, // Fase 0-4
+    
+    // Inicializar mecânica
+    init: function(config) {
+        this.totalSteps = config.totalSteps || 5;
+        this.currentStep = 0;
+        
+        console.log('🏔️ Mecânica ESCALADA inicializada');
+        console.log('Total de andares:', this.totalSteps);
+        
+        this.injectHTML();
+        this.injectCSS();
+        this.updatePosition();
+    },
+    
+    // Injetar HTML da montanha
+    injectHTML: function() {
+        const container = document.querySelector('.game-container');
+        
+        // Criar container da mecânica
+        const mechanicHTML = `
+            <div id="escalada-container" class="mechanic-container">
+                <!-- Montanha com andares -->
+                <div class="mountain">
+                    ${this.generateFloors()}
+                </div>
+                
+                <!-- Lume escalador -->
+                <div id="lume-climber" class="lume-climber">
+                    🌟
+                </div>
+            </div>
+        `;
+        
+        container.insertAdjacentHTML('beforeend', mechanicHTML);
+    },
+    
+    // Gerar andares da montanha
+    generateFloors: function() {
+        let floorsHTML = '';
+        
+        for (let i = this.totalSteps - 1; i >= 0; i--) {
+            const floorNumber = i;
+            const floorLabel = i === 0 ? 'BASE' : `ANDAR ${i}`;
+            const isTop = i === this.totalSteps - 1;
+            
+            floorsHTML += `
+                <div class="floor" data-floor="${floorNumber}">
+                    <div class="floor-platform ${isTop ? 'top' : ''}">
+                        <span class="floor-label">${floorLabel}</span>
+                        ${isTop ? '<span class="victory-flag">🚩</span>' : ''}
+                    </div>
+                </div>
+            `;
+        }
+        
+        return floorsHTML;
+    },
+    
+    // Injetar CSS
+    injectCSS: function() {
+        if (document.getElementById('escalada-styles')) return;
+        
+        const style = document.createElement('style');
+        style.id = 'escalada-styles';
+        style.textContent = `
+            /* Container da mecânica */
+            #escalada-container {
+                position: fixed;
+                right: 40px;
+                top: 100px;
+                bottom: 40px;
+                width: 200px;
+                z-index: 100;
+                pointer-events: none;
+            }
+            
+            /* Montanha */
+            .mountain {
+                position: relative;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+            
+            /* Andar */
+            .floor {
+                position: relative;
+                height: calc(100% / 5);
+                display: flex;
+                align-items: flex-end;
+                justify-content: center;
+            }
+            
+            /* Plataforma do andar */
+            .floor-platform {
+                width: 100%;
+                height: 40px;
+                background: linear-gradient(to bottom, #8b7355, #654321);
+                border-radius: 10px 10px 0 0;
+                border: 3px solid #5a3a1a;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+                transition: all 0.3s ease;
+            }
+            
+            .floor-platform:hover {
+                transform: scale(1.05);
+            }
+            
+            /* Plataforma do topo (vitória) */
+            .floor-platform.top {
+                background: linear-gradient(to bottom, #ffd700, #ff8c00);
+                border-color: #cc6600;
+                box-shadow: 0 4px 20px rgba(255, 215, 0, 0.5);
+            }
+            
+            /* Label do andar */
+            .floor-label {
+                font-size: 0.7rem;
+                font-weight: bold;
+                color: white;
+                text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+                letter-spacing: 1px;
+            }
+            
+            /* Bandeira de vitória */
+            .victory-flag {
+                position: absolute;
+                top: -30px;
+                font-size: 2rem;
+                animation: wave 1s ease-in-out infinite;
+            }
+            
+            @keyframes wave {
+                0%, 100% { transform: rotate(-10deg); }
+                50% { transform: rotate(10deg); }
+            }
+            
+            /* Lume escalador - CORRIGIDO */
+            .lume-climber {
+                position: absolute;
+                left: 50%;
+                bottom: 0;
+                transform: translateX(-50%);
+                font-size: 3rem;
+                filter: drop-shadow(0 0 20px #fff8dc);
+                transition: bottom 1s cubic-bezier(0.68, -0.55, 0.265, 1.55), 
+                            transform 0.3s ease;
+                z-index: 101;
+                pointer-events: none;
+            }
+            
+            /* Animação de subida */
+            .lume-climber.climbing {
+                animation: climb 1s ease-in-out;
+            }
+            
+            @keyframes climb {
+                0%, 100% { transform: translateX(-50%) scale(1); }
+                25% { transform: translateX(-50%) scale(1.2) rotate(-10deg); }
+                50% { transform: translateX(-50%) scale(1.1) rotate(5deg); }
+                75% { transform: translateX(-50%) scale(1.2) rotate(-5deg); }
+            }
+            
+            /* Shake animation */
+            @keyframes shake {
+                0%, 100% { transform: translateX(-50%) translateY(0); }
+                25% { transform: translateX(-50%) translateY(-10px); }
+                50% { transform: translateX(-50%) translateY(5px); }
+                75% { transform: translateX(-50%) translateY(-5px); }
+            }
+            
+            /* Partículas ao subir */
+            .climb-particle {
+                position: absolute;
+                width: 10px;
+                height: 10px;
+                background: #ffd700;
+                border-radius: 50%;
+                pointer-events: none;
+                animation: particleRise 1s ease-out forwards;
+            }
+            
+            @keyframes particleRise {
+                0% {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
+                }
+                100% {
+                    opacity: 0;
+                    transform: translateY(-100px) scale(0);
+                }
+            }
+            
+            /* Responsivo */
+            @media (max-width: 768px) {
+                #escalada-container {
+                    right: 10px;
+                    top: 80px;
+                    width: 120px;
+                }
+                
+                .floor-platform {
+                    height: 30px;
+                }
+                
+                .floor-label {
+                    font-size: 0.6rem;
+                }
+                
+                .lume-climber {
+                    font-size: 2rem;
+                }
+                
+                .victory-flag {
+                    font-size: 1.5rem;
+                    top: -25px;
+                }
+            }
+        `;
+        
+        document.head.appendChild(style);
+    },
+    
+    // Atualizar posição do Lume - CORRIGIDO
+    updatePosition: function() {
+        const lume = document.getElementById('lume-climber');
+        if (!lume) return;
+        
+        // Calcular posição (0 = base, 4 = topo)
+        // Lume fica EM CIMA da plataforma
+        const floorHeight = 100 / this.totalSteps;
+        const platformHeight = 40; // Altura da plataforma em px
+        const lumeOffset = 20; // Ajuste fino para centralizar
+        
+        const bottomPosition = (this.currentStep * floorHeight);
+        
+        // Posicionar em cima da plataforma
+        lume.style.bottom = `calc(${bottomPosition}% + ${platformHeight - lumeOffset}px)`;
+        
+        console.log(`🏔️ Lume no andar ${this.currentStep}/${this.totalSteps - 1}`);
+    },
+    
+    // Subir um andar (quando acerta)
+    climb: function() {
+        if (this.currentStep >= this.totalSteps - 1) {
+            console.log('🏔️ Lume já está no topo!');
+            return;
+        }
+        
+        this.currentStep++;
+        
+        // Adicionar classe de animação
+        const lume = document.getElementById('lume-climber');
+        lume.classList.add('climbing');
+        
+        // Criar partículas
+        this.createParticles();
+        
+        // Atualizar posição
+        this.updatePosition();
+        
+        // Remover classe após animação
+        setTimeout(() => {
+            lume.classList.remove('climbing');
+        }, 1000);
+        
+        // Se chegou no topo
+        if (this.currentStep === this.totalSteps - 1) {
+            setTimeout(() => {
+                this.onReachTop();
+            }, 1000);
+        }
+    },
+    
+    // Descer um andar (quando erra) - opcional
+    fall: function() {
+        if (this.currentStep <= 0) return;
+        
+        this.currentStep--;
+        
+        const lume = document.getElementById('lume-climber');
+        lume.style.transform = 'translateX(-50%) scale(0.8)';
+        
+        this.updatePosition();
+        
+        setTimeout(() => {
+            lume.style.transform = 'translateX(-50%) scale(1)';
+        }, 300);
+    },
+    
+    // Criar partículas ao subir
+    createParticles: function() {
+        const lume = document.getElementById('lume-climber');
+        const rect = lume.getBoundingClientRect();
+        
+        for (let i = 0; i < 8; i++) {
+            setTimeout(() => {
+                const particle = document.createElement('div');
+                particle.className = 'climb-particle';
+                particle.style.left = (rect.left + rect.width / 2) + 'px';
+                particle.style.top = (rect.top + rect.height / 2) + 'px';
+                particle.style.position = 'fixed';
+                
+                // Posição aleatória
+                const angle = (Math.random() - 0.5) * 180;
+                particle.style.setProperty('--angle', angle + 'deg');
+                
+                document.body.appendChild(particle);
+                
+                setTimeout(() => {
+                    particle.remove();
+                }, 1000);
+            }, i * 50);
+        }
+    },
+    
+    // Quando chega no topo
+    onReachTop: function() {
+        console.log('🎉 Lume chegou no topo!');
+        
+        const lume = document.getElementById('lume-climber');
+        lume.style.transform = 'translateX(-50%) scale(1.5)';
+        
+        // Efeito de vitória
+        this.createVictoryEffect();
+    },
+    
+    // Efeito de vitória
+    createVictoryEffect: function() {
+        for (let i = 0; i < 20; i++) {
+            setTimeout(() => {
+                const particle = document.createElement('div');
+                particle.textContent = '⭐';
+                particle.style.position = 'fixed';
+                particle.style.right = '140px';
+                particle.style.top = '100px';
+                particle.style.fontSize = '2rem';
+                particle.style.zIndex = '1000';
+                particle.style.pointerEvents = 'none';
+                particle.style.animation = `particleRise ${1 + Math.random()}s ease-out forwards`;
+                
+                document.body.appendChild(particle);
+                
+                setTimeout(() => particle.remove(), 2000);
+            }, i * 100);
+        }
+    },
+    
+    // Feedback de acerto
+    onCorrect: function() {
+        console.log('✅ Resposta correta! Subindo...');
+        this.climb();
+    },
+    
+    // Feedback de erro
+    onWrong: function() {
+        console.log('❌ Resposta errada!');
+        // Não desce, só não sobe
+        
+        // Shake effect
+        const lume = document.getElementById('lume-climber');
+        lume.style.animation = 'shake 0.5s';
+        setTimeout(() => {
+            lume.style.animation = '';
+        }, 500);
+    },
+    
+    // Resetar mecânica
+    reset: function() {
+        this.currentStep = 0;
+        this.updatePosition();
+        
+        const lume = document.getElementById('lume-climber');
+        if (lume) {
+            lume.style.transform = 'translateX(-50%) scale(1)';
+        }
+    },
+    
+    // Destruir mecânica
+    destroy: function() {
+        const container = document.getElementById('escalada-container');
+        if (container) {
+            container.remove();
+        }
+        
+        const styles = document.getElementById('escalada-styles');
+        if (styles) {
+            styles.remove();
+        }
+    }
+};
+
+// Expor globalmente
+window.ESCALADA = ESCALADA;
+
+console.log('🏔️ escalada.js carregado!');
+
+            
+            // ========== MODALITIES ==========
+            
+// ===== quiz.js =====
+// ===== MODALIDADE: QUIZ =====
+// Múltipla escolha com 4 alternativas
+
+const QUIZ = {
+    name: 'quiz',
+    currentQuestion: null,
+    
+    // Criar UI do quiz
+    createUI: function(data) {
+        const container = document.createElement('div');
+        container.className = 'quiz-container';
+        
+        // Pergunta
+        const questionBox = document.createElement('div');
+        questionBox.className = 'quiz-question';
+        questionBox.innerHTML = `
+            <div class="question-icon">❓</div>
+            <div class="question-text">${data.pergunta}</div>
+        `;
+        container.appendChild(questionBox);
+        
+        // Alternativas
+        const optionsContainer = document.createElement('div');
+        optionsContainer.className = 'quiz-options';
+        
+        data.alternativas.forEach((alternativa, index) => {
+            const button = document.createElement('button');
+            button.className = 'quiz-option';
+            
+            // Letras A, B, C, D
+            const letter = String.fromCharCode(65 + index);
+            button.innerHTML = `
+                <span class="option-letter">${letter}</span>
+                <span class="option-text">${alternativa}</span>
+            `;
+            
+            button.setAttribute('data-index', index);
+            button.onclick = () => this.selectOption(index, data.correta, data);
+            optionsContainer.appendChild(button);
+        });
+        
+        container.appendChild(optionsContainer);
+        
+        // Injetar CSS se ainda não foi
+        this.injectCSS();
+        
+        this.currentQuestion = data;
+        
+        return container;
+    },
+    
+    // Selecionar opção
+    selectOption: function(selectedIndex, correctIndex, data) {
+        const isCorrect = selectedIndex === correctIndex;
+        const buttons = document.querySelectorAll('.quiz-option');
+        
+        console.log('🎯 Resposta selecionada:', selectedIndex, '| Correta:', correctIndex, '| Acertou:', isCorrect);
+        
+        // Desabilitar todos os botões
+        buttons.forEach(btn => {
+            btn.disabled = true;
+            btn.style.cursor = 'not-allowed';
+            btn.style.opacity = '0.6';
+        });
+        
+        // Marcar resposta selecionada
+        const selectedButton = buttons[selectedIndex];
+        const correctButton = buttons[correctIndex];
+        
+        if (isCorrect) {
+            // ACERTOU
+            selectedButton.classList.add('correct');
+            selectedButton.style.opacity = '1';
+            
+            // Feedback
+            const feedbackMsg = data.feedback_correto || '✅ Correto! Muito bem!';
+            showFeedback(feedbackMsg, 'correct');
+            
+            // Ações de sucesso
+            playSound('success');
+            addScore(100);
+            incrementCorrect();
+            
+            // Lume sobe na escalada
+            if (window.ESCALADA) {
+                ESCALADA.onCorrect();
+            }
+            
+            // Próxima fase após 2.5s
+            setTimeout(() => {
+                nextPhase();
+            }, 2500);
+            
+        } else {
+            // ERROU
+            selectedButton.classList.add('wrong');
+            selectedButton.style.opacity = '1';
+            
+            // Mostrar resposta correta após 500ms
+            setTimeout(() => {
+                correctButton.classList.add('correct');
+                correctButton.style.opacity = '1';
+            }, 500);
+            
+            // Feedback
+            const feedbackMsg = data.feedback_errado || '❌ Ops! A resposta correta era a alternativa ' + String.fromCharCode(65 + correctIndex);
+            showFeedback(feedbackMsg, 'wrong');
+            
+            // Ações de erro
+            playSound('error');
+            
+            // Lume faz shake
+            if (window.ESCALADA) {
+                ESCALADA.onWrong();
+            }
+            
+            // Seguir para próxima fase após 3s (mesmo errando)
+            setTimeout(() => {
+                nextPhase();
+            }, 3000);
+        }
+    },
+    
+    // Injetar CSS
+    injectCSS: function() {
+        if (document.getElementById('quiz-styles')) return;
+        
+        const style = document.createElement('style');
+        style.id = 'quiz-styles';
+        style.textContent = `
+            /* Container do Quiz */
+            .quiz-container {
+                max-width: 700px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+            
+            /* Pergunta */
+            .quiz-question {
+                background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
+                border: 3px solid #667eea;
+                border-radius: 20px;
+                padding: 30px;
+                margin-bottom: 30px;
+                text-align: center;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            }
+            
+            .question-icon {
+                font-size: 3rem;
+                margin-bottom: 15px;
+                animation: bounce 2s ease-in-out infinite;
+            }
+            
+            @keyframes bounce {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-10px); }
+            }
+            
+            .question-text {
+                font-size: 1.4rem;
+                font-weight: 600;
+                color: #212529;
+                line-height: 1.6;
+            }
+            
+            /* Alternativas */
+            .quiz-options {
+                display: grid;
+                gap: 15px;
+            }
+            
+            .quiz-option {
+                display: flex;
+                align-items: center;
+                padding: 20px 25px;
+                background: white;
+                border: 3px solid #dee2e6;
+                border-radius: 15px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                text-align: left;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            }
+            
+            .quiz-option:hover:not(:disabled) {
+                transform: translateX(10px);
+                border-color: #667eea;
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+                background: linear-gradient(to right, #ffffff, #f8f9ff);
+            }
+            
+            .quiz-option:active:not(:disabled) {
+                transform: translateX(5px);
+            }
+            
+            /* Letra da alternativa */
+            .option-letter {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 40px;
+                height: 40px;
+                background: linear-gradient(135deg, #667eea, #764ba2);
+                color: white;
+                font-weight: bold;
+                font-size: 1.2rem;
+                border-radius: 50%;
+                margin-right: 20px;
+                flex-shrink: 0;
+                transition: transform 0.3s ease;
+            }
+            
+            .quiz-option:hover:not(:disabled) .option-letter {
+                transform: scale(1.2) rotate(10deg);
+            }
+            
+            /* Texto da alternativa */
+            .option-text {
+                font-size: 1.1rem;
+                font-weight: 500;
+                color: #212529;
+                line-height: 1.5;
+            }
+            
+            /* Estado: Correta */
+            .quiz-option.correct {
+                background: linear-gradient(135deg, #51cf66, #38d9a9);
+                border-color: #37b24d;
+                animation: correctPulse 0.6s ease;
+            }
+            
+            .quiz-option.correct .option-letter {
+                background: #2f9e44;
+            }
+            
+            .quiz-option.correct .option-text {
+                color: white;
+                font-weight: 700;
+            }
+            
+            @keyframes correctPulse {
+                0%, 100% { transform: scale(1) translateX(0); }
+                50% { transform: scale(1.03) translateX(10px); }
+            }
+            
+            /* Estado: Errada */
+            .quiz-option.wrong {
+                background: linear-gradient(135deg, #ff6b6b, #ff8787);
+                border-color: #f03e3e;
+                animation: wrongShake 0.5s ease;
+            }
+            
+            .quiz-option.wrong .option-letter {
+                background: #c92a2a;
+            }
+            
+            .quiz-option.wrong .option-text {
+                color: white;
+                font-weight: 700;
+            }
+            
+            @keyframes wrongShake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-10px); }
+                50% { transform: translateX(10px); }
+                75% { transform: translateX(-5px); }
+            }
+            
+            /* Responsivo */
+            @media (max-width: 768px) {
+                .quiz-container {
+                    padding: 15px;
+                }
+                
+                .quiz-question {
+                    padding: 20px;
+                }
+                
+                .question-icon {
+                    font-size: 2.5rem;
+                }
+                
+                .question-text {
+                    font-size: 1.1rem;
+                }
+                
+                .quiz-option {
+                    padding: 15px 20px;
+                }
+                
+                .option-letter {
+                    width: 35px;
+                    height: 35px;
+                    font-size: 1rem;
+                    margin-right: 15px;
+                }
+                
+                .option-text {
+                    font-size: 1rem;
+                }
+            }
+        `;
+        
+        document.head.appendChild(style);
+    }
+};
+
+// Expor globalmente
+window.QUIZ = QUIZ;
+
+console.log('📝 quiz.js carregado!');
+
+
+            
+            // ========== GAME DATA ==========
+            const GAME_CONFIG = {
+  "tema": "Matemática Básica - TESTE",
+  "descricao": "Teste do assembler corrigido!",
+  "mecanica": "escalada",
+  "fases": [
+    {
+      "modalidade": "quiz",
+      "dados": {
+        "pergunta": "Quanto é 2 + 2?",
+        "alternativas": [
+          "3",
+          "4",
+          "5",
+          "6"
+        ],
+        "correta": 1,
+        "feedback_correto": "Perfeito! 2 + 2 = 4",
+        "feedback_errado": "Ops! Tente novamente."
+      }
+    }
+  ]
+};
+            
+            // ========== INITIALIZATION ==========
+            window.totalPhases = 1;
+            
+            console.log('🎮 Inicializando jogo...');
+            console.log('📊 Total de fases:', window.totalPhases);
+            console.log('📋 Config:', GAME_CONFIG);
+            
+            // Aguardar DOM carregar
+            window.addEventListener('DOMContentLoaded', function() {
+                console.log('✅ DOM carregado!');
+                
+                // Verificar se Game Engine existe
+                if (!window.GAME_ENGINE) {
+                    console.error('❌ GAME_ENGINE não encontrado!');
+                    alert('Erro: Game Engine não carregado!');
+                    return;
+                }
+                
+                // Verificar se modalidades existem
+                console.log('Modalidades disponíveis:', {
+                    QUIZ: typeof window.QUIZ,
+                    TRUE_FALSE: typeof window.TRUE_FALSE,
+                    FILL_BLANKS: typeof window.FILL_BLANKS,
+                    SEQUENCE: typeof window.SEQUENCE
+                });
+                
+                // Inicializar jogo
+                console.log('🚀 Iniciando Game Engine...');
+                GAME_ENGINE.init(GAME_CONFIG);
+            });
+        
+    </script>
+</body>
+</html>

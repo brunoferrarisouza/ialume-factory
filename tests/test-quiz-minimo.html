@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TESTE MÍNIMO - Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            text-align: center;
+            color: #212529;
+            margin-bottom: 30px;
+        }
+        #test-area {
+            min-height: 200px;
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 TESTE MÍNIMO - QUIZ</h1>
+        <div id="test-area">
+            <p>Aguarde... testando componentes...</p>
+        </div>
+        <div id="status" class="status">
+            Carregando scripts...
+        </div>
+    </div>
+
+    <script>
+        // ===== COPIAR O CÓDIGO DO QUIZ.JS AQUI =====
+        const QUIZ = {
+            name: 'quiz',
+            currentQuestion: null,
+            
+            createUI: function(data) {
+                const container = document.createElement('div');
+                container.className = 'quiz-container';
+                container.innerHTML = `
+                    <div style="background: #f0f0f0; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                        <h2>${data.pergunta}</h2>
+                    </div>
+                    <div id="options"></div>
+                `;
+                
+                const optionsDiv = container.querySelector('#options');
+                data.alternativas.forEach((alt, index) => {
+                    const btn = document.createElement('button');
+                    btn.textContent = alt;
+                    btn.style.cssText = 'display: block; width: 100%; padding: 15px; margin: 10px 0; font-size: 16px; cursor: pointer; border: 2px solid #667eea; border-radius: 10px; background: white;';
+                    btn.onclick = () => alert(index === data.correta ? 'CORRETO!' : 'ERRADO!');
+                    optionsDiv.appendChild(btn);
+                });
+                
+                this.injectCSS();
+                return container;
+            },
+            
+            injectCSS: function() {
+                // CSS já inline
+            }
+        };
+        
+        window.QUIZ = QUIZ;
+        
+        // ===== TESTE =====
+        const statusDiv = document.getElementById('status');
+        const testArea = document.getElementById('test-area');
+        
+        try {
+            // 1. Verificar se QUIZ existe
+            statusDiv.innerHTML = '<div class="success">✅ QUIZ carregado</div>';
+            
+            // 2. Criar dados de teste
+            const testData = {
+                pergunta: "Quanto é 2 + 2?",
+                alternativas: ["3", "4", "5", "6"],
+                correta: 1
+            };
+            
+            statusDiv.innerHTML += '<div class="success">✅ Dados de teste criados</div>';
+            
+            // 3. Tentar criar UI
+            statusDiv.innerHTML += '<div>🔨 Criando UI do quiz...</div>';
+            const quizUI = QUIZ.createUI(testData);
+            
+            statusDiv.innerHTML += '<div class="success">✅ UI criada com sucesso!</div>';
+            
+            // 4. Injetar no DOM
+            testArea.innerHTML = '';
+            testArea.appendChild(quizUI);
+            
+            statusDiv.innerHTML += '<div class="success">✅✅✅ TESTE PASSOU! Quiz está funcionando!</div>';
+            
+        } catch (error) {
+            statusDiv.innerHTML += '<div class="error">❌ ERRO: ' + error.message + '</div>';
+            console.error('Erro completo:', error);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "ialume-factory",
+  "version": "1.0.0",
+  "description": "IAlume Game Factory - Sistema de montagem de jogos educativos",
+  "scripts": {
+    "gerar-teste": "node tests/gerar-jogo-corrigido.js",
+    "abrir-teste": "open tests/jogo-teste-CORRIGIDO.html",
+    "teste-completo": "npm run gerar-teste && npm run abrir-teste"
+  },
+  "keywords": ["educacao", "jogos", "lume"],
+  "author": "Bruno Ferrari",
+  "license": "MIT"
+}

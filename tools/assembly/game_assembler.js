@@ -160,19 +160,26 @@ class GameAssembler {
     }
 
     /**
-     * Carrega mecânica especificada
+     * Carrega mecânica especificada (ou nenhuma se 'none')
      */
     async loadMechanic(mechanicName) {
+        // ✅ Se mechanic é 'none', não carregar nada
+        if (!mechanicName || mechanicName === 'none') {
+            console.log('   ⏭️  Mechanic: none (jogo linear sem mecânica visual)');
+            return '// Sem mecânica visual (jogo linear)';
+        }
+        
         const mechanicPath = path.join(this.componentsPath.mechanics, `${mechanicName}.js`);
         console.log('   Loading mechanic:', mechanicPath);
         
         try {
             const content = await fs.readFile(mechanicPath, 'utf-8');
-            console.log('   ✅ Mechanic loaded:', content.length, 'chars');
+            console.log('   ✅ Mechanic loaded:', mechanicName, '-', content.length, 'chars');
             return content;
         } catch (error) {
             console.warn('   ⚠️ Mechanic not found:', mechanicName);
-            return '// Mecânica não carregada';
+            console.warn('   Continuando sem mecânica visual...');
+            return '// Mecânica não encontrada';
         }
     }
 

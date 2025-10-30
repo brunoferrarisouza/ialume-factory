@@ -30,11 +30,19 @@ const GAME_ENGINE = {
         console.log('🏔️ Total de andares na escalada:', totalSteps);
         console.log('✅ Cálculo correto: fases.length =', totalSteps, '(fase 0 já está incluída)');
         
-        // Configurar escalada (se existir) - ANTES de injetar fases
-        if (window.ESCALADA && gameConfig.mecanica === 'escalada') {
-            ESCALADA.init({
-                totalSteps: totalSteps
-            });
+        // Configurar mecânica (se existir e não for 'none') - ANTES de injetar fases
+        if (gameConfig.mecanica && gameConfig.mecanica !== 'none') {
+            const Mechanic = this.getMechanic(gameConfig.mecanica);
+            if (Mechanic) {
+                console.log('🎮 Inicializando mecânica:', gameConfig.mecanica);
+                Mechanic.init({
+                    totalSteps: totalSteps
+                });
+            } else {
+                console.warn('⚠️ Mecânica não encontrada:', gameConfig.mecanica);
+            }
+        } else {
+            console.log('⏭️  Jogo linear (sem mecânica visual)');
         }
         
         // Injetar todas as fases
@@ -148,6 +156,17 @@ const GAME_ENGINE = {
         };
         
         return modalidades[nome.toLowerCase()];
+    },
+    
+    // Obter objeto da mecânica
+    getMechanic: function(nome) {
+        const mechanics = {
+            'escalada': window.ESCALADA,
+            'corrida': window.CORRIDA,  // futuro
+            'labirinto': window.LABIRINTO  // futuro
+        };
+        
+        return mechanics[nome.toLowerCase()];
     },
     
     // Registrar resultado de uma fase

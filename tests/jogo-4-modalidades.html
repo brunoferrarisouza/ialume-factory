@@ -285,8 +285,8 @@ body {
             <div id="phase-0" class="phase active">
                 <div class="lume-char">🌟</div>
                 <div class="story-box">
-                    <h1>IAlume - Teste Corrigido</h1>
-                    <p>Teste o jogo com as correções aplicadas!</p>
+                    <h1>Teste Completo - 4 Modalidades</h1>
+                    <p>Teste todas as modalidades do IAlume Factory!</p>
                     <button class="btn btn-primary" onclick="startAdventure()">
                         COMEÇAR AVENTURA
                     </button>
@@ -2569,19 +2569,19 @@ console.log('sequence.js carregado com drag and drop!');
             
             // ========== GAME DATA ==========
             const GAME_CONFIG = {
-  "tema": "IAlume - Teste Corrigido",
-  "descricao": "Teste o jogo com as correções aplicadas!",
+  "tema": "Teste Completo - 4 Modalidades",
+  "descricao": "Teste todas as modalidades do IAlume Factory!",
   "mecanica": "escalada",
   "fases": [
     {
       "type": "welcome",
       "titulo": "Bem-vindo!",
-      "mensagem": "Teste o jogo com as correções aplicadas!"
+      "mensagem": "Vamos testar todas as modalidades!"
     },
     {
       "modalidade": "quiz",
       "dados": {
-        "pergunta": "Quanto é 5 + 3?",
+        "pergunta": "🧮 Quanto é 5 + 3?",
         "alternativas": [
           "6",
           "7",
@@ -2594,48 +2594,41 @@ console.log('sequence.js carregado com drag and drop!');
       }
     },
     {
-      "modalidade": "quiz",
+      "modalidade": "true-false",
       "dados": {
-        "pergunta": "Quanto é 12 - 7?",
-        "alternativas": [
-          "3",
-          "4",
-          "5",
-          "6"
-        ],
-        "correta": 2,
-        "feedback_correto": "✅ Excelente! 12 - 7 = 5",
-        "feedback_errado": "❌ Quase! Tente novamente."
+        "afirmacao": "🌍 O Brasil foi descoberto em 1500.",
+        "correta": true,
+        "feedback_correto": "✅ Correto! 1500 é a data oficial do descobrimento.",
+        "feedback_errado": "❌ Na verdade, foi em 1500!"
       }
     },
     {
-      "modalidade": "quiz",
+      "modalidade": "fill-blanks",
       "dados": {
-        "pergunta": "Quanto é 4 × 5?",
-        "alternativas": [
-          "15",
-          "20",
-          "25",
-          "30"
-        ],
-        "correta": 1,
-        "feedback_correto": "✅ Muito bem! 4 × 5 = 20",
-        "feedback_errado": "❌ Revise a tabuada."
+        "frase": "🏛️ A capital do Brasil é ____.",
+        "resposta": "Brasília",
+        "feedback_correto": "✅ Excelente! Brasília é nossa capital!",
+        "feedback_errado": "❌ Era Brasília!"
       }
     },
     {
-      "modalidade": "quiz",
+      "modalidade": "sequence",
       "dados": {
-        "pergunta": "Quanto é 20 ÷ 4?",
-        "alternativas": [
+        "instrucao": "🔢 Ordene os números do menor ao maior:",
+        "itens": [
+          "10",
           "3",
-          "4",
-          "5",
-          "6"
+          "7",
+          "1"
         ],
-        "correta": 2,
-        "feedback_correto": "✅ Perfeito! 20 ÷ 4 = 5",
-        "feedback_errado": "❌ Revise a divisão."
+        "ordem_correta": [
+          "1",
+          "3",
+          "7",
+          "10"
+        ],
+        "feedback_correto": "✅ Perfeito! Ordem crescente correta!",
+        "feedback_errado": "❌ Veja a ordem correta."
       }
     }
   ]

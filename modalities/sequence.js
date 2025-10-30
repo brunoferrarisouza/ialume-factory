@@ -144,26 +144,20 @@ const SEQUENCE = {
         if (isCorrect) {
             items.forEach(item => item.classList.add('correct'));
             button.classList.add('correct');
-            
+
             showFeedback(data.feedback_correto || 'Perfeito!', 'correct');
             playSound('success');
-            addScore(100);
-            incrementCorrect();
-            
-            if (window.ESCALADA) ESCALADA.onCorrect();
-            
-            setTimeout(() => nextPhase(), 2500);
-            
+
         } else {
             items.forEach(item => item.classList.add('wrong'));
             button.classList.add('wrong');
-            
+
             setTimeout(() => {
                 items.forEach(item => item.classList.remove('wrong'));
                 this.currentOrder = [...data.ordem_correta];
                 const listBox = document.getElementById('seq-list');
                 this.renderList(listBox, this.currentOrder);
-                
+
                 const newItems = document.querySelectorAll('.seq-item');
                 newItems.forEach(item => {
                     item.classList.add('show-correct');
@@ -171,13 +165,18 @@ const SEQUENCE = {
                     item.style.cursor = 'default';
                 });
             }, 1000);
-            
+
             showFeedback(data.feedback_errado || 'Ops! Veja a ordem correta.', 'wrong');
             playSound('error');
-            
-            if (window.ESCALADA) ESCALADA.onWrong();
-            
-            setTimeout(() => nextPhase(), 4000);
+        }
+
+        // ✅ CHAMAR CALLBACK CENTRAL (registra no Game Engine, anima mecânica, avança fase)
+        const phaseNumber = window.gameState ? window.gameState.currentPhase : 1;
+
+        if (window.onAnswerChecked) {
+            onAnswerChecked(isCorrect, phaseNumber);
+        } else {
+            console.error('❌ onAnswerChecked não encontrado! Verifique se base.js foi carregado.');
         }
     },
     

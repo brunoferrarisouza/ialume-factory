@@ -285,8 +285,8 @@ body {
             <div id="phase-0" class="phase active">
                 <div class="lume-char">🌟</div>
                 <div class="story-box">
-                    <h1>Teste Completo - 4 Modalidades</h1>
-                    <p>Teste todas as modalidades do IAlume Factory!</p>
+                    <h1>🧪 Teste Completo - IAlume Factory</h1>
+                    <p>Teste integrado: 4 modalidades + escalada + Bubble + callback central</p>
                     <button class="btn btn-primary" onclick="startAdventure()">
                         COMEÇAR AVENTURA
                     </button>
@@ -447,6 +447,85 @@ function incrementCorrect() {
         correctElement.textContent = gameState.correctAnswers;
     }
 }
+
+// ===== CALLBACK CENTRAL PARA TODAS AS MODALIDADES =====
+/**
+ * Função centralizada chamada por TODAS as modalidades quando o usuário responde.
+ * Esta é a PONTE entre modalidades, mecânicas e Game Engine.
+ *
+ * FLUXO:
+ * 1. Registra resultado no GAME_ENGINE (para estatísticas finais)
+ * 2. Atualiza UI de score (pontos e acertos)
+ * 3. Dispara feedback visual da mecânica (escalada, corrida, etc)
+ * 4. Avança para próxima fase após delay
+ *
+ * @param {boolean} isCorrect - Se a resposta está correta
+ * @param {number} phaseNumber - Número da fase (1, 2, 3, 4, etc)
+ */
+function onAnswerChecked(isCorrect, phaseNumber) {
+    console.log('🎯 onAnswerChecked chamado:', {
+        isCorrect: isCorrect,
+        phaseNumber: phaseNumber,
+        timestamp: new Date().toISOString()
+    });
+
+    // 1️⃣ REGISTRAR NO GAME ENGINE (SEMPRE!)
+    // Isso garante que os dados estarão disponíveis em getFinalResult()
+    const points = isCorrect ? 100 : 0;
+
+    if (window.GAME_ENGINE && typeof GAME_ENGINE.recordResult === 'function') {
+        GAME_ENGINE.recordResult(phaseNumber, isCorrect, points);
+        console.log('✅ Resultado registrado no Game Engine');
+    } else {
+        console.warn('⚠️ GAME_ENGINE.recordResult() não encontrado! Dados não serão salvos.');
+    }
+
+    // 2️⃣ ATUALIZAR UI DE SCORE (gameState local + elementos DOM)
+    if (isCorrect) {
+        addScore(points);
+        incrementCorrect();
+        console.log('📊 Score atualizado:', gameState.score, 'pontos,', gameState.correctAnswers, 'acertos');
+    }
+
+    // 3️⃣ FEEDBACK VISUAL DA MECÂNICA (se existir)
+    // Suporta múltiplas mecânicas: escalada, corrida, labirinto, etc
+    if (window.ESCALADA) {
+        console.log('🏔️ Acionando mecânica ESCALADA');
+        if (isCorrect) {
+            ESCALADA.onCorrect();
+        } else {
+            ESCALADA.onWrong();
+        }
+    } else if (window.CORRIDA) {
+        console.log('🏃 Acionando mecânica CORRIDA');
+        if (isCorrect) {
+            CORRIDA.onCorrect();
+        } else {
+            CORRIDA.onWrong();
+        }
+    } else if (window.LABIRINTO) {
+        console.log('🌀 Acionando mecânica LABIRINTO');
+        if (isCorrect) {
+            LABIRINTO.onCorrect();
+        } else {
+            LABIRINTO.onWrong();
+        }
+    } else {
+        // Sem mecânica = jogo linear simples
+        console.log('⏭️  Sem mecânica visual (modo linear)');
+    }
+
+    // 4️⃣ PRÓXIMA FASE (após delay para animações)
+    const delay = isCorrect ? 2500 : 3000;
+    console.log('⏱️ Avançando para próxima fase em', delay, 'ms');
+
+    setTimeout(() => {
+        nextPhase();
+    }, delay);
+}
+
+// Expor globalmente para as modalidades
+window.onAnswerChecked = onAnswerChecked;
 
 // ACOES DO JOGO - CORRIGIDO
 function startAdventure() {
@@ -1933,53 +2012,36 @@ const QUIZ = {
             // ACERTOU
             selectedButton.classList.add('correct');
             selectedButton.style.opacity = '1';
-            
+
             // Feedback
             const feedbackMsg = data.feedback_correto || '✅ Correto! Muito bem!';
             showFeedback(feedbackMsg, 'correct');
-            
-            // Ações de sucesso
             playSound('success');
-            addScore(100);
-            incrementCorrect();
-            
-            // Lume sobe na escalada
-            if (window.ESCALADA) {
-                ESCALADA.onCorrect();
-            }
-            
-            // Próxima fase após 2.5s
-            setTimeout(() => {
-                nextPhase();
-            }, 2500);
-            
+
         } else {
             // ERROU
             selectedButton.classList.add('wrong');
             selectedButton.style.opacity = '1';
-            
+
             // Mostrar resposta correta após 500ms
             setTimeout(() => {
                 correctButton.classList.add('correct');
                 correctButton.style.opacity = '1';
             }, 500);
-            
+
             // Feedback
             const feedbackMsg = data.feedback_errado || '❌ Ops! A resposta correta era a alternativa ' + String.fromCharCode(65 + correctIndex);
             showFeedback(feedbackMsg, 'wrong');
-            
-            // Ações de erro
             playSound('error');
-            
-            // Lume faz shake
-            if (window.ESCALADA) {
-                ESCALADA.onWrong();
-            }
-            
-            // Seguir para próxima fase após 3s (mesmo errando)
-            setTimeout(() => {
-                nextPhase();
-            }, 3000);
+        }
+
+        // ✅ CHAMAR CALLBACK CENTRAL (registra no Game Engine, anima mecânica, avança fase)
+        const phaseNumber = window.gameState ? window.gameState.currentPhase : 1;
+
+        if (window.onAnswerChecked) {
+            onAnswerChecked(isCorrect, phaseNumber);
+        } else {
+            console.error('❌ onAnswerChecked não encontrado! Verifique se base.js foi carregado.');
         }
     },
     
@@ -2252,45 +2314,34 @@ const TRUE_FALSE = {
             // ACERTOU
             selectedButton.classList.add('correct');
             selectedButton.style.opacity = '1';
-            
+
             const feedbackMsg = data.feedback_correto || '✅ Correto!';
             showFeedback(feedbackMsg, 'correct');
-            
             playSound('success');
-            addScore(100);
-            incrementCorrect();
-            
-            if (window.ESCALADA) {
-                ESCALADA.onCorrect();
-            }
-            
-            setTimeout(() => {
-                nextPhase();
-            }, 2500);
-            
+
         } else {
             // ERROU
             selectedButton.classList.add('wrong');
             selectedButton.style.opacity = '1';
-            
+
             // Mostrar resposta correta
             setTimeout(() => {
                 correctButton.classList.add('correct');
                 correctButton.style.opacity = '1';
             }, 500);
-            
+
             const feedbackMsg = data.feedback_errado || '❌ Incorreto! A resposta é ' + (correctValue ? 'VERDADEIRO' : 'FALSO');
             showFeedback(feedbackMsg, 'wrong');
-            
             playSound('error');
-            
-            if (window.ESCALADA) {
-                ESCALADA.onWrong();
-            }
-            
-            setTimeout(() => {
-                nextPhase();
-            }, 3000);
+        }
+
+        // ✅ CHAMAR CALLBACK CENTRAL (registra no Game Engine, anima mecânica, avança fase)
+        const phaseNumber = window.gameState ? window.gameState.currentPhase : 1;
+
+        if (window.onAnswerChecked) {
+            onAnswerChecked(isCorrect, phaseNumber);
+        } else {
+            console.error('❌ onAnswerChecked não encontrado! Verifique se base.js foi carregado.');
         }
     },
     
@@ -2544,10 +2595,7 @@ const FILL_BLANKS = {
             button.classList.add('correct');
             showFeedback(data.feedback_correto || '✅ Correto!', 'correct');
             playSound('success');
-            addScore(100);
-            incrementCorrect();
-            if (window.ESCALADA) ESCALADA.onCorrect();
-            setTimeout(() => nextPhase(), 2500);
+
         } else {
             input.classList.add('wrong');
             button.classList.add('wrong');
@@ -2558,8 +2606,15 @@ const FILL_BLANKS = {
             }, 800);
             showFeedback(data.feedback_errado || `❌ Resposta: ${data.resposta}`, 'wrong');
             playSound('error');
-            if (window.ESCALADA) ESCALADA.onWrong();
-            setTimeout(() => nextPhase(), 3500);
+        }
+
+        // ✅ CHAMAR CALLBACK CENTRAL (registra no Game Engine, anima mecânica, avança fase)
+        const phaseNumber = window.gameState ? window.gameState.currentPhase : 1;
+
+        if (window.onAnswerChecked) {
+            onAnswerChecked(isCorrect, phaseNumber);
+        } else {
+            console.error('❌ onAnswerChecked não encontrado! Verifique se base.js foi carregado.');
         }
     },
     
@@ -2740,26 +2795,20 @@ const SEQUENCE = {
         if (isCorrect) {
             items.forEach(item => item.classList.add('correct'));
             button.classList.add('correct');
-            
+
             showFeedback(data.feedback_correto || 'Perfeito!', 'correct');
             playSound('success');
-            addScore(100);
-            incrementCorrect();
-            
-            if (window.ESCALADA) ESCALADA.onCorrect();
-            
-            setTimeout(() => nextPhase(), 2500);
-            
+
         } else {
             items.forEach(item => item.classList.add('wrong'));
             button.classList.add('wrong');
-            
+
             setTimeout(() => {
                 items.forEach(item => item.classList.remove('wrong'));
                 this.currentOrder = [...data.ordem_correta];
                 const listBox = document.getElementById('seq-list');
                 this.renderList(listBox, this.currentOrder);
-                
+
                 const newItems = document.querySelectorAll('.seq-item');
                 newItems.forEach(item => {
                     item.classList.add('show-correct');
@@ -2767,13 +2816,18 @@ const SEQUENCE = {
                     item.style.cursor = 'default';
                 });
             }, 1000);
-            
+
             showFeedback(data.feedback_errado || 'Ops! Veja a ordem correta.', 'wrong');
             playSound('error');
-            
-            if (window.ESCALADA) ESCALADA.onWrong();
-            
-            setTimeout(() => nextPhase(), 4000);
+        }
+
+        // ✅ CHAMAR CALLBACK CENTRAL (registra no Game Engine, anima mecânica, avança fase)
+        const phaseNumber = window.gameState ? window.gameState.currentPhase : 1;
+
+        if (window.onAnswerChecked) {
+            onAnswerChecked(isCorrect, phaseNumber);
+        } else {
+            console.error('❌ onAnswerChecked não encontrado! Verifique se base.js foi carregado.');
         }
     },
     
@@ -2932,66 +2986,71 @@ console.log('sequence.js carregado com drag and drop!');
             
             // ========== GAME DATA ==========
             const GAME_CONFIG = {
-  "tema": "Teste Completo - 4 Modalidades",
-  "descricao": "Teste todas as modalidades do IAlume Factory!",
+  "tema": "🧪 Teste Completo - IAlume Factory",
+  "descricao": "Teste integrado: 4 modalidades + escalada + Bubble + callback central",
   "mecanica": "escalada",
   "fases": [
     {
-      "type": "welcome",
-      "titulo": "Bem-vindo!",
-      "mensagem": "Vamos testar todas as modalidades!"
+      "type": "welcome"
     },
     {
       "modalidade": "quiz",
       "dados": {
-        "pergunta": "🧮 Quanto é 5 + 3?",
+        "pergunta": "🧮 Qual é o resultado de 7 × 8?",
         "alternativas": [
-          "6",
-          "7",
-          "8",
-          "9"
+          "54",
+          "56",
+          "63",
+          "72"
         ],
-        "correta": 2,
-        "feedback_correto": "✅ Perfeito! 5 + 3 = 8",
-        "feedback_errado": "❌ Ops! Revise a adição."
+        "correta": 1,
+        "feedback_correto": "✅ Perfeito! 7 × 8 = 56",
+        "feedback_errado": "❌ Ops! A resposta correta é 56."
       }
     },
     {
       "modalidade": "true-false",
       "dados": {
-        "afirmacao": "🌍 O Brasil foi descoberto em 1500.",
+        "afirmacao": "🌍 A Terra gira ao redor do Sol.",
         "correta": true,
-        "feedback_correto": "✅ Correto! 1500 é a data oficial do descobrimento.",
-        "feedback_errado": "❌ Na verdade, foi em 1500!"
+        "feedback_correto": "✅ Correto! A Terra orbita o Sol!",
+        "feedback_errado": "❌ Na verdade, isso é verdadeiro! A Terra orbita o Sol."
       }
     },
     {
       "modalidade": "fill-blanks",
       "dados": {
-        "frase": "🏛️ A capital do Brasil é ____.",
-        "resposta": "Brasília",
-        "feedback_correto": "✅ Excelente! Brasília é nossa capital!",
-        "feedback_errado": "❌ Era Brasília!"
+        "frase": "🦖 Os dinossauros viveram na Era ____.",
+        "resposta": "Mesozoica",
+        "variacoes_aceitas": [
+          "mesozoica",
+          "Mesozoica",
+          "mesozóica",
+          "Mesozóica"
+        ],
+        "dica": "Começou há cerca de 252 milhões de anos",
+        "feedback_correto": "✅ Isso mesmo! Era Mesozoica!",
+        "feedback_errado": "❌ A resposta correta é Mesozoica."
       }
     },
     {
       "modalidade": "sequence",
       "dados": {
-        "instrucao": "🔢 Ordene os números do menor ao maior:",
+        "instrucao": "🔢 Ordene os planetas do mais próximo ao mais distante do Sol:",
         "itens": [
-          "10",
-          "3",
-          "7",
-          "1"
+          "Saturno",
+          "Terra",
+          "Mercúrio",
+          "Marte"
         ],
         "ordem_correta": [
-          "1",
-          "3",
-          "7",
-          "10"
+          "Mercúrio",
+          "Terra",
+          "Marte",
+          "Saturno"
         ],
-        "feedback_correto": "✅ Perfeito! Ordem crescente correta!",
-        "feedback_errado": "❌ Veja a ordem correta."
+        "feedback_correto": "✅ Perfeito! Ordem planetária correta!",
+        "feedback_errado": "❌ Ops! Veja a ordem correta dos planetas."
       }
     }
   ]

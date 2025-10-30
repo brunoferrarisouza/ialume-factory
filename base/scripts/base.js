@@ -115,6 +115,85 @@ function incrementCorrect() {
     }
 }
 
+// ===== CALLBACK CENTRAL PARA TODAS AS MODALIDADES =====
+/**
+ * Função centralizada chamada por TODAS as modalidades quando o usuário responde.
+ * Esta é a PONTE entre modalidades, mecânicas e Game Engine.
+ *
+ * FLUXO:
+ * 1. Registra resultado no GAME_ENGINE (para estatísticas finais)
+ * 2. Atualiza UI de score (pontos e acertos)
+ * 3. Dispara feedback visual da mecânica (escalada, corrida, etc)
+ * 4. Avança para próxima fase após delay
+ *
+ * @param {boolean} isCorrect - Se a resposta está correta
+ * @param {number} phaseNumber - Número da fase (1, 2, 3, 4, etc)
+ */
+function onAnswerChecked(isCorrect, phaseNumber) {
+    console.log('🎯 onAnswerChecked chamado:', {
+        isCorrect: isCorrect,
+        phaseNumber: phaseNumber,
+        timestamp: new Date().toISOString()
+    });
+
+    // 1️⃣ REGISTRAR NO GAME ENGINE (SEMPRE!)
+    // Isso garante que os dados estarão disponíveis em getFinalResult()
+    const points = isCorrect ? 100 : 0;
+
+    if (window.GAME_ENGINE && typeof GAME_ENGINE.recordResult === 'function') {
+        GAME_ENGINE.recordResult(phaseNumber, isCorrect, points);
+        console.log('✅ Resultado registrado no Game Engine');
+    } else {
+        console.warn('⚠️ GAME_ENGINE.recordResult() não encontrado! Dados não serão salvos.');
+    }
+
+    // 2️⃣ ATUALIZAR UI DE SCORE (gameState local + elementos DOM)
+    if (isCorrect) {
+        addScore(points);
+        incrementCorrect();
+        console.log('📊 Score atualizado:', gameState.score, 'pontos,', gameState.correctAnswers, 'acertos');
+    }
+
+    // 3️⃣ FEEDBACK VISUAL DA MECÂNICA (se existir)
+    // Suporta múltiplas mecânicas: escalada, corrida, labirinto, etc
+    if (window.ESCALADA) {
+        console.log('🏔️ Acionando mecânica ESCALADA');
+        if (isCorrect) {
+            ESCALADA.onCorrect();
+        } else {
+            ESCALADA.onWrong();
+        }
+    } else if (window.CORRIDA) {
+        console.log('🏃 Acionando mecânica CORRIDA');
+        if (isCorrect) {
+            CORRIDA.onCorrect();
+        } else {
+            CORRIDA.onWrong();
+        }
+    } else if (window.LABIRINTO) {
+        console.log('🌀 Acionando mecânica LABIRINTO');
+        if (isCorrect) {
+            LABIRINTO.onCorrect();
+        } else {
+            LABIRINTO.onWrong();
+        }
+    } else {
+        // Sem mecânica = jogo linear simples
+        console.log('⏭️  Sem mecânica visual (modo linear)');
+    }
+
+    // 4️⃣ PRÓXIMA FASE (após delay para animações)
+    const delay = isCorrect ? 2500 : 3000;
+    console.log('⏱️ Avançando para próxima fase em', delay, 'ms');
+
+    setTimeout(() => {
+        nextPhase();
+    }, delay);
+}
+
+// Expor globalmente para as modalidades
+window.onAnswerChecked = onAnswerChecked;
+
 // ACOES DO JOGO - CORRIGIDO
 function startAdventure() {
     playSound('click');
@@ -138,10 +217,17 @@ function nextPhase() {
         // Apenas ir para próxima fase (o quiz já subiu o Lume)
         goToPhase(nextPhaseNumber);
     } else {
-        console.log('Fim do jogo! Mostrando vitoria...');
+        console.log('Fim do jogo! Chamando GAME_ENGINE.finish()...');
         
-        setTimeout(() => {
-            showVictory();
+        // USAR GAME_ENGINE.finish() em vez de showVictory()
+        setTimeout(function() {
+            if (window.GAME_ENGINE && typeof GAME_ENGINE.finish === 'function') {
+                GAME_ENGINE.finish();
+            } else {
+                // Fallback: se GAME_ENGINE não existir, usar showVictory
+                console.warn('⚠️ GAME_ENGINE.finish() não encontrado, usando showVictory()');
+                showVictory();
+            }
         }, 1000);
     }
 }

@@ -75,45 +75,34 @@ const TRUE_FALSE = {
             // ACERTOU
             selectedButton.classList.add('correct');
             selectedButton.style.opacity = '1';
-            
+
             const feedbackMsg = data.feedback_correto || '✅ Correto!';
             showFeedback(feedbackMsg, 'correct');
-            
             playSound('success');
-            addScore(100);
-            incrementCorrect();
-            
-            if (window.ESCALADA) {
-                ESCALADA.onCorrect();
-            }
-            
-            setTimeout(() => {
-                nextPhase();
-            }, 2500);
-            
+
         } else {
             // ERROU
             selectedButton.classList.add('wrong');
             selectedButton.style.opacity = '1';
-            
+
             // Mostrar resposta correta
             setTimeout(() => {
                 correctButton.classList.add('correct');
                 correctButton.style.opacity = '1';
             }, 500);
-            
+
             const feedbackMsg = data.feedback_errado || '❌ Incorreto! A resposta é ' + (correctValue ? 'VERDADEIRO' : 'FALSO');
             showFeedback(feedbackMsg, 'wrong');
-            
             playSound('error');
-            
-            if (window.ESCALADA) {
-                ESCALADA.onWrong();
-            }
-            
-            setTimeout(() => {
-                nextPhase();
-            }, 3000);
+        }
+
+        // ✅ CHAMAR CALLBACK CENTRAL (registra no Game Engine, anima mecânica, avança fase)
+        const phaseNumber = window.gameState ? window.gameState.currentPhase : 1;
+
+        if (window.onAnswerChecked) {
+            onAnswerChecked(isCorrect, phaseNumber);
+        } else {
+            console.error('❌ onAnswerChecked não encontrado! Verifique se base.js foi carregado.');
         }
     },
     

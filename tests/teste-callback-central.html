@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Teste: Callback Central - IAlume Factory</title>
+    <style>
+        /* ===== PALETA LUME ===== */
+        :root {
+            --lume-primary: #ffd700;
+            --lume-glow: #fff8dc;
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --correct: #51cf66;
+            --wrong: #ff6b6b;
+        }
+
+        /* ===== RESET ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* ===== CONTAINER ===== */
+        .game-container {
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+            min-height: 500px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: linear-gradient(to bottom, #fff, #f8f9fa);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        #phase-title {
+            color: #212529;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* ===== CONTEÚDO ===== */
+        #content-area {
+            padding: 40px;
+            text-align: center;
+        }
+
+        .phase {
+            display: none;
+        }
+
+        .phase.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== LUME (flutua) ===== */
+        .lume-char {
+            font-size: 6rem;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 30px var(--lume-glow));
+            margin-bottom: 20px;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* ===== STORY BOX ===== */
+        .story-box {
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+
+        .story-box h1 {
+            color: #212529;
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+
+        .story-box p {
+            font-size: 1.2rem;
+            color: #6c757d;
+            line-height: 1.8;
+        }
+
+        /* ===== BOTÕES ===== */
+        .btn {
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        /* ===== FEEDBACK ===== */
+        #feedback-zone {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 20px 30px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.5s ease;
+            z-index: 1000;
+        }
+
+        #feedback-zone.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        #feedback-zone.correct {
+            background: var(--correct);
+            color: white;
+        }
+
+        #feedback-zone.wrong {
+            background: var(--wrong);
+            color: white;
+        }
+
+        /* ===== SCORE ===== */
+        .score-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .score-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #212529;
+        }
+
+        .score-item:last-child {
+            margin-bottom: 0;
+        }
+
+        #score, #correct-count {
+            color: var(--lume-primary);
+            transition: transform 0.2s;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Header -->
+        <div class="header">
+            <h1 id="phase-title">🎯 TESTE: CALLBACK CENTRAL</h1>
+        </div>
+
+        <!-- Score -->
+        <div class="score-container">
+            <div class="score-item">
+                Pontos: <span id="score">0</span>
+            </div>
+            <div class="score-item">
+                Acertos: <span id="correct-count">0</span>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div id="content-area">
+            <!-- Fase 0: Boas-vindas -->
+            <div id="phase-0" class="phase active">
+                <div class="lume-char">🌟</div>
+                <div class="story-box">
+                    <h1>✅ Teste: Sistema de Callback Central</h1>
+                    <p>Este teste valida que todas as modalidades estão usando o callback central <code>onAnswerChecked()</code> que:</p>
+                    <ul style="text-align: left; margin: 20px auto; max-width: 500px; line-height: 2;">
+                        <li>✅ Registra resultado no GAME_ENGINE</li>
+                        <li>✅ Atualiza UI de score</li>
+                        <li>✅ Anima a mecânica (escalada)</li>
+                        <li>✅ Avança para próxima fase</li>
+                    </ul>
+                    <p style="margin-top: 20px;"><strong>Abra o Console (F12) para ver os logs!</strong></p>
+                    <button class="btn btn-primary" onclick="startAdventure()">
+                        🚀 COMEÇAR TESTE
+                    </button>
+                </div>
+            </div>
+
+            <!-- Fases dinâmicas (injetadas pelo Game Engine) -->
+            <div id="phase-1" class="phase"></div>
+            <div id="phase-2" class="phase"></div>
+            <div id="phase-3" class="phase"></div>
+            <div id="phase-4" class="phase"></div>
+        </div>
+
+        <!-- Feedback Zone -->
+        <div id="feedback-zone"></div>
+    </div>
+
+    <!-- ========== CARREGAR SCRIPTS EXTERNOS (ORDEM IMPORTA!) ========== -->
+
+    <!-- 1. BASE (tem que carregar PRIMEIRO!) -->
+    <script src="../base/scripts/base.js"></script>
+
+    <!-- 2. GAME ENGINE -->
+    <script src="../base/scripts/game-engine.js"></script>
+
+    <!-- 3. MECÂNICA: Escalada -->
+    <script src="../mechanics/escalada.js"></script>
+
+    <!-- 4. MODALIDADES -->
+    <script src="../modalities/quiz.js"></script>
+    <script src="../modalities/true-false.js"></script>
+    <script src="../modalities/fill-blanks.js"></script>
+    <script src="../modalities/sequence.js"></script>
+
+    <!-- ========== CONFIGURAÇÃO DO JOGO ========== -->
+    <script>
+        // Configuração do jogo de teste
+        const gameConfig = {
+            tema: "Teste de Callback Central - 4 Modalidades",
+            mecanica: "escalada",
+            fases: [
+                // Fase 0: Boas-vindas (estática no HTML)
+                {
+                    type: "welcome"
+                },
+                // Fase 1: QUIZ
+                {
+                    modalidade: "quiz",
+                    dados: {
+                        pergunta: "Quanto é 2 + 2?",
+                        alternativas: ["3", "4", "5", "6"],
+                        correta: 1,
+                        feedback_correto: "✅ Correto! 2 + 2 = 4",
+                        feedback_errado: "❌ Ops! A resposta correta é 4."
+                    }
+                },
+                // Fase 2: VERDADEIRO OU FALSO
+                {
+                    modalidade: "true-false",
+                    dados: {
+                        afirmacao: "O céu é azul durante o dia.",
+                        correta: true,
+                        feedback_correto: "✅ Verdadeiro! O céu é azul!",
+                        feedback_errado: "❌ Na verdade, é verdadeiro!"
+                    }
+                },
+                // Fase 3: PREENCHER LACUNAS
+                {
+                    modalidade: "fill-blanks",
+                    dados: {
+                        frase: "A capital do Brasil é ____.",
+                        resposta: "Brasília",
+                        variacoes_aceitas: ["brasília", "brasilia", "Brasília", "Brasilia"],
+                        feedback_correto: "✅ Correto! Brasília é a capital!",
+                        feedback_errado: "❌ A resposta correta é Brasília."
+                    }
+                },
+                // Fase 4: SEQUÊNCIA
+                {
+                    modalidade: "sequence",
+                    dados: {
+                        instrucao: "Ordene os números do menor para o maior:",
+                        itens: ["10", "3", "7", "1"],
+                        ordem_correta: ["1", "3", "7", "10"],
+                        feedback_correto: "✅ Perfeito! Ordem crescente correta!",
+                        feedback_errado: "❌ Ops! Veja a ordem correta."
+                    }
+                }
+            ]
+        };
+
+        // Inicializar o jogo quando a página carregar
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('🎮 Iniciando teste de callback central...');
+            console.log('📋 Config do jogo:', gameConfig);
+
+            // Inicializar Game Engine
+            const success = GAME_ENGINE.init(gameConfig);
+
+            if (success) {
+                console.log('✅ Game Engine inicializado com sucesso!');
+                console.log('✅ Callback central onAnswerChecked() carregado:', typeof window.onAnswerChecked);
+            } else {
+                console.error('❌ Falha ao inicializar Game Engine!');
+            }
+        });
+    </script>
+</body>
+</html>

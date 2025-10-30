@@ -49,10 +49,7 @@ const FILL_BLANKS = {
             button.classList.add('correct');
             showFeedback(data.feedback_correto || '✅ Correto!', 'correct');
             playSound('success');
-            addScore(100);
-            incrementCorrect();
-            if (window.ESCALADA) ESCALADA.onCorrect();
-            setTimeout(() => nextPhase(), 2500);
+
         } else {
             input.classList.add('wrong');
             button.classList.add('wrong');
@@ -63,8 +60,15 @@ const FILL_BLANKS = {
             }, 800);
             showFeedback(data.feedback_errado || `❌ Resposta: ${data.resposta}`, 'wrong');
             playSound('error');
-            if (window.ESCALADA) ESCALADA.onWrong();
-            setTimeout(() => nextPhase(), 3500);
+        }
+
+        // ✅ CHAMAR CALLBACK CENTRAL (registra no Game Engine, anima mecânica, avança fase)
+        const phaseNumber = window.gameState ? window.gameState.currentPhase : 1;
+
+        if (window.onAnswerChecked) {
+            onAnswerChecked(isCorrect, phaseNumber);
+        } else {
+            console.error('❌ onAnswerChecked não encontrado! Verifique se base.js foi carregado.');
         }
     },
     

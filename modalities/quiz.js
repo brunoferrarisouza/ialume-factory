@@ -83,53 +83,36 @@ const QUIZ = {
             // ACERTOU
             selectedButton.classList.add('correct');
             selectedButton.style.opacity = '1';
-            
+
             // Feedback
             const feedbackMsg = data.feedback_correto || '✅ Correto! Muito bem!';
             showFeedback(feedbackMsg, 'correct');
-            
-            // Ações de sucesso
             playSound('success');
-            addScore(100);
-            incrementCorrect();
-            
-            // Lume sobe na escalada
-            if (window.ESCALADA) {
-                ESCALADA.onCorrect();
-            }
-            
-            // Próxima fase após 2.5s
-            setTimeout(() => {
-                nextPhase();
-            }, 2500);
-            
+
         } else {
             // ERROU
             selectedButton.classList.add('wrong');
             selectedButton.style.opacity = '1';
-            
+
             // Mostrar resposta correta após 500ms
             setTimeout(() => {
                 correctButton.classList.add('correct');
                 correctButton.style.opacity = '1';
             }, 500);
-            
+
             // Feedback
             const feedbackMsg = data.feedback_errado || '❌ Ops! A resposta correta era a alternativa ' + String.fromCharCode(65 + correctIndex);
             showFeedback(feedbackMsg, 'wrong');
-            
-            // Ações de erro
             playSound('error');
-            
-            // Lume faz shake
-            if (window.ESCALADA) {
-                ESCALADA.onWrong();
-            }
-            
-            // Seguir para próxima fase após 3s (mesmo errando)
-            setTimeout(() => {
-                nextPhase();
-            }, 3000);
+        }
+
+        // ✅ CHAMAR CALLBACK CENTRAL (registra no Game Engine, anima mecânica, avança fase)
+        const phaseNumber = window.gameState ? window.gameState.currentPhase : 1;
+
+        if (window.onAnswerChecked) {
+            onAnswerChecked(isCorrect, phaseNumber);
+        } else {
+            console.error('❌ onAnswerChecked não encontrado! Verifique se base.js foi carregado.');
         }
     },
     

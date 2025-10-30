@@ -274,34 +274,61 @@ function showVictoryBubble(resultado) {
     }, 1000);
 }
 
-// ========== OVERRIDE DO GAME ENGINE ==========
-// Sobrescrever método finish do Game Engine para usar versão Bubble
-if (window.GAME_ENGINE) {
-    const originalFinish = GAME_ENGINE.finish;
+// ========== INICIALIZAÇÃO ==========
+function setupBubbleIntegration() {
+    console.log('🔗 Inicializando parâmetros Bubble...');
+    initBubbleParams();
     
-    GAME_ENGINE.finish = function() {
-        const resultado = this.getFinalResult();
-        
-        console.log('🏁 JOGO FINALIZADO (MODO BUBBLE)!', resultado);
-        
-        // Enviar para Bubble
-        sendResultToBubble(resultado);
-        
-        // Mostrar tela Bubble
-        showVictoryBubble(resultado);
-        
-        return resultado;
-    };
-    
-    console.log('✅ Game Engine configurado para modo Bubble');
+    // Fazer override IMEDIATAMENTE
+    overrideGameEngineFinish();
 }
 
-// ========== INICIALIZAÇÃO ==========
-// Inicializar parâmetros Bubble quando DOM carregar
+// ========== OVERRIDE DO GAME ENGINE ==========
+// Wrapper que intercepta o finish() SEMPRE
+function overrideGameEngineFinish() {
+    // Criar um interval que verifica se GAME_ENGINE existe
+    const checkInterval = setInterval(function() {
+        if (window.GAME_ENGINE && typeof window.GAME_ENGINE.finish === 'function') {
+            clearInterval(checkInterval);
+            
+            console.log('✅ GAME_ENGINE encontrado! Aplicando override Bubble...');
+            
+            // Guardar referência ao método original
+            const originalFinish = GAME_ENGINE.finish;
+            
+            // Sobrescrever com versão Bubble
+            GAME_ENGINE.finish = function() {
+                console.log('🏁 JOGO FINALIZADO (MODO BUBBLE)!');
+                
+                const resultado = this.getFinalResult();
+                console.log('📊 Resultado:', resultado);
+                
+                // Enviar para Bubble
+                console.log('📤 Tentando enviar para Bubble...');
+                sendResultToBubble(resultado);
+                
+                // Mostrar tela Bubble
+                console.log('🎉 Mostrando tela de vitória Bubble...');
+                showVictoryBubble(resultado);
+                
+                return resultado;
+            };
+            
+            console.log('✅ Game Engine.finish() SOBRESCRITO para modo Bubble');
+        }
+    }, 50); // Verifica a cada 50ms
+    
+    // Timeout de segurança (10 segundos)
+    setTimeout(function() {
+        clearInterval(checkInterval);
+    }, 10000);
+}
+
+// Inicializar assim que possível
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initBubbleParams);
+    document.addEventListener('DOMContentLoaded', setupBubbleIntegration);
 } else {
-    initBubbleParams();
+    setupBubbleIntegration();
 }
 
 console.log('🔗 bubble-integration.js carregado!');

@@ -140,7 +140,7 @@ class GameAssembler {
      * Carrega scripts base
      */
     async loadBaseJS() {
-        const scripts = ['base.js', 'game-engine.js', 'questoes.js'];
+        const scripts = ['base.js', 'game-engine.js', 'questoes.js', 'bubble-integration.js'];
         let combinedJS = '';
 
         for (const script of scripts) {

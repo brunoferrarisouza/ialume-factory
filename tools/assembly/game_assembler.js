@@ -177,27 +177,20 @@ class GameAssembler {
     }
 
     /**
-     * Carrega modalidades necessárias - CORRIGIDO!
+     * Carrega TODAS as 4 modalidades (biblioteca completa)
+     * Cada jogo usa apenas as que precisa, mas todas ficam disponíveis
      */
     async loadModalities(config) {
-        const modalitiesUsed = new Set();
+        // ✅ SEMPRE carregar todas as 4 modalidades
+        const allModalities = ['quiz', 'true-false', 'fill-blanks', 'sequence'];
         
-        // Identificar modalidades usadas nas fases
-        if (config.fases && Array.isArray(config.fases)) {
-            config.fases.forEach(fase => {
-                if (fase.modalidade) {
-                    modalitiesUsed.add(fase.modalidade.toLowerCase());
-                }
-            });
-        }
-
-        console.log('   Modalidades detectadas:', Array.from(modalitiesUsed));
+        console.log('   📚 Carregando biblioteca completa de modalidades...');
 
         let combinedJS = '';
 
-        for (const modality of modalitiesUsed) {
+        for (const modality of allModalities) {
             const modalityPath = path.join(this.componentsPath.modalities, `${modality}.js`);
-            console.log('   Loading modality:', modalityPath);
+            console.log('   Loading:', modalityPath);
             
             try {
                 const content = await fs.readFile(modalityPath, 'utf-8');
@@ -211,8 +204,11 @@ class GameAssembler {
         }
 
         if (combinedJS === '') {
-            console.warn('   ⚠️ NENHUMA MODALIDADE CARREGADA!');
+            console.error('   ❌ NENHUMA MODALIDADE CARREGADA!');
+            throw new Error('Falha ao carregar modalidades');
         }
+        
+        console.log('   ✅ Biblioteca completa carregada: 4 modalidades disponíveis');
 
         return combinedJS;
     }

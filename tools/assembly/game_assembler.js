@@ -35,7 +35,7 @@ class GameAssembler {
 
             // 2. Carregar mecânica
             console.log('\n🏔️ Carregando mecânica...');
-            const mechanicJS = await this.loadMechanic(config.mechanic || 'escalada');
+            const mechanicJS = await this.loadMechanic(config.mecanica || config.mechanic || 'escalada');
 
             // 3. Carregar modalidades necessárias
             console.log('\n🎯 Carregando modalidades...');
@@ -227,7 +227,7 @@ class GameAssembler {
         return {
             tema: config.tema || 'Jogo Educativo',
             descricao: config.descricao || 'Complete as fases e ajude Lume a chegar ao topo!',
-            mecanica: config.mechanic || 'escalada',
+            mecanica: config.mecanica || config.mechanic || 'escalada',
             fases: config.fases || []
         };
     }

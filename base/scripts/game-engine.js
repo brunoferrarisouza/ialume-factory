@@ -162,10 +162,11 @@ const GAME_ENGINE = {
     getMechanic: function(nome) {
         const mechanics = {
             'escalada': window.ESCALADA,
+            'perseguicao': window.PERSEGUICAO,
             'corrida': window.CORRIDA,  // futuro
             'labirinto': window.LABIRINTO  // futuro
         };
-        
+
         return mechanics[nome.toLowerCase()];
     },
     

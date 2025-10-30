@@ -285,8 +285,8 @@ body {
             <div id="phase-0" class="phase active">
                 <div class="lume-char">🌟</div>
                 <div class="story-box">
-                    <h1>🧪 Teste Completo - IAlume Factory</h1>
-                    <p>Teste integrado: 4 modalidades + escalada + Bubble + callback central</p>
+                    <h1>🏃‍♂️ Teste Perseguição - IAlume Factory</h1>
+                    <p>Teste da mecânica de perseguição: Lume foge do dragão da ignorância!</p>
                     <button class="btn btn-primary" onclick="startAdventure()">
                         COMEÇAR AVENTURA
                     </button>
@@ -1488,438 +1488,587 @@ console.log('🔗 bubble-integration.js carregado!');
 
             
             // ========== MECHANIC ==========
-            // ===== MECÂNICA: ESCALADA =====
-// Lume sobe uma montanha/torre conforme completa as fases
+            // ===== MECÂNICA: PERSEGUIÇÃO/FUGA =====
+// Lume foge horizontalmente de um perigo (dragão da ignorância)
 
-const ESCALADA = {
-    name: 'escalada',
+const PERSEGUICAO = {
+    name: 'perseguicao',
     currentStep: 0,
     totalSteps: 5, // Fase 0-4
-    
+    lumePosition: 20, // Começa em 20% da esquerda
+    dangerPosition: 0, // Perigo começa em 0%
+
     // Inicializar mecânica
     init: function(config) {
-        console.log('🏔️ ESCALADA.init() chamado com config:', config);
-        
+        console.log('🏃‍♂️ PERSEGUICAO.init() chamado com config:', config);
+
         if (!config || !config.totalSteps) {
             console.error('❌ ERRO: config.totalSteps não fornecido!');
             return;
         }
-        
+
         this.totalSteps = config.totalSteps;
         this.currentStep = 0;
-        
-        console.log('✅ Mecânica ESCALADA inicializada');
-        console.log('   Total de andares (totalSteps):', this.totalSteps);
-        console.log('   Andar atual (currentStep):', this.currentStep);
-        console.log('   ✅ OPÇÃO A: 4 fases = 4 andares (BASE=0, ANDAR 1, ANDAR 2, TOPO=3)');
-        console.log('   Andares a criar: BASE (0) até TOPO (' + (this.totalSteps - 1) + ')');
-        
+        this.lumePosition = 20; // Reset
+        this.dangerPosition = 0; // Reset
+
+        console.log('✅ Mecânica PERSEGUIÇÃO inicializada');
+        console.log('   Total de fases:', this.totalSteps);
+        console.log('   Fase atual:', this.currentStep);
+        console.log('   Posição inicial de Lume:', this.lumePosition + '%');
+        console.log('   Posição inicial do perigo:', this.dangerPosition + '%');
+
         this.injectHTML();
         this.injectCSS();
-        this.updatePosition();
+        this.updatePositions();
     },
-    
-    // Injetar HTML da montanha
+
+    // Injetar HTML da pista de fuga
     injectHTML: function() {
         const container = document.querySelector('.game-container');
-        
+
         // Criar container da mecânica
         const mechanicHTML = `
-            <div id="escalada-container" class="mechanic-container">
-                <!-- Montanha com andares -->
-                <div class="mountain">
-                    ${this.generateFloors()}
+            <div id="perseguicao-container" class="mechanic-container">
+                <!-- Pista/Caminho -->
+                <div class="chase-track">
+                    <!-- Marcadores de progresso -->
+                    <div class="progress-markers">
+                        ${this.generateMarkers()}
+                    </div>
+
+                    <!-- Linha de perigo (quando perigo alcança, game over) -->
+                    <div class="danger-line" id="danger-line"></div>
                 </div>
-                
-                <!-- Lume escalador -->
-                <div id="lume-climber" class="lume-climber">
+
+                <!-- Lume fugindo -->
+                <div id="lume-runner" class="lume-runner">
                     🌟
+                </div>
+
+                <!-- Perigo perseguindo -->
+                <div id="danger-chaser" class="danger-chaser">
+                    🐉
+                </div>
+
+                <!-- Zona segura (chegada) -->
+                <div class="safe-zone">
+                    <div class="safe-zone-flag">🏁</div>
+                    <span class="safe-zone-label">SEGURANÇA!</span>
                 </div>
             </div>
         `;
-        
+
         container.insertAdjacentHTML('beforeend', mechanicHTML);
     },
-    
-    // Gerar andares da montanha
-    generateFloors: function() {
-        console.log('🏭️ Gerando andares da montanha...');
-        console.log('   Criando', this.totalSteps, 'andares (BASE=0 até TOPO=' + (this.totalSteps - 1) + ')');
-        
-        let floorsHTML = '';
-        
-        // ✅ Loop de (totalSteps - 1) até 0
-        for (let i = this.totalSteps - 1; i >= 0; i--) {
-            const floorNumber = i;
-            
-            // ✅ Label: BASE para 0, "ANDAR X" para os outros
-            const floorLabel = i === 0 ? 'BASE' : `ANDAR ${i}`;
-            
-            // ✅ Topo é o último andar (totalSteps - 1)
-            const isTop = i === this.totalSteps - 1;
-            
-            console.log('   Criando:', floorLabel, '(índice', i + ')', isTop ? '🏆 TOPO' : '');
-            
-            floorsHTML += `
-                <div class="floor" data-floor="${floorNumber}">
-                    <div class="floor-platform ${isTop ? 'top' : ''}">
-                        <span class="floor-label">${floorLabel}</span>
-                        ${isTop ? '<span class="victory-flag">🚩</span>' : ''}
-                    </div>
+
+    // Gerar marcadores de progresso
+    generateMarkers: function() {
+        console.log('📍 Gerando marcadores de progresso...');
+
+        // Calcular posições dinâmicas baseadas no movimento real
+        // Lume começa em 20% e avança 15% por fase jogável
+        const startPosition = 20;
+        const advancePerStep = 15;
+        const playablePhases = this.totalSteps - 1; // -1 porque fase 0 é welcome
+
+        console.log('   Fases jogáveis:', playablePhases);
+        console.log('   Posição inicial:', startPosition + '%');
+        console.log('   Avanço por fase:', advancePerStep + '%');
+
+        let markersHTML = '';
+
+        // Gerar marcador para cada posição que Lume alcança
+        for (let i = 0; i <= playablePhases; i++) {
+            const position = startPosition + (i * advancePerStep);
+
+            let label;
+            if (i === 0) {
+                label = 'INÍCIO';
+            } else if (i === playablePhases) {
+                label = 'META';
+            } else {
+                label = `${position}%`;
+            }
+
+            console.log(`   Marcador ${i}: ${position}% (${label})`);
+
+            markersHTML += `
+                <div class="marker" style="left: ${position}%">
+                    <div class="marker-line"></div>
+                    <span class="marker-label">${label}</span>
                 </div>
             `;
         }
-        
-        console.log('✅ Todos os', this.totalSteps, 'andares gerados!');
-        return floorsHTML;
+
+        console.log('✅ Marcadores gerados!');
+        return markersHTML;
     },
-    
+
     // Injetar CSS
     injectCSS: function() {
-        if (document.getElementById('escalada-styles')) return;
-        
-        // ✅ Calcular altura dinâmica dos andares
-        const numAndares = this.totalSteps; // OPÇÃO A: totalSteps = número de andares
-        const floorHeightPercent = 100 / numAndares;
-        
-        console.log('🎨 Criando CSS com', numAndares, 'andares, altura de cada:', floorHeightPercent + '%');
-        
+        if (document.getElementById('perseguicao-styles')) return;
+
+        console.log('🎨 Criando CSS para mecânica de perseguição');
+
         const style = document.createElement('style');
-        style.id = 'escalada-styles';
+        style.id = 'perseguicao-styles';
         style.textContent = `
             /* Container da mecânica */
-            #escalada-container {
+            #perseguicao-container {
                 position: fixed;
+                left: 40px;
                 right: 40px;
-                top: 100px;
                 bottom: 40px;
-                width: 200px;
+                height: 150px;
                 z-index: 100;
                 pointer-events: none;
             }
-            
-            /* Montanha */
-            .mountain {
-                position: relative;
-                height: 100%;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
+
+            /* Pista de fuga */
+            .chase-track {
+                position: absolute;
+                bottom: 60px;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: linear-gradient(to right,
+                    #ff4444 0%,
+                    #ffaa00 20%,
+                    #ffff00 40%,
+                    #88ff00 60%,
+                    #00ff00 80%,
+                    #00ff00 100%
+                );
+                border-radius: 2px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.3);
             }
-            
-            /* Andar - ✅ ALTURA DINÂMICA */
-            .floor {
-                position: relative;
-                height: ${floorHeightPercent}%; /* Calculado dinamicamente! */
-                display: flex;
-                align-items: flex-end;
-                justify-content: center;
-            }
-            
-            /* Plataforma do andar */
-            .floor-platform {
-                width: 100%;
-                height: 40px;
-                background: linear-gradient(to bottom, #8b7355, #654321);
-                border-radius: 10px 10px 0 0;
-                border: 3px solid #5a3a1a;
-                box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                position: relative;
-                transition: all 0.3s ease;
-            }
-            
-            .floor-platform:hover {
-                transform: scale(1.05);
-            }
-            
-            /* Plataforma do topo (vitória) */
-            .floor-platform.top {
-                background: linear-gradient(to bottom, #ffd700, #ff8c00);
-                border-color: #cc6600;
-                box-shadow: 0 4px 20px rgba(255, 215, 0, 0.5);
-            }
-            
-            /* Label do andar */
-            .floor-label {
-                font-size: 0.7rem;
-                font-weight: bold;
-                color: white;
-                text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-                letter-spacing: 1px;
-            }
-            
-            /* Bandeira de vitória */
-            .victory-flag {
+
+            /* Marcadores de progresso */
+            .progress-markers {
                 position: absolute;
                 top: -30px;
-                font-size: 2rem;
+                left: 0;
+                right: 0;
+                height: 30px;
+            }
+
+            .marker {
+                position: absolute;
+                transform: translateX(-50%);
+            }
+
+            .marker-line {
+                width: 2px;
+                height: 20px;
+                background: rgba(255,255,255,0.5);
+                margin: 0 auto;
+            }
+
+            .marker-label {
+                display: block;
+                font-size: 0.6rem;
+                color: rgba(255,255,255,0.8);
+                text-align: center;
+                margin-top: 2px;
+                white-space: nowrap;
+                font-weight: bold;
+                text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            }
+
+            /* Linha de perigo */
+            .danger-line {
+                position: absolute;
+                left: 70%;
+                top: -10px;
+                bottom: -10px;
+                width: 2px;
+                background: rgba(255,0,0,0.3);
+                border-left: 2px dashed rgba(255,0,0,0.6);
+            }
+
+            /* Lume correndo */
+            .lume-runner {
+                position: absolute;
+                left: 20%;
+                bottom: 30px;
+                font-size: 3rem;
+                filter: drop-shadow(0 0 20px #fff8dc);
+                transition: left 1s cubic-bezier(0.68, -0.55, 0.265, 1.55),
+                            transform 0.3s ease;
+                z-index: 103;
+                pointer-events: none;
+            }
+
+            /* Perigo perseguindo */
+            .danger-chaser {
+                position: absolute;
+                left: 0%;
+                bottom: 30px;
+                font-size: 3rem;
+                filter: drop-shadow(0 0 20px #ff4444);
+                transition: left 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                            transform 0.3s ease;
+                z-index: 102;
+                pointer-events: none;
+                animation: dangerFloat 2s ease-in-out infinite;
+            }
+
+            @keyframes dangerFloat {
+                0%, 100% { transform: translateY(0) scale(1); }
+                50% { transform: translateY(-10px) scale(1.1); }
+            }
+
+            /* Zona segura (chegada) */
+            .safe-zone {
+                position: absolute;
+                right: 10px;
+                bottom: 20px;
+                width: 80px;
+                height: 100px;
+                background: linear-gradient(to top,
+                    rgba(0,255,0,0.2),
+                    rgba(0,255,0,0.05)
+                );
+                border: 3px solid rgba(0,255,0,0.5);
+                border-radius: 10px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                z-index: 101;
+            }
+
+            .safe-zone-flag {
+                font-size: 2.5rem;
                 animation: wave 1s ease-in-out infinite;
             }
-            
+
+            .safe-zone-label {
+                font-size: 0.7rem;
+                font-weight: bold;
+                color: #00ff00;
+                text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+                margin-top: 5px;
+            }
+
             @keyframes wave {
                 0%, 100% { transform: rotate(-10deg); }
                 50% { transform: rotate(10deg); }
             }
-            
-            /* Lume escalador - CORRIGIDO */
-            .lume-climber {
+
+            /* Animação de corrida */
+            .lume-runner.running {
+                animation: run 0.8s ease-in-out;
+            }
+
+            @keyframes run {
+                0%, 100% { transform: scale(1) rotate(0deg); }
+                25% { transform: scale(1.15) rotate(-5deg); }
+                50% { transform: scale(1.1) rotate(3deg); }
+                75% { transform: scale(1.15) rotate(-3deg); }
+            }
+
+            /* Animação de avanço do perigo */
+            .danger-chaser.advancing {
+                animation: dangerAdvance 1s ease-in-out;
+            }
+
+            @keyframes dangerAdvance {
+                0%, 100% { transform: scale(1) translateY(0); }
+                25% { transform: scale(1.2) translateY(-5px); }
+                50% { transform: scale(1.15) translateY(0); }
+                75% { transform: scale(1.2) translateY(-5px); }
+            }
+
+            /* Animação de tremor (erro) */
+            @keyframes tremble {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-5px); }
+                50% { transform: translateX(5px); }
+                75% { transform: translateX(-5px); }
+            }
+
+            /* Partículas ao correr */
+            .run-particle {
                 position: absolute;
-                left: 50%;
-                bottom: 0;
-                transform: translateX(-50%);
-                font-size: 3rem;
-                filter: drop-shadow(0 0 20px #fff8dc);
-                transition: bottom 1s cubic-bezier(0.68, -0.55, 0.265, 1.55), 
-                            transform 0.3s ease;
-                z-index: 101;
-                pointer-events: none;
-            }
-            
-            /* Animação de subida */
-            .lume-climber.climbing {
-                animation: climb 1s ease-in-out;
-            }
-            
-            @keyframes climb {
-                0%, 100% { transform: translateX(-50%) scale(1); }
-                25% { transform: translateX(-50%) scale(1.2) rotate(-10deg); }
-                50% { transform: translateX(-50%) scale(1.1) rotate(5deg); }
-                75% { transform: translateX(-50%) scale(1.2) rotate(-5deg); }
-            }
-            
-            /* Shake animation */
-            @keyframes shake {
-                0%, 100% { transform: translateX(-50%) translateY(0); }
-                25% { transform: translateX(-50%) translateY(-10px); }
-                50% { transform: translateX(-50%) translateY(5px); }
-                75% { transform: translateX(-50%) translateY(-5px); }
-            }
-            
-            /* Partículas ao subir */
-            .climb-particle {
-                position: absolute;
-                width: 10px;
-                height: 10px;
+                width: 8px;
+                height: 8px;
                 background: #ffd700;
                 border-radius: 50%;
                 pointer-events: none;
-                animation: particleRise 1s ease-out forwards;
+                animation: particleFade 0.8s ease-out forwards;
             }
-            
-            @keyframes particleRise {
+
+            @keyframes particleFade {
                 0% {
                     opacity: 1;
-                    transform: translateY(0) scale(1);
+                    transform: translateX(0) scale(1);
                 }
                 100% {
                     opacity: 0;
-                    transform: translateY(-100px) scale(0);
+                    transform: translateX(-50px) scale(0);
                 }
             }
-            
+
+            /* Efeito de vitória */
+            .victory-burst {
+                position: fixed;
+                font-size: 2rem;
+                z-index: 1000;
+                pointer-events: none;
+                animation: burstOut 1.5s ease-out forwards;
+            }
+
+            @keyframes burstOut {
+                0% {
+                    opacity: 1;
+                    transform: translate(0, 0) scale(1) rotate(0deg);
+                }
+                100% {
+                    opacity: 0;
+                    transform: translate(var(--tx), var(--ty)) scale(0) rotate(360deg);
+                }
+            }
+
             /* Responsivo */
             @media (max-width: 768px) {
-                #escalada-container {
-                    right: 10px;
-                    top: 80px;
-                    width: 120px;
+                #perseguicao-container {
+                    left: 20px;
+                    right: 20px;
+                    bottom: 20px;
+                    height: 120px;
                 }
-                
-                .floor-platform {
-                    height: 30px;
+
+                .lume-runner,
+                .danger-chaser {
+                    font-size: 2rem;
+                    bottom: 20px;
                 }
-                
-                .floor-label {
-                    font-size: 0.6rem;
+
+                .safe-zone {
+                    width: 60px;
+                    height: 80px;
                 }
-                
-                .lume-climber {
+
+                .safe-zone-flag {
                     font-size: 2rem;
                 }
-                
-                .victory-flag {
-                    font-size: 1.5rem;
-                    top: -25px;
+
+                .safe-zone-label {
+                    font-size: 0.6rem;
+                }
+
+                .marker-label {
+                    font-size: 0.5rem;
                 }
             }
         `;
-        
+
         document.head.appendChild(style);
     },
-    
-    // Atualizar posição do Lume - CORRIGIDO
-    updatePosition: function() {
-        const lume = document.getElementById('lume-climber');
-        if (!lume) return;
-        
-        // Calcular posição (0 = base, 4 = topo)
-        // Lume fica EM CIMA da plataforma
-        const floorHeight = 100 / this.totalSteps;
-        const platformHeight = 40; // Altura da plataforma em px
-        const lumeOffset = 20; // Ajuste fino para centralizar
-        
-        const bottomPosition = (this.currentStep * floorHeight);
-        
-        // Posicionar em cima da plataforma
-        lume.style.bottom = `calc(${bottomPosition}% + ${platformHeight - lumeOffset}px)`;
-        
-        console.log(`🏔️ Lume no andar ${this.currentStep}/${this.totalSteps - 1}`);
+
+    // Atualizar posições de Lume e do perigo
+    updatePositions: function() {
+        const lume = document.getElementById('lume-runner');
+        const danger = document.getElementById('danger-chaser');
+
+        if (!lume || !danger) return;
+
+        // Garantir que não ultrapassa limites
+        this.lumePosition = Math.max(0, Math.min(80, this.lumePosition));
+        this.dangerPosition = Math.max(0, Math.min(70, this.dangerPosition));
+
+        lume.style.left = this.lumePosition + '%';
+        danger.style.left = this.dangerPosition + '%';
+
+        console.log(`🏃‍♂️ Posições - Lume: ${this.lumePosition}% | Perigo: ${this.dangerPosition}%`);
+        console.log(`   Distância: ${this.lumePosition - this.dangerPosition}%`);
+
+        // Verificar se perigo alcançou Lume
+        if (this.dangerPosition >= this.lumePosition - 5) {
+            console.warn('⚠️ PERIGO MUITO PRÓXIMO!');
+            this.onDangerClose();
+        }
     },
-    
-    // Subir um andar (quando acerta)
-    climb: function() {
-        console.log('⬆️ climb() chamado. Andar atual:', this.currentStep, '/ Total:', this.totalSteps);
-        
+
+    // Lume avança (quando acerta)
+    runForward: function() {
+        console.log('⬆️ runForward() chamado. Fase atual:', this.currentStep, '/ Total:', this.totalSteps);
+
         if (this.currentStep >= this.totalSteps - 1) {
-            console.log('🚫 Lume já está no topo! (andar', this.currentStep, '=', this.totalSteps - 1, ')');
+            console.log('🚫 Lume já completou todas as fases!');
             return;
         }
-        
+
         this.currentStep++;
-        console.log('✅ Subindo para andar', this.currentStep);
-        
+
+        // Avançar 15% por acerto
+        this.lumePosition += 15;
+
+        console.log('✅ Lume avançou para:', this.lumePosition + '%');
+
         // Adicionar classe de animação
-        const lume = document.getElementById('lume-climber');
-        lume.classList.add('climbing');
-        
+        const lume = document.getElementById('lume-runner');
+        lume.classList.add('running');
+
         // Criar partículas
-        this.createParticles();
-        
+        this.createRunParticles();
+
         // Atualizar posição
-        this.updatePosition();
-        
+        this.updatePositions();
+
         // Remover classe após animação
         setTimeout(() => {
-            lume.classList.remove('climbing');
-        }, 1000);
-        
-        // VERIFICAÇÃO CORRETA: Chegou no topo?
-        const isAtTop = this.currentStep === this.totalSteps - 1;
-        console.log('🎯 Está no topo?', isAtTop, '(currentStep:', this.currentStep, '=== totalSteps-1:', this.totalSteps - 1, ')');
-        
-        if (isAtTop) {
-            console.log('🎉 CHEGOU NO TOPO! Disparando efeito de vitória...');
+            lume.classList.remove('running');
+        }, 800);
+
+        // Verificar se chegou na zona segura (80%)
+        if (this.lumePosition >= 80) {
+            console.log('🎉 LUME CHEGOU NA ZONA SEGURA!');
             setTimeout(() => {
-                this.onReachTop();
+                this.onReachSafety();
             }, 1000);
         }
     },
-    
-    // Descer um andar (quando erra) - opcional
-    fall: function() {
-        if (this.currentStep <= 0) return;
-        
-        this.currentStep--;
-        
-        const lume = document.getElementById('lume-climber');
-        lume.style.transform = 'translateX(-50%) scale(0.8)';
-        
-        this.updatePosition();
-        
+
+    // Perigo avança (quando erra)
+    dangerAdvances: function() {
+        console.log('❌ dangerAdvances() chamado');
+
+        // Perigo avança 10% por erro
+        this.dangerPosition += 10;
+
+        console.log('🐉 Perigo avançou para:', this.dangerPosition + '%');
+
+        // Adicionar classe de animação
+        const danger = document.getElementById('danger-chaser');
+        danger.classList.add('advancing');
+
+        // Atualizar posição
+        this.updatePositions();
+
+        // Remover classe após animação
         setTimeout(() => {
-            lume.style.transform = 'translateX(-50%) scale(1)';
-        }, 300);
+            danger.classList.remove('advancing');
+        }, 1000);
     },
-    
-    // Criar partículas ao subir
-    createParticles: function() {
-        const lume = document.getElementById('lume-climber');
+
+    // Criar partículas de corrida
+    createRunParticles: function() {
+        const lume = document.getElementById('lume-runner');
         const rect = lume.getBoundingClientRect();
-        
-        for (let i = 0; i < 8; i++) {
+
+        for (let i = 0; i < 6; i++) {
             setTimeout(() => {
                 const particle = document.createElement('div');
-                particle.className = 'climb-particle';
-                particle.style.left = (rect.left + rect.width / 2) + 'px';
+                particle.className = 'run-particle';
+                particle.style.left = rect.left + 'px';
                 particle.style.top = (rect.top + rect.height / 2) + 'px';
                 particle.style.position = 'fixed';
-                
-                // Posição aleatória
-                const angle = (Math.random() - 0.5) * 180;
-                particle.style.setProperty('--angle', angle + 'deg');
-                
+
                 document.body.appendChild(particle);
-                
+
                 setTimeout(() => {
                     particle.remove();
-                }, 1000);
+                }, 800);
             }, i * 50);
         }
     },
-    
-    // Quando chega no topo
-    onReachTop: function() {
-        console.log('🎉 Lume chegou no topo!');
-        
-        const lume = document.getElementById('lume-climber');
-        lume.style.transform = 'translateX(-50%) scale(1.5)';
-        
+
+    // Quando perigo fica muito próximo
+    onDangerClose: function() {
+        console.warn('⚠️ PERIGO MUITO PRÓXIMO DE LUME!');
+
+        const lume = document.getElementById('lume-runner');
+        lume.style.animation = 'tremble 0.3s';
+
+        setTimeout(() => {
+            lume.style.animation = '';
+        }, 300);
+    },
+
+    // Quando chega na zona segura
+    onReachSafety: function() {
+        console.log('🎉 Lume chegou na zona segura!');
+
+        const lume = document.getElementById('lume-runner');
+        lume.style.transform = 'scale(1.5)';
+
         // Efeito de vitória
         this.createVictoryEffect();
     },
-    
+
     // Efeito de vitória
     createVictoryEffect: function() {
+        const emojis = ['⭐', '🌟', '✨', '💫', '🎉', '🎊'];
+
         for (let i = 0; i < 20; i++) {
             setTimeout(() => {
                 const particle = document.createElement('div');
-                particle.textContent = '⭐';
-                particle.style.position = 'fixed';
-                particle.style.right = '140px';
-                particle.style.top = '100px';
-                particle.style.fontSize = '2rem';
-                particle.style.zIndex = '1000';
-                particle.style.pointerEvents = 'none';
-                particle.style.animation = `particleRise ${1 + Math.random()}s ease-out forwards`;
-                
+                particle.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                particle.className = 'victory-burst';
+
+                // Posição inicial (perto da zona segura)
+                const startX = window.innerWidth - 100;
+                const startY = window.innerHeight - 100;
+
+                particle.style.left = startX + 'px';
+                particle.style.top = startY + 'px';
+
+                // Direção aleatória
+                const tx = (Math.random() - 0.5) * 300;
+                const ty = (Math.random() - 0.5) * 300;
+                particle.style.setProperty('--tx', tx + 'px');
+                particle.style.setProperty('--ty', ty + 'px');
+
                 document.body.appendChild(particle);
-                
-                setTimeout(() => particle.remove(), 2000);
-            }, i * 100);
+
+                setTimeout(() => particle.remove(), 1500);
+            }, i * 80);
         }
     },
-    
+
     // Feedback de acerto
     onCorrect: function() {
-        console.log('✅ Resposta correta! Subindo...');
-        this.climb();
+        console.log('✅ Resposta correta! Lume avança...');
+        this.runForward();
     },
-    
+
     // Feedback de erro
     onWrong: function() {
-        console.log('❌ Resposta errada!');
-        // Não desce, só não sobe
-        
-        // Shake effect
-        const lume = document.getElementById('lume-climber');
-        lume.style.animation = 'shake 0.5s';
+        console.log('❌ Resposta errada! Perigo avança...');
+        this.dangerAdvances();
+
+        // Shake effect em Lume
+        const lume = document.getElementById('lume-runner');
+        lume.style.animation = 'tremble 0.5s';
         setTimeout(() => {
             lume.style.animation = '';
         }, 500);
     },
-    
+
     // Resetar mecânica
     reset: function() {
         this.currentStep = 0;
-        this.updatePosition();
-        
-        const lume = document.getElementById('lume-climber');
+        this.lumePosition = 20;
+        this.dangerPosition = 0;
+        this.updatePositions();
+
+        const lume = document.getElementById('lume-runner');
         if (lume) {
-            lume.style.transform = 'translateX(-50%) scale(1)';
+            lume.style.transform = 'scale(1)';
         }
     },
-    
+
     // Destruir mecânica
     destroy: function() {
-        const container = document.getElementById('escalada-container');
+        const container = document.getElementById('perseguicao-container');
         if (container) {
             container.remove();
         }
-        
-        const styles = document.getElementById('escalada-styles');
+
+        const styles = document.getElementById('perseguicao-styles');
         if (styles) {
             styles.remove();
         }
@@ -1927,9 +2076,9 @@ const ESCALADA = {
 };
 
 // Expor globalmente
-window.ESCALADA = ESCALADA;
+window.PERSEGUICAO = PERSEGUICAO;
 
-console.log('🏔️ escalada.js carregado!');
+console.log('🏃‍♂️ perseguicao.js carregado!');
 
             
             // ========== MODALITIES ==========
@@ -2994,9 +3143,9 @@ console.log('sequence.js carregado com drag and drop!');
             
             // ========== GAME DATA ==========
             const GAME_CONFIG = {
-  "tema": "🧪 Teste Completo - IAlume Factory",
-  "descricao": "Teste integrado: 4 modalidades + escalada + Bubble + callback central",
-  "mecanica": "escalada",
+  "tema": "🏃‍♂️ Teste Perseguição - IAlume Factory",
+  "descricao": "Teste da mecânica de perseguição: Lume foge do dragão da ignorância!",
+  "mecanica": "perseguicao",
   "fases": [
     {
       "type": "welcome"
@@ -3004,61 +3153,60 @@ console.log('sequence.js carregado com drag and drop!');
     {
       "modalidade": "quiz",
       "dados": {
-        "pergunta": "🧮 Qual é o resultado de 7 × 8?",
+        "pergunta": "🏃‍♂️ Qual animal é mais rápido em terra?",
         "alternativas": [
-          "54",
-          "56",
-          "63",
-          "72"
+          "Leão",
+          "Guepardo",
+          "Cavalo",
+          "Lobo"
         ],
         "correta": 1,
-        "feedback_correto": "✅ Perfeito! 7 × 8 = 56",
-        "feedback_errado": "❌ Ops! A resposta correta é 56."
+        "feedback_correto": "✅ Isso! O guepardo é o mais rápido! 🐆",
+        "feedback_errado": "❌ O guepardo é o mais rápido em terra!"
       }
     },
     {
       "modalidade": "true-false",
       "dados": {
-        "afirmacao": "🌍 A Terra gira ao redor do Sol.",
-        "correta": true,
-        "feedback_correto": "✅ Correto! A Terra orbita o Sol!",
-        "feedback_errado": "❌ Na verdade, isso é verdadeiro! A Terra orbita o Sol."
+        "afirmacao": "🐉 Dragões existiram de verdade na pré-história.",
+        "correta": false,
+        "feedback_correto": "✅ Correto! Dragões são apenas lendas!",
+        "feedback_errado": "❌ Dragões são criaturas mitológicas, não reais!"
       }
     },
     {
       "modalidade": "fill-blanks",
       "dados": {
-        "frase": "🦖 Os dinossauros viveram na Era ____.",
-        "resposta": "Mesozoica",
+        "frase": "⚡ A velocidade da luz é aproximadamente ____ km/s.",
+        "resposta": "300000",
         "variacoes_aceitas": [
-          "mesozoica",
-          "Mesozoica",
-          "mesozóica",
-          "Mesozóica"
+          "300000",
+          "300.000",
+          "300 mil"
         ],
-        "dica": "Começou há cerca de 252 milhões de anos",
-        "feedback_correto": "✅ Isso mesmo! Era Mesozoica!",
-        "feedback_errado": "❌ A resposta correta é Mesozoica."
+        "dica": "Um número bem grande!",
+        "feedback_correto": "✅ Perfeito! A luz viaja a 300.000 km/s!",
+        "feedback_errado": "❌ A velocidade da luz é 300.000 km/s."
       }
     },
     {
       "modalidade": "sequence",
       "dados": {
-        "instrucao": "🔢 Ordene os planetas do mais próximo ao mais distante do Sol:",
+        "instrucao": "🏃‍♂️ Ordene estas ações de uma corrida:",
         "itens": [
-          "Saturno",
-          "Terra",
-          "Mercúrio",
-          "Marte"
+          "Chegada",
+          "Partida",
+          "Aceleração",
+          "Respiração final"
         ],
         "ordem_correta": [
-          "Mercúrio",
-          "Terra",
-          "Marte",
-          "Saturno"
+          "Partida",
+          "Aceleração",
+          "Respiração final",
+          "Chegada"
         ],
-        "feedback_correto": "✅ Perfeito! Ordem planetária correta!",
-        "feedback_errado": "❌ Ops! Veja a ordem correta dos planetas."
+        "feedback_correto": "✅ Excelente! Você escapou do dragão! 🎉",
+        "feedback_errado": "❌ A ordem correta é diferente!"
       }
     }
   ]

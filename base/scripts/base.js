@@ -155,13 +155,20 @@ function onAnswerChecked(isCorrect, phaseNumber) {
     }
 
     // 3️⃣ FEEDBACK VISUAL DA MECÂNICA (se existir)
-    // Suporta múltiplas mecânicas: escalada, corrida, labirinto, etc
+    // Suporta múltiplas mecânicas: escalada, perseguicao, corrida, labirinto, etc
     if (window.ESCALADA) {
         console.log('🏔️ Acionando mecânica ESCALADA');
         if (isCorrect) {
             ESCALADA.onCorrect();
         } else {
             ESCALADA.onWrong();
+        }
+    } else if (window.PERSEGUICAO) {
+        console.log('🏃‍♂️ Acionando mecânica PERSEGUIÇÃO');
+        if (isCorrect) {
+            PERSEGUICAO.onCorrect();
+        } else {
+            PERSEGUICAO.onWrong();
         }
     } else if (window.CORRIDA) {
         console.log('🏃 Acionando mecânica CORRIDA');

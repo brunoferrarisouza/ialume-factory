@@ -308,3 +308,4 @@ function checkAnswer(userAnswer, correctAnswer, tolerance) {
     
     return isCorrect;
 }
+// TESTE GIT - linha adicionada

@@ -5,7 +5,10 @@
   "scripts": {
     "gerar-teste": "node tests/gerar-jogo-corrigido.js",
     "abrir-teste": "open tests/jogo-teste-CORRIGIDO.html",
-    "teste-completo": "npm run gerar-teste && npm run abrir-teste"
+    "teste-completo": "npm run gerar-teste && npm run abrir-teste",
+    "deploy": "node scripts/deploy-cdn.js",
+    "push-cdn": "node scripts/push-cdn.js",
+    "deploy-push": "npm run deploy && npm run push-cdn"
   },
   "keywords": ["educacao", "jogos", "lume"],
   "author": "Bruno Ferrari",

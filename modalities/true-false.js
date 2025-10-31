@@ -5,6 +5,19 @@ const TRUE_FALSE = {
     name: 'true-false',
     currentQuestion: null,
     
+    /**
+     * ✅ MÉTODO INIT - Ponto de entrada para a modalidade
+     * @param {Object} phaseData - Dados da fase
+     */
+    init: function(phaseData) {
+        console.log('🎯 TRUE_FALSE.init() chamado com:', phaseData);
+        
+        // Criar e retornar a UI
+        const ui = this.createUI(phaseData);
+        
+        return ui;
+    },
+    
     // Criar UI
     createUI: function(data) {
         const container = document.createElement('div');

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 iAlume Game - Teste Completo</title>
+    
+    <!-- Base CSS -->
+    <link rel="stylesheet" href="./base.css">
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .loading-screen {
+            text-align: center;
+            color: white;
+            padding: 40px;
+        }
+        
+        .loading-screen h1 {
+            font-size: 3em;
+            margin: 0 0 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .spinner {
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top: 5px solid white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-screen" id="loadingScreen">
+        <h1>⚡ iAlume</h1>
+        <div class="spinner"></div>
+        <p>Carregando jogo...</p>
+    </div>
+
+    <!-- Container do Jogo (oculto inicialmente) -->
+    <div id="game-container" style="display: none;"></div>
+
+    <!-- Configuração do Jogo -->
+    <script>
+        window.GAME_CONFIG = {
+            "gameId": "demo-sistema-solar",
+            "title": "Desafio: Sistema Solar",
+            "modality": "quiz",
+            "mechanic": "escalada",
+            "theme": {
+                "primaryColor": "#667eea",
+                "backgroundColor": "#1a1a2e"
+            },
+            "phases": [
+                {
+                    "phaseNumber": 1,
+                    "question": "Qual é o planeta mais próximo do Sol?",
+                    "options": [
+                        "Mercúrio",
+                        "Vênus",
+                        "Terra",
+                        "Marte"
+                    ],
+                    "correctAnswer": 0,
+                    "explanation": "Mercúrio é o planeta mais próximo do Sol, com uma distância média de 57,9 milhões de km. Sua órbita é a mais rápida do Sistema Solar!",
+                    "concept": "Sistema Solar - Planetas Interiores",
+                    "metaphor": "Como o primeiro corredor em uma corrida ao redor do Sol"
+                },
+                {
+                    "phaseNumber": 2,
+                    "question": "Quantos planetas existem no Sistema Solar?",
+                    "options": [
+                        "7 planetas",
+                        "8 planetas",
+                        "9 planetas",
+                        "10 planetas"
+                    ],
+                    "correctAnswer": 1,
+                    "explanation": "Existem 8 planetas no Sistema Solar desde 2006, quando Plutão foi reclassificado como planeta anão pela União Astronômica Internacional.",
+                    "concept": "Sistema Solar - Composição",
+                    "metaphor": "Uma família de oito irmãos orbitando ao redor do pai Sol"
+                },
+                {
+                    "phaseNumber": 3,
+                    "question": "Qual é o maior planeta do Sistema Solar?",
+                    "options": [
+                        "Saturno",
+                        "Netuno",
+                        "Júpiter",
+                        "Urano"
+                    ],
+                    "correctAnswer": 2,
+                    "explanation": "Júpiter é o maior planeta, com um diâmetro de cerca de 142.984 km - mais de 11 vezes o diâmetro da Terra! Ele tem mais massa que todos os outros planetas juntos.",
+                    "concept": "Sistema Solar - Gigantes Gasosos",
+                    "metaphor": "O gigante gentil que protege os planetas internos com sua gravidade"
+                },
+                {
+                    "phaseNumber": 4,
+                    "question": "Qual planeta é conhecido como 'Planeta Vermelho'?",
+                    "options": [
+                        "Vênus",
+                        "Marte",
+                        "Júpiter",
+                        "Saturno"
+                    ],
+                    "correctAnswer": 1,
+                    "explanation": "Marte é chamado de Planeta Vermelho devido ao óxido de ferro (ferrugem) em sua superfície, que lhe dá uma coloração avermelhada característica.",
+                    "concept": "Sistema Solar - Marte",
+                    "metaphor": "Um deserto enferrujado flutuando no espaço"
+                }
+            ]
+        };
+        
+        console.log('✅ Configuração do jogo carregada:', window.GAME_CONFIG);
+    </script>
+
+    <!-- Scripts do Sistema (ordem importa!) -->
+    <!-- 1. Base: Estado do jogo, áudio, navegação -->
+    <script src="./base.js"></script>
+    
+    <!-- 2. Game Engine: Pontuação e registro de resultados -->
+    <script src="./game-engine.js"></script>
+    
+    <!-- 3. Integração Bubble: Comunicação com plataforma externa -->
+    <script src="./bubble-integration.js"></script>
+    
+    <!-- 4. Mecânica Visual: Escalada -->
+    <script src="./mechanics/escalada.js"></script>
+    
+    <!-- 5. Modalidade: Quiz -->
+    <script src="./modalities/quiz.js"></script>
+
+    <!-- Script de Inicialização -->
+    <script>
+        console.log('🎮 Iniciando sistema iAlume...');
+        
+        // Aguardar carregamento completo do DOM
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 DOM carregado');
+            
+            // Verificar componentes
+            console.log('🔍 Verificando componentes:');
+            console.log('- gameState:', typeof gameState);
+            console.log('- GAME_ENGINE:', typeof GAME_ENGINE);
+            console.log('- BUBBLE:', typeof BUBBLE);
+            console.log('- ESCALADA:', typeof ESCALADA);
+            console.log('- QUIZ:', typeof QUIZ);
+            console.log('- initAudio:', typeof initAudio);
+            
+            // Tentar inicializar o jogo
+            try {
+                // Esconder loading
+                document.getElementById('loadingScreen').style.display = 'none';
+                document.getElementById('game-container').style.display = 'block';
+                
+                // Inicializar áudio
+                if (typeof initAudio === 'function') {
+                    initAudio();
+                    console.log('✅ Áudio inicializado');
+                } else {
+                    console.warn('⚠️ initAudio não disponível');
+                }
+                
+                // Verificar se QUIZ existe e tem método init
+                if (typeof QUIZ !== 'undefined' && typeof QUIZ.init === 'function') {
+                    console.log('✅ QUIZ disponível, iniciando primeira fase...');
+                    
+                    // Inicializar primeira fase
+                    QUIZ.init(window.GAME_CONFIG.phases[0]);
+                    
+                    console.log('🎮 Jogo iniciado com sucesso!');
+                } else {
+                    throw new Error('Modalidade QUIZ não está disponível');
+                }
+                
+            } catch (error) {
+                console.error('❌ Erro ao inicializar:', error);
+                
+                // Mostrar erro na tela
+                document.body.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: white;">
+                        <h1>❌ Erro ao Carregar</h1>
+                        <p style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 10px; max-width: 600px; margin: 20px auto;">
+                            ${error.message}
+                        </p>
+                        <p>Verifique o console (F12) para mais detalhes</p>
+                    </div>
+                `;
+            }
+        });
+        
+        // Log adicional quando window carregar
+        window.addEventListener('load', function() {
+            console.log('🌐 Window carregada');
+            console.log('📊 Status final dos componentes:');
+            console.log('- gameState:', typeof gameState);
+            console.log('- GAME_ENGINE:', typeof GAME_ENGINE);
+            console.log('- ESCALADA:', typeof ESCALADA);
+            console.log('- QUIZ:', typeof QUIZ);
+        });
+    </script>
+</body>
+</html>

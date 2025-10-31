@@ -1,6 +1,19 @@
 const FILL_BLANKS = {
     name: 'fill-blanks',
     
+    /**
+     * ✅ MÉTODO INIT - Ponto de entrada para a modalidade
+     * @param {Object} phaseData - Dados da fase
+     */
+    init: function(phaseData) {
+        console.log('🎯 FILL_BLANKS.init() chamado com:', phaseData);
+        
+        // Criar e retornar a UI
+        const ui = this.createUI(phaseData);
+        
+        return ui;
+    },
+    
     createUI: function(data) {
         const container = document.createElement('div');
         container.className = 'fill-blanks-container';

@@ -6,13 +6,26 @@ const SEQUENCE = {
     currentOrder: [],
     draggedIndex: null,
     
+    /**
+     * ✅ MÉTODO INIT - Ponto de entrada para a modalidade
+     * @param {Object} phaseData - Dados da fase
+     */
+    init: function(phaseData) {
+        console.log('🎯 SEQUENCE.init() chamado com:', phaseData);
+        
+        // Criar e retornar a UI
+        const ui = this.createUI(phaseData);
+        
+        return ui;
+    },
+    
     createUI: function(data) {
         const container = document.createElement('div');
         container.className = 'sequence-container';
         
         const headerBox = document.createElement('div');
         headerBox.className = 'seq-header';
-        headerBox.innerHTML = '<div class="seq-icon">123</div><div class="seq-title">Arraste para ordenar:</div>';
+        headerBox.innerHTML = '<div class="seq-icon">🔢</div><div class="seq-title">Arraste para ordenar:</div>';
         container.appendChild(headerBox);
         
         if (data.instrucao) {
@@ -33,7 +46,7 @@ const SEQUENCE = {
         
         const button = document.createElement('button');
         button.className = 'seq-button';
-        button.textContent = 'CONFIRMAR ORDEM';
+        button.textContent = '✓ CONFIRMAR ORDEM';
         button.onclick = () => this.checkAnswer(data);
         container.appendChild(button);
         
@@ -145,7 +158,7 @@ const SEQUENCE = {
             items.forEach(item => item.classList.add('correct'));
             button.classList.add('correct');
 
-            showFeedback(data.feedback_correto || 'Perfeito!', 'correct');
+            showFeedback(data.feedback_correto || '✅ Perfeito!', 'correct');
             playSound('success');
 
         } else {
@@ -166,7 +179,7 @@ const SEQUENCE = {
                 });
             }, 1000);
 
-            showFeedback(data.feedback_errado || 'Ops! Veja a ordem correta.', 'wrong');
+            showFeedback(data.feedback_errado || '❌ Ops! Veja a ordem correta.', 'wrong');
             playSound('error');
         }
 
@@ -330,4 +343,4 @@ const SEQUENCE = {
 };
 
 window.SEQUENCE = SEQUENCE;
-console.log('sequence.js carregado com drag and drop!');
+console.log('🔢 sequence.js carregado com drag and drop!');

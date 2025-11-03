@@ -11,8 +11,8 @@
  */
 
 // ========== CONFIGURAÇÃO ==========
-const CDN_BASE_URL = 'https://brunoferrarisouza.github.io/ialume-factory';
-const VERSION = 'cdn/1.0.0';
+const CDN_BASE_URL = 'https://SEU-USUARIO.github.io/ialume-factory';
+const VERSION = '1.0.0';
 
 /**
  * Gera HTML completo do jogo
@@ -21,9 +21,6 @@ const VERSION = 'cdn/1.0.0';
  */
 function gerarJogoCompleto(config) {
   const cdnPath = `${CDN_BASE_URL}/${VERSION}`;
-  
-  // ✅ Tratamento de analyzer undefined
-  const safeAnalyzer = config.analyzer || null;
   
   return `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -95,7 +92,6 @@ function gerarJogoCompleto(config) {
     <script>
         // Dados do jogo injetados
         const GAME_CONFIG = ${JSON.stringify(config, null, 2)};
-        const ANALYZER_DATA = ${JSON.stringify(safeAnalyzer)};
         
         // Aguarda todos os scripts carregarem
         window.addEventListener('load', function() {

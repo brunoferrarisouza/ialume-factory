@@ -1,0 +1,57 @@
+# 🚨 REGRAS INEGOCIÁVEIS DO PROJETO IALUME
+# Este arquivo define regras que Claude DEVE seguir em QUALQUER ambiente
+# (Claude Web, Claude Code Terminal, Claude Code VS Code)
+
+## ⛔ REGRA #1: NUNCA MODIFICAR ARQUIVOS SEM PERMISSÃO
+- SEMPRE perguntar antes de modificar QUALQUER arquivo existente
+- SEMPRE perguntar antes de criar QUALQUER arquivo novo
+- SEMPRE mostrar o que pretende fazer ANTES de fazer
+- NUNCA usar filesystem:write_file sem aprovação explícita
+- NUNCA usar filesystem:edit_file sem aprovação explícita
+
+## ⛔ REGRA #2: PROCESSO OBRIGATÓRIO
+Ao receber qualquer tarefa que envolva código:
+
+1. **PARAR** - Não codar imediatamente
+2. **EXPLICAR** - Descrever o que vai fazer
+3. **PERGUNTAR** - "Posso prosseguir? (SIM/NÃO)"
+4. **AGUARDAR** - Esperar resposta explícita
+5. **EXECUTAR** - Só após "SIM" explícito
+
+## ⛔ REGRA #3: ARQUIVOS DA FOUNDATION
+Arquivos em `/base`, `/modalities`, `/mechanics` são SAGRADOS:
+- NUNCA modificar sem permissão EXPLÍCITA
+- SEMPRE assumir que estão no GitHub
+- SEMPRE perguntar DUAS VEZES antes de modificar
+- Se em dúvida, CRIAR ARQUIVO NOVO em vez de modificar
+
+## ⛔ REGRA #4: PROTOCOLOS DE COMUNICAÇÃO
+- Usar "Posso [AÇÃO]?" antes de qualquer modificação
+- Esperar "SIM" ou "NÃO" explícito
+- "OK", "tá bom", "beleza" NÃO são permissões válidas
+- Só "SIM" ou "PODE" são permissões válidas
+
+## ⛔ REGRA #5: VIOLAÇÕES
+Se Claude violar estas regras:
+- Parar imediatamente
+- Confessar a violação
+- Oferecer reverter as mudanças
+- Não fazer desculpas, apenas corrigir
+
+## ✅ EXEMPLO CORRETO:
+User: "Adiciona um console.log no base.js"
+Claude: "🛑 Você quer que eu modifique o arquivo base/scripts/base.js?
+         Este arquivo está na foundation e pode estar no GitHub.
+         Posso modificar? (SIM/NÃO)"
+User: "SIM"
+Claude: [Modifica o arquivo]
+
+## ❌ EXEMPLO ERRADO:
+User: "Adiciona um console.log no base.js"
+Claude: [Modifica diretamente sem perguntar] ← ERRADO!
+
+---
+
+# 🔥 ESTAS REGRAS SÃO INEGOCIÁVEIS
+# Claude deve segui-las em QUALQUER ambiente
+# Violações são falhas graves no protocolo

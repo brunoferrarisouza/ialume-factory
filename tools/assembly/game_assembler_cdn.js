@@ -12,7 +12,7 @@
 
 // ========== CONFIGURAÇÃO ==========
 const CDN_BASE_URL = 'https://brunoferrarisouza.github.io/ialume-factory';
-const VERSION = 'cdn/1.0.0';
+const VERSION = '1.0.0';
 
 /**
  * Gera HTML completo do jogo

@@ -1,0 +1,46 @@
+{
+  "version": "1.0.0",
+  "timestamp": "2025-11-05T05:12:04.989Z",
+  "files": [
+    {
+      "path": "/1.0.0/base.js",
+      "source": "base/scripts/base.js"
+    },
+    {
+      "path": "/1.0.0/game-engine.js",
+      "source": "base/scripts/game-engine.js"
+    },
+    {
+      "path": "/1.0.0/bubble-integration.js",
+      "source": "base/scripts/bubble-integration.js"
+    },
+    {
+      "path": "/1.0.0/base.css",
+      "source": "base/styles/base.css"
+    },
+    {
+      "path": "/1.0.0/mechanics/escalada.js",
+      "source": "mechanics/escalada.js"
+    },
+    {
+      "path": "/1.0.0/mechanics/perseguicao.js",
+      "source": "mechanics/perseguicao.js"
+    },
+    {
+      "path": "/1.0.0/modalities/quiz.js",
+      "source": "modalities/quiz.js"
+    },
+    {
+      "path": "/1.0.0/modalities/true-false.js",
+      "source": "modalities/true-false.js"
+    },
+    {
+      "path": "/1.0.0/modalities/fill-blanks.js",
+      "source": "modalities/fill-blanks.js"
+    },
+    {
+      "path": "/1.0.0/modalities/sequence.js",
+      "source": "modalities/sequence.js"
+    }
+  ]
+}

@@ -1,0 +1,127 @@
+{
+  "titulo": "Lume e a Régua Mágica Perdida",
+  "conceito": "medidas",
+  "mecanica": "escalada",
+  "fases": [
+    {
+      "numero": 0,
+      "tipo": "abertura",
+      "narrativa": "Sábio Régulo, guardião das medidas, perdeu sua Régua Mágica no topo da Montanha do Conhecimento! Sem ela, ninguém consegue medir nada corretamente. Ajude Lume, o vaga-lume corajoso, a subir a montanha e recuperar a régua!",
+      "botao": "Começar Aventura"
+    },
+    {
+      "numero": 1,
+      "tipo": "quiz",
+      "bloom": "lembrar",
+      "pergunta": "Qual instrumento usamos para medir o comprimento de objetos?",
+      "alternativas": [
+        "Régua",
+        "Balança",
+        "Termômetro",
+        "Relógio"
+      ],
+      "correta": 0,
+      "feedback_correto": "✅ Isso mesmo! A régua é o instrumento perfeito para medir comprimento!",
+      "feedback_errado": "❌ Ops! A balança mede peso, o termômetro mede temperatura e o relógio mede tempo. Para comprimento, usamos a régua!"
+    },
+    {
+      "numero": 2,
+      "tipo": "slider",
+      "bloom": "entender",
+      "pergunta": "Olhe para o lápis na imagem. Sem usar régua, ESTIME quantos centímetros você acha que ele tem:",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "valor_correto": 15,
+      "tolerancia": 3,
+      "unidade": "cm",
+      "feedback_correto": "✅ Ótima estimativa! Você tem um bom olho para medidas!",
+      "feedback_errado": "❌ O lápis tem aproximadamente 15 cm. Não se preocupe, estimar fica mais fácil com prática!"
+    },
+    {
+      "numero": 3,
+      "tipo": "drag-drop",
+      "bloom": "aplicar",
+      "instrucao": "Arraste cada objeto para a categoria de medida correta:",
+      "items": [
+        {
+          "id": "regua",
+          "texto": "Régua 📏",
+          "zona_correta": "comprimento"
+        },
+        {
+          "id": "balanca",
+          "texto": "Balança ⚖️",
+          "zona_correta": "peso"
+        },
+        {
+          "id": "termometro",
+          "texto": "Termômetro 🌡️",
+          "zona_correta": "temperatura"
+        },
+        {
+          "id": "relogio",
+          "texto": "Relógio ⏰",
+          "zona_correta": "tempo"
+        }
+      ],
+      "zonas": [
+        {
+          "id": "comprimento",
+          "nome": "Mede Comprimento",
+          "cor": "#667eea"
+        },
+        {
+          "id": "peso",
+          "nome": "Mede Peso",
+          "cor": "#f093fb"
+        },
+        {
+          "id": "temperatura",
+          "nome": "Mede Temperatura",
+          "cor": "#ff6b6b"
+        },
+        {
+          "id": "tempo",
+          "nome": "Mede Tempo",
+          "cor": "#51cf66"
+        }
+      ],
+      "feedback_correto": "✅ Perfeito! Você classificou todos os instrumentos corretamente!",
+      "feedback_errado": "❌ Alguns instrumentos estão na zona errada. Lembre-se: régua para comprimento, balança para peso, termômetro para temperatura e relógio para tempo!"
+    },
+    {
+      "numero": 4,
+      "tipo": "construtor",
+      "bloom": "criar",
+      "instrucao": "Monte a sequência de unidades de medida do MENOR para o MAIOR:",
+      "pecas_disponiveis": [
+        {
+          "id": "mm",
+          "texto": "milímetro",
+          "icone": "📏"
+        },
+        {
+          "id": "cm",
+          "texto": "centímetro",
+          "icone": "📏"
+        },
+        {
+          "id": "m",
+          "texto": "metro",
+          "icone": "📏"
+        },
+        {
+          "id": "km",
+          "texto": "quilômetro",
+          "icone": "📏"
+        }
+      ],
+      "sequencia_correta": ["mm", "cm", "m", "km"],
+      "min_pecas": 4,
+      "max_pecas": 4,
+      "feedback_correto": "✅ Incrível! Você domina as unidades de medida! Lume recuperou a Régua Mágica e Sábio Régulo está muito orgulhoso! 🎉",
+      "feedback_errado": "❌ Quase lá! Lembre: milímetro é menor que centímetro, centímetro menor que metro, e metro menor que quilômetro. Tente novamente!"
+    }
+  ]
+}

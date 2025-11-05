@@ -1,6 +1,7 @@
 // ===== BUBBLE INTEGRATION =====
 // Código de integração com Bubble.io
 // Injeta CONFIG, envia resultados, auto-close
+// Atualizado: 2025-11-05 - API Key via window.BUBBLE_API_KEY
 
 // ========== CONFIGURAÇÃO BUBBLE ==========
 const BUBBLE_CONFIG = {

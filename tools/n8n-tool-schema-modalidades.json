@@ -1,0 +1,961 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Game Config Schema - iAlume Factory",
+  "description": "Schema completo para configuração de jogos educacionais com 15 modalidades",
+  "type": "object",
+  "required": ["titulo", "conceito", "mecanica", "fases"],
+  "properties": {
+    "titulo": {
+      "type": "string",
+      "description": "Título narrativo do jogo",
+      "minLength": 5,
+      "maxLength": 100,
+      "examples": ["Lume e a Régua Mágica", "O Tesouro das Frações"]
+    },
+    "conceito": {
+      "type": "string",
+      "description": "Conceito pedagógico principal",
+      "minLength": 3,
+      "maxLength": 50,
+      "examples": ["medidas", "frações", "geometria", "sequências"]
+    },
+    "mecanica": {
+      "type": "string",
+      "description": "Mecânica de progressão visual",
+      "enum": [
+        "escalada",
+        "perseguicao",
+        "mergulho",
+        "construcao",
+        "voo",
+        "labirinto",
+        "jardim",
+        "constelacao",
+        "rio",
+        "tesouro"
+      ]
+    },
+    "fases": {
+      "type": "array",
+      "description": "Array de fases do jogo (5 fases: abertura + 4 pedagógicas)",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/definitions/fase_abertura"
+          },
+          {
+            "$ref": "#/definitions/fase_quiz"
+          },
+          {
+            "$ref": "#/definitions/fase_true_false"
+          },
+          {
+            "$ref": "#/definitions/fase_fill_blanks"
+          },
+          {
+            "$ref": "#/definitions/fase_sequence"
+          },
+          {
+            "$ref": "#/definitions/fase_input"
+          },
+          {
+            "$ref": "#/definitions/fase_slider"
+          },
+          {
+            "$ref": "#/definitions/fase_drag_drop"
+          },
+          {
+            "$ref": "#/definitions/fase_matching"
+          },
+          {
+            "$ref": "#/definitions/fase_memoria"
+          },
+          {
+            "$ref": "#/definitions/fase_desenho"
+          },
+          {
+            "$ref": "#/definitions/fase_clique"
+          },
+          {
+            "$ref": "#/definitions/fase_escolha_porta"
+          },
+          {
+            "$ref": "#/definitions/fase_construtor"
+          },
+          {
+            "$ref": "#/definitions/fase_classificacao"
+          },
+          {
+            "$ref": "#/definitions/fase_temporizador"
+          }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "fase_abertura": {
+      "type": "object",
+      "description": "Fase 0 - Abertura narrativa",
+      "required": ["numero", "tipo", "narrativa", "botao"],
+      "properties": {
+        "numero": {
+          "type": "integer",
+          "const": 0
+        },
+        "tipo": {
+          "type": "string",
+          "const": "abertura"
+        },
+        "narrativa": {
+          "type": "string",
+          "description": "Texto narrativo de abertura",
+          "minLength": 20,
+          "maxLength": 300
+        },
+        "botao": {
+          "type": "string",
+          "description": "Texto do botão de início",
+          "default": "Começar Aventura"
+        }
+      }
+    },
+    "fase_quiz": {
+      "type": "object",
+      "description": "Modalidade: Quiz (múltipla escolha)",
+      "required": ["numero", "tipo", "bloom", "pergunta", "alternativas", "correta", "feedback_correto", "feedback_errado"],
+      "properties": {
+        "numero": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "tipo": {
+          "type": "string",
+          "const": "quiz"
+        },
+        "bloom": {
+          "type": "string",
+          "enum": ["lembrar", "entender", "aplicar", "criar"]
+        },
+        "pergunta": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 200
+        },
+        "alternativas": {
+          "type": "array",
+          "description": "4 alternativas (A, B, C, D)",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        },
+        "correta": {
+          "type": "integer",
+          "description": "Índice da alternativa correta (0-3)",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "feedback_correto": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 150
+        },
+        "feedback_errado": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 150
+        }
+      }
+    },
+    "fase_true_false": {
+      "type": "object",
+      "description": "Modalidade: Verdadeiro ou Falso",
+      "required": ["numero", "tipo", "bloom", "afirmacao", "correta", "feedback_correto", "feedback_errado"],
+      "properties": {
+        "numero": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "tipo": {
+          "type": "string",
+          "const": "true-false"
+        },
+        "bloom": {
+          "type": "string",
+          "enum": ["lembrar", "entender", "aplicar", "criar"]
+        },
+        "afirmacao": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 200
+        },
+        "correta": {
+          "type": "boolean",
+          "description": "true = Verdadeiro, false = Falso"
+        },
+        "feedback_correto": {
+          "type": "string"
+        },
+        "feedback_errado": {
+          "type": "string"
+        }
+      }
+    },
+    "fase_fill_blanks": {
+      "type": "object",
+      "description": "Modalidade: Preencher Lacunas",
+      "required": ["numero", "tipo", "bloom", "frase", "resposta", "feedback_correto", "feedback_errado"],
+      "properties": {
+        "numero": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "tipo": {
+          "type": "string",
+          "const": "fill-blanks"
+        },
+        "bloom": {
+          "type": "string",
+          "enum": ["lembrar", "entender", "aplicar", "criar"]
+        },
+        "frase": {
+          "type": "string",
+          "description": "Frase com ____ para indicar lacuna",
+          "minLength": 10,
+          "maxLength": 200
+        },
+        "resposta": {
+          "type": "string",
+          "description": "Resposta correta",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "variacoes_aceitas": {
+          "type": "array",
+          "description": "Variações aceitas como corretas",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dica": {
+          "type": "string",
+          "description": "Dica opcional"
+        },
+        "feedback_correto": {
+          "type": "string"
+        },
+        "feedback_errado": {
+          "type": "string"
+        }
+      }
+    },
+    "fase_sequence": {
+      "type": "object",
+      "description": "Modalidade: Ordenar Sequência (drag & drop)",
+      "required": ["numero", "tipo", "bloom", "instrucao", "itens", "ordem_correta", "feedback_correto", "feedback_errado"],
+      "properties": {
+        "numero": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "tipo": {
+          "type": "string",
+          "const": "sequence"
+        },
+        "bloom": {
+          "type": "string",
+          "enum": ["lembrar", "entender", "aplicar", "criar"]
+        },
+        "instrucao": {
+          "type": "string",
+          "description": "Instrução para o aluno",
+          "minLength": 10,
+          "maxLength": 150
+        },
+        "itens": {
+          "type": "array",
+          "description": "Itens para ordenar (embaralhados)",
+          "minItems": 3,
+          "maxItems": 6,
+          "items": {
+            "type": "string"
+          }
+        },
+        "ordem_correta": {
+          "type": "array",
+          "description": "Ordem correta dos itens",
+          "minItems": 3,
+          "maxItems": 6,
+          "items": {
+            "type": "string"
+          }
+        },
+        "feedback_correto": {
+          "type": "string"
+        },
+        "feedback_errado": {
+          "type": "string"
+        }
+      }
+    },
+    "fase_input": {
+      "type": "object",
+      "description": "Modalidade: Input (resposta curta)",
+      "required": ["numero", "tipo", "bloom", "pergunta", "resposta", "feedback_correto", "feedback_errado"],
+      "properties": {
+        "numero": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "tipo": {
+          "type": "string",
+          "const": "input"
+        },
+        "bloom": {
+          "type": "string",
+          "enum": ["lembrar", "entender", "aplicar", "criar"]
+        },
+        "pergunta": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 200
+        },
+        "resposta": {
+          "type": "string",
+          "description": "Resposta esperada",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "variacoes_aceitas": {
+          "type": "array",
+          "description": "Variações aceitas",
+          "items": {
+            "type": "string"
+          }
+        },
+        "case_sensitive": {
+          "type": "boolean",
+          "description": "Se diferencia maiúsculas/minúsculas",
+          "default": false
+        },
+        "dica": {
+          "type": "string"
+        },
+        "feedback_correto": {
+          "type": "string"
+        },
+        "feedback_errado": {
+          "type": "string"
+        }
+      }
+    },
+    "fase_slider": {
+      "type": "object",
+      "description": "Modalidade: Slider (escala)",
+      "required": ["numero", "tipo", "bloom", "pergunta", "min", "max", "valor_correto", "tolerancia", "feedback_correto", "feedback_errado"],
+      "properties": {
+        "numero": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "tipo": {
+          "type": "string",
+          "const": "slider"
+        },
+        "bloom": {
+          "type": "string",
+          "enum": ["lembrar", "entender", "aplicar", "criar"]
+        },
+        "pergunta": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 200
+        },
+        "min": {
+          "type": "number",
+          "description": "Valor mínimo do slider"
+        },
+        "max": {
+          "type": "number",
+          "description": "Valor máximo do slider"
+        },
+        "step": {
+          "type": "number",
+          "description": "Incremento do slider",
+          "default": 1
+        },
+        "valor_correto": {
+          "type": "number",
+          "description": "Valor correto esperado"
+        },
+        "tolerancia": {
+          "type": "number",
+          "description": "Margem de erro aceita"
+        },
+        "unidade": {
+          "type": "string",
+          "description": "Unidade de medida (cm, kg, etc)"
+        },
+        "feedback_correto": {
+          "type": "string"
+        },
+        "feedback_errado": {
+          "type": "string"
+        }
+      }
+    },
+    "fase_drag_drop": {
+      "type": "object",
+      "description": "Modalidade: Drag & Drop (arrastar para zonas)",
+      "required": ["numero", "tipo", "bloom", "instrucao", "items", "zonas", "feedback_correto", "feedback_errado"],
+      "properties": {
+        "numero": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "tipo": {
+          "type": "string",
+          "const": "drag-drop"
+        },
+        "bloom": {
+          "type": "string",
+          "enum": ["lembrar", "entender", "aplicar", "criar"]
+        },
+        "instrucao": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 200
+        },
+        "items": {
+          "type": "array",
+          "description": "Items para arrastar",
+          "minItems": 2,
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "required": ["id", "texto", "zona_correta"],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "texto": {
+                "type": "string"
+              },
+              "zona_correta": {
+                "type": "string",
+                "description": "ID da zona correta"
+              }
+            }
+          }
+        },
+        "zonas": {
+          "type": "array",
+          "description": "Zonas de drop",
+          "minItems": 2,
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "required": ["id", "nome", "cor"],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "nome": {
+                "type": "string"
+              },
+              "cor": {
+                "type": "string",
+                "description": "Cor da zona (#hex)"
+              }
+            }
+          }
+        },
+        "feedback_correto": {
+          "type": "string"
+        },
+        "feedback_errado": {
+          "type": "string"
+        }
+      }
+    },
+    "fase_matching": {
+      "type": "object",
+      "description": "Modalidade: Matching (conectar pares)",
+      "required": ["numero", "tipo", "bloom", "instrucao", "pares", "feedback_correto", "feedback_errado"],
+      "properties": {
+        "numero": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "tipo": {
+          "type": "string",
+          "const": "matching"
+        },
+        "bloom": {
+          "type": "string",
+          "enum": ["lembrar", "entender", "aplicar", "criar"]
+        },
+        "instrucao": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 200
+        },
+        "pares": {
+          "type": "array",
+          "description": "Pares a conectar",
+          "minItems": 3,
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "required": ["esquerda", "direita"],
+            "properties": {
+              "esquerda": {
+                "type": "string"
+              },
+              "direita": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "feedback_correto": {
+          "type": "string"
+        },
+        "feedback_errado": {
+          "type": "string"
+        }
+      }
+    },
+    "fase_memoria": {
+      "type": "object",
+      "description": "Modalidade: Jogo de Memória",
+      "required": ["numero", "tipo", "bloom", "instrucao", "pares", "feedback_correto", "feedback_errado"],
+      "properties": {
+        "numero": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "tipo": {
+          "type": "string",
+          "const": "memoria"
+        },
+        "bloom": {
+          "type": "string",
+          "enum": ["lembrar", "entender", "aplicar", "criar"]
+        },
+        "instrucao": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 200
+        },
+        "pares": {
+          "type": "array",
+          "description": "Pares de cartas (mesmo id = par)",
+          "minItems": 4,
+          "maxItems": 12,
+          "items": {
+            "type": "object",
+            "required": ["id", "conteudo", "tipo"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "ID do par (pares têm mesmo ID)"
+              },
+              "conteudo": {
+                "type": "string",
+                "description": "Texto ou emoji da carta"
+              },
+              "tipo": {
+                "type": "string",
+                "enum": ["text", "emoji", "image"]
+              }
+            }
+          }
+        },
+        "max_tentativas": {
+          "type": "integer",
+          "description": "Número máximo de tentativas",
+          "minimum": 10,
+          "maximum": 50,
+          "default": 20
+        },
+        "feedback_correto": {
+          "type": "string"
+        },
+        "feedback_errado": {
+          "type": "string"
+        }
+      }
+    },
+    "fase_desenho": {
+      "type": "object",
+      "description": "Modalidade: Desenho (canvas)",
+      "required": ["numero", "tipo", "bloom", "instrucao", "feedback_correto", "feedback_errado"],
+      "properties": {
+        "numero": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "tipo": {
+          "type": "string",
+          "const": "desenho"
+        },
+        "bloom": {
+          "type": "string",
+          "enum": ["lembrar", "entender", "aplicar", "criar"]
+        },
+        "instrucao": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 200
+        },
+        "tipo_validacao": {
+          "type": "string",
+          "description": "Tipo de validação do desenho",
+          "enum": ["linha-reta", "circulo", "quadrado", "livre"]
+        },
+        "parametros": {
+          "type": "object",
+          "description": "Parâmetros de validação (comprimento, raio, etc)"
+        },
+        "feedback_correto": {
+          "type": "string"
+        },
+        "feedback_errado": {
+          "type": "string"
+        }
+      }
+    },
+    "fase_clique": {
+      "type": "object",
+      "description": "Modalidade: Clique (hotspot)",
+      "required": ["numero", "tipo", "bloom", "pergunta", "imagem", "areas_corretas", "feedback_correto", "feedback_errado"],
+      "properties": {
+        "numero": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "tipo": {
+          "type": "string",
+          "const": "clique"
+        },
+        "bloom": {
+          "type": "string",
+          "enum": ["lembrar", "entender", "aplicar", "criar"]
+        },
+        "pergunta": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 200
+        },
+        "imagem": {
+          "type": "string",
+          "description": "URL da imagem"
+        },
+        "areas_corretas": {
+          "type": "array",
+          "description": "Áreas clicáveis corretas",
+          "minItems": 1,
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "required": ["x", "y", "largura", "altura"],
+            "properties": {
+              "x": {
+                "type": "number"
+              },
+              "y": {
+                "type": "number"
+              },
+              "largura": {
+                "type": "number"
+              },
+              "altura": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "feedback_correto": {
+          "type": "string"
+        },
+        "feedback_errado": {
+          "type": "string"
+        }
+      }
+    },
+    "fase_escolha_porta": {
+      "type": "object",
+      "description": "Modalidade: Escolha de Porta",
+      "required": ["numero", "tipo", "bloom", "pergunta", "portas", "porta_correta", "feedback_correto", "feedback_errado"],
+      "properties": {
+        "numero": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "tipo": {
+          "type": "string",
+          "const": "escolha-porta"
+        },
+        "bloom": {
+          "type": "string",
+          "enum": ["lembrar", "entender", "aplicar", "criar"]
+        },
+        "pergunta": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 200
+        },
+        "portas": {
+          "type": "array",
+          "description": "Opções de portas",
+          "minItems": 2,
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "required": ["id", "emoji", "titulo", "descricao"],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "emoji": {
+                "type": "string",
+                "description": "Emoji da porta"
+              },
+              "titulo": {
+                "type": "string"
+              },
+              "descricao": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "porta_correta": {
+          "type": "string",
+          "description": "ID da porta correta"
+        },
+        "feedback_correto": {
+          "type": "string"
+        },
+        "feedback_errado": {
+          "type": "string"
+        }
+      }
+    },
+    "fase_construtor": {
+      "type": "object",
+      "description": "Modalidade: Construtor (compor elementos)",
+      "required": ["numero", "tipo", "bloom", "instrucao", "pecas_disponiveis", "sequencia_correta", "feedback_correto", "feedback_errado"],
+      "properties": {
+        "numero": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "tipo": {
+          "type": "string",
+          "const": "construtor"
+        },
+        "bloom": {
+          "type": "string",
+          "enum": ["lembrar", "entender", "aplicar", "criar"]
+        },
+        "instrucao": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 200
+        },
+        "pecas_disponiveis": {
+          "type": "array",
+          "description": "Peças disponíveis para construir",
+          "minItems": 3,
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "required": ["id", "texto", "icone"],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "texto": {
+                "type": "string"
+              },
+              "icone": {
+                "type": "string",
+                "description": "Emoji ou ícone"
+              }
+            }
+          }
+        },
+        "sequencia_correta": {
+          "type": "array",
+          "description": "Sequência correta de IDs",
+          "items": {
+            "type": "string"
+          }
+        },
+        "min_pecas": {
+          "type": "integer",
+          "description": "Mínimo de peças necessárias"
+        },
+        "max_pecas": {
+          "type": "integer",
+          "description": "Máximo de peças permitidas"
+        },
+        "feedback_correto": {
+          "type": "string"
+        },
+        "feedback_errado": {
+          "type": "string"
+        }
+      }
+    },
+    "fase_classificacao": {
+      "type": "object",
+      "description": "Modalidade: Classificação (múltiplas categorias)",
+      "required": ["numero", "tipo", "bloom", "instrucao", "items", "categorias", "feedback_correto", "feedback_errado"],
+      "properties": {
+        "numero": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "tipo": {
+          "type": "string",
+          "const": "classificacao"
+        },
+        "bloom": {
+          "type": "string",
+          "enum": ["lembrar", "entender", "aplicar", "criar"]
+        },
+        "instrucao": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 200
+        },
+        "items": {
+          "type": "array",
+          "description": "Items para classificar",
+          "minItems": 3,
+          "maxItems": 10,
+          "items": {
+            "type": "object",
+            "required": ["id", "texto", "categoria_correta"],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "texto": {
+                "type": "string"
+              },
+              "categoria_correta": {
+                "type": "string",
+                "description": "ID da categoria correta"
+              }
+            }
+          }
+        },
+        "categorias": {
+          "type": "array",
+          "description": "Categorias disponíveis",
+          "minItems": 2,
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "required": ["id", "nome", "cor"],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "nome": {
+                "type": "string"
+              },
+              "cor": {
+                "type": "string",
+                "description": "Cor da categoria (#hex)"
+              }
+            }
+          }
+        },
+        "feedback_correto": {
+          "type": "string"
+        },
+        "feedback_errado": {
+          "type": "string"
+        }
+      }
+    },
+    "fase_temporizador": {
+      "type": "object",
+      "description": "Modalidade: Temporizador (quiz com tempo limite)",
+      "required": ["numero", "tipo", "bloom", "pergunta", "alternativas", "correta", "tempo_limite", "feedback_correto", "feedback_errado", "feedback_tempo_esgotado"],
+      "properties": {
+        "numero": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "tipo": {
+          "type": "string",
+          "const": "temporizador"
+        },
+        "bloom": {
+          "type": "string",
+          "enum": ["lembrar", "entender", "aplicar", "criar"]
+        },
+        "pergunta": {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 200
+        },
+        "alternativas": {
+          "type": "array",
+          "description": "4 alternativas",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {
+            "type": "string"
+          }
+        },
+        "correta": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "tempo_limite": {
+          "type": "integer",
+          "description": "Tempo em segundos",
+          "minimum": 5,
+          "maximum": 60
+        },
+        "feedback_correto": {
+          "type": "string"
+        },
+        "feedback_errado": {
+          "type": "string"
+        },
+        "feedback_tempo_esgotado": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

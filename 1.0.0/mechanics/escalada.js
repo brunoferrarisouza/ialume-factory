@@ -31,7 +31,7 @@ const ESCALADA = {
     
     // Injetar HTML da montanha
     injectHTML: function() {
-        const container = document.querySelector('.game-container');
+        const container = document.querySelector('#game-container'); // ✅ ID ao invés de classe
         
         // Criar container da mecânica
         const mechanicHTML = `

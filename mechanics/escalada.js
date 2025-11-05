@@ -32,7 +32,14 @@ const ESCALADA = {
     // Injetar HTML da montanha
     injectHTML: function() {
         const container = document.querySelector('.game-container');
-        
+
+        // Verificar se container existe (importante para Bubble SPA)
+        if (!container) {
+            console.warn('⚠️ .game-container não encontrado ainda, tentando novamente em 100ms...');
+            setTimeout(() => this.injectHTML(), 100);
+            return;
+        }
+
         // Criar container da mecânica
         const mechanicHTML = `
             <div id="escalada-container" class="mechanic-container">
@@ -40,14 +47,14 @@ const ESCALADA = {
                 <div class="mountain">
                     ${this.generateFloors()}
                 </div>
-                
+
                 <!-- Lume escalador -->
                 <div id="lume-climber" class="lume-climber">
                     🌟
                 </div>
             </div>
         `;
-        
+
         container.insertAdjacentHTML('beforeend', mechanicHTML);
     },
     

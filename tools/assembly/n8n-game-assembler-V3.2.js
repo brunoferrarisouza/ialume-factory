@@ -212,17 +212,30 @@ const html = `<!DOCTYPE html>
 
     <!-- Game Config -->
     <script>
-        // Configuração do jogo injetada
-        const GAME_CONFIG = ${JSON.stringify(adaptedConfig, null, 2)};
+        // ========== LIMPEZA DE JOGO ANTERIOR ==========
+        // Importante para Bubble SPA que pode re-injetar HTML
+        if (window.gameState && window.gameState.initialized) {
+            console.log('🧹 Limpando jogo anterior...');
+            window.gameState = null;
+        }
+
+        // Configuração do jogo injetada (var permite redeclaração)
+        var GAME_CONFIG = ${JSON.stringify(adaptedConfig, null, 2)};
 
         console.log('🎮 GAME_CONFIG injetado:', GAME_CONFIG);
 
-        // Modalidades necessárias para este jogo
-        const REQUIRED_MODALITIES = ${JSON.stringify(Array.from(modalitiesUsed))};
+        // Modalidades necessárias para este jogo (var permite redeclaração)
+        var REQUIRED_MODALITIES = ${JSON.stringify(Array.from(modalitiesUsed))};
 
         // Função de inicialização ROBUSTA (compatível com Bubble SPA)
         function initGame() {
             console.log('🔄 Tentando inicializar Game Engine...');
+
+            // 0. Prevenir múltiplas inicializações simultâneas
+            if (window.gameState && window.gameState.initializing) {
+                console.log('⏭️ Já está inicializando, ignorando chamada duplicada');
+                return;
+            }
 
             // 1. Verificar se GAME_ENGINE carregou
             if (typeof GAME_ENGINE === 'undefined') {
@@ -250,6 +263,11 @@ const html = `<!DOCTYPE html>
             // 3. Tudo pronto! Inicializar o jogo
             console.log('✅ GAME_ENGINE e todas as modalidades carregados!');
             console.log('   Modalidades:', REQUIRED_MODALITIES.join(', '));
+
+            // Marcar que está inicializando
+            if (!window.gameState) window.gameState = {};
+            window.gameState.initializing = true;
+
             GAME_ENGINE.init(GAME_CONFIG);
         }
 

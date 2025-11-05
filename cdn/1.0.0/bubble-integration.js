@@ -5,7 +5,7 @@
 // ========== CONFIGURAÇÃO BUBBLE ==========
 const BUBBLE_CONFIG = {
     bubbleApiUrl: 'https://ialume.bubbleapps.io/api/1.1',
-    bubbleApiKey: '%%BUBBLE_API_KEY%%',  // Substituir no Bubble
+    bubbleApiKey: window.BUBBLE_API_KEY || '%%BUBBLE_API_KEY%%',  // Lê de window.BUBBLE_API_KEY ou usa placeholder
     paginaId: null,
     sessaoId: null,
     alunoId: null

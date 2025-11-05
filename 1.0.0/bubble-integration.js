@@ -1,11 +1,19 @@
-// ===== BUBBLE INTEGRATION =====
+// ===== BUBBLE INTEGRATION V2.1 =====
 // Código de integração com Bubble.io
 // Injeta CONFIG, envia resultados, auto-close
+//
+// CHANGELOG:
+// - v2.1 (2025-11-05): Suporte a API Key via window.BUBBLE_API_KEY
+// - v2.0 (2025-11-05): Override de GAME_ENGINE.finish()
+// - v1.0 (2025-11-04): Versão inicial
+//
+// IMPORTANTE: Este arquivo LÊ a API Key de window.BUBBLE_API_KEY
+// que deve ser definida ANTES de carregar este script!
 
 // ========== CONFIGURAÇÃO BUBBLE ==========
 const BUBBLE_CONFIG = {
     bubbleApiUrl: 'https://ialume.bubbleapps.io/api/1.1',
-    bubbleApiKey: '%%BUBBLE_API_KEY%%',  // Substituir no Bubble
+    bubbleApiKey: window.BUBBLE_API_KEY || '%%BUBBLE_API_KEY%%',  // Lê de window.BUBBLE_API_KEY ou usa placeholder
     paginaId: null,
     sessaoId: null,
     alunoId: null

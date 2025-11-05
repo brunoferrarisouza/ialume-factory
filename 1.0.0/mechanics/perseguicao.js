@@ -37,6 +37,13 @@ const PERSEGUICAO = {
     injectHTML: function() {
         const container = document.querySelector('.game-container');
 
+        // Verificar se container existe (importante para Bubble SPA)
+        if (!container) {
+            console.warn('⚠️ .game-container não encontrado ainda, tentando novamente em 100ms...');
+            setTimeout(() => this.injectHTML(), 100);
+            return;
+        }
+
         // Criar container da mecânica
         const mechanicHTML = `
             <div id="perseguicao-container" class="mechanic-container">

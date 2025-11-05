@@ -7,18 +7,24 @@ const GAME_ENGINE = {
     
     // Inicializar jogo com configuração
     init: function(gameConfig) {
+        // Evitar reinicialização duplicada
+        if (window.gameState && window.gameState.initialized) {
+            console.log('⏭️ Game Engine já inicializado, pulando...');
+            return true;
+        }
+
         console.log('🎮 Iniciando Game Engine...', gameConfig);
-        
+
         this.config = gameConfig;
         this.currentPhaseIndex = 0;
         this.results = [];
-        
+
         // Validar configuração
         if (!this.validateConfig(gameConfig)) {
             console.error('❌ Configuração inválida!');
             return false;
         }
-        
+
         // Configurar sistema base
         window.totalPhases = gameConfig.fases.length;
         
@@ -47,7 +53,13 @@ const GAME_ENGINE = {
         
         // Injetar todas as fases
         this.injectAllPhases();
-        
+
+        // Marcar como inicializado
+        if (!window.gameState) {
+            window.gameState = {};
+        }
+        window.gameState.initialized = true;
+
         console.log('✅ Game Engine inicializado!');
         return true;
     },

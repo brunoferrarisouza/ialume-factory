@@ -46,9 +46,21 @@ gptConfig.questions.forEach((q, i) => {
 
 console.log('🎯 Modalidades detectadas:', Array.from(modalitiesUsed));
 
+// ========== FORMATAÇÃO DE TÍTULO ==========
+// Função para converter underscores em título formatado
+function formatTitle(str) {
+  if (!str) return 'Jogo Educativo';
+
+  // Remover underscores e capitalizar cada palavra
+  return str
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+}
+
 // ========== ADAPTER ==========
 const adaptedConfig = {
-  tema: gptConfig.narrative?.theme || 'Jogo Educativo',
+  tema: formatTitle(gptConfig.narrative?.theme) || 'Jogo Educativo',
   descricao: gptConfig.narrative?.intro || '',
   mecanica: gptConfig.mechanic?.name || 'escalada',
   fases: []

@@ -546,23 +546,62 @@ const PERSEGUICAO = {
         }
     },
 
+    // Mostrar mecânica (mobile: trazer para frente)
+    showMechanic: function() {
+        const gameContainer = document.querySelector('.game-container');
+        if (gameContainer && window.innerWidth <= 768) {
+            console.log('📱 Mostrando mecânica (mobile)');
+            gameContainer.classList.add('showing-mechanic');
+        }
+    },
+
+    // Esconder mecânica (mobile: voltar para fundo)
+    hideMechanic: function() {
+        const gameContainer = document.querySelector('.game-container');
+        if (gameContainer && window.innerWidth <= 768) {
+            console.log('📱 Escondendo mecânica (mobile)');
+            gameContainer.classList.remove('showing-mechanic');
+        }
+    },
+
     // Feedback de acerto
     onCorrect: function() {
         console.log('✅ Resposta correta! Lume avança...');
-        this.runForward();
+
+        // Mobile: mostrar mecânica antes da animação
+        this.showMechanic();
+
+        // Pequeno delay para transição de opacity
+        setTimeout(() => {
+            this.runForward();
+
+            // Esconder mecânica após animação
+            setTimeout(() => {
+                this.hideMechanic();
+            }, 1000); // Duração da animação de corrida
+        }, 100);
     },
 
     // Feedback de erro
     onWrong: function() {
         console.log('❌ Resposta errada! Perigo avança...');
-        this.dangerAdvances();
 
-        // Shake effect em Lume
-        const lume = document.getElementById('lume-runner');
-        lume.style.animation = 'tremble 0.5s';
+        // Mobile: mostrar mecânica antes da animação
+        this.showMechanic();
+
         setTimeout(() => {
-            lume.style.animation = '';
-        }, 500);
+            this.dangerAdvances();
+
+            // Shake effect em Lume
+            const lume = document.getElementById('lume-runner');
+            lume.style.animation = 'tremble 0.5s';
+            setTimeout(() => {
+                lume.style.animation = '';
+
+                // Esconder mecânica após animação
+                this.hideMechanic();
+            }, 1100); // Duração da animação de perigo + shake
+        }, 100);
     },
 
     // Resetar mecânica

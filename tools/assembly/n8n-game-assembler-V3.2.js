@@ -125,7 +125,7 @@ gptConfig.questions.forEach((q, i) => {
 
   adaptedConfig.fases.push({
     modalidade: modalityType,
-    ...dados  // ✅ Spread operator: coloca todos os campos de "dados" no mesmo nível
+    dados: dados  // ✅ REVERTIDO: Mantém estrutura original com camada "dados"
   });
 });
 
@@ -217,17 +217,40 @@ const html = `<!DOCTYPE html>
 
         console.log('🎮 GAME_CONFIG injetado:', GAME_CONFIG);
 
-        // Função de inicialização (compatível com Bubble SPA)
+        // Modalidades necessárias para este jogo
+        const REQUIRED_MODALITIES = ${JSON.stringify(Array.from(modalitiesUsed))};
+
+        // Função de inicialização ROBUSTA (compatível com Bubble SPA)
         function initGame() {
             console.log('🔄 Tentando inicializar Game Engine...');
 
-            if (typeof GAME_ENGINE !== 'undefined') {
-                console.log('✅ GAME_ENGINE encontrado, inicializando...');
-                GAME_ENGINE.init(GAME_CONFIG);
-            } else {
+            // 1. Verificar se GAME_ENGINE carregou
+            if (typeof GAME_ENGINE === 'undefined') {
                 console.log('⏳ GAME_ENGINE ainda não carregado, tentando novamente em 100ms...');
                 setTimeout(initGame, 100);
+                return;
             }
+
+            // 2. Verificar se todas as modalidades necessárias carregaram
+            const modalidadesCarregadas = REQUIRED_MODALITIES.filter(mod => {
+                return GAME_ENGINE.getModalidade(mod) !== undefined;
+            });
+
+            if (modalidadesCarregadas.length < REQUIRED_MODALITIES.length) {
+                const faltando = REQUIRED_MODALITIES.filter(mod => {
+                    return GAME_ENGINE.getModalidade(mod) === undefined;
+                });
+                console.log('⏳ Aguardando modalidades carregarem...');
+                console.log('   Carregadas:', modalidadesCarregadas.join(', '));
+                console.log('   Faltando:', faltando.join(', '));
+                setTimeout(initGame, 100);
+                return;
+            }
+
+            // 3. Tudo pronto! Inicializar o jogo
+            console.log('✅ GAME_ENGINE e todas as modalidades carregados!');
+            console.log('   Modalidades:', REQUIRED_MODALITIES.join(', '));
+            GAME_ENGINE.init(GAME_CONFIG);
         }
 
         // Inicializar imediatamente (para Bubble SPA)

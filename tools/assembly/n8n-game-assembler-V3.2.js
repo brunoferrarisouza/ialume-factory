@@ -125,7 +125,7 @@ gptConfig.questions.forEach((q, i) => {
 
   adaptedConfig.fases.push({
     modalidade: modalityType,
-    dados: dados
+    ...dados  // ✅ Spread operator: coloca todos os campos de "dados" no mesmo nível
   });
 });
 

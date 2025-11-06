@@ -33,10 +33,9 @@ const ESCALADA = {
         this.injectProgressBar(); // ← NOVO: Barra de progresso
         this.injectHTML();
         this.injectCSS();
-        this.injectVisualElements(); // ← Sol e estrelas
         this.updatePosition();
         this.updateVisibleFloors(); // ← Mostrar degraus iniciais (1,2,3)
-        this.applyGraduation(0); // ← Estado inicial (dia claro, sol visível)
+        this.applySkyGraduation(0); // ← Estado inicial (manhã)
     },
 
     // ===== NOVO: Sistema de Parallax =====
@@ -131,49 +130,6 @@ const ESCALADA = {
         }
     },
 
-    // Injetar elementos visuais (sol, estrelas)
-    injectVisualElements: function() {
-        const container = document.querySelector('.game-container');
-        if (!container) return;
-
-        // SOL (canto superior direito)
-        const sol = document.createElement('div');
-        sol.id = 'sol-element';
-        sol.innerHTML = '☀️';
-        sol.style.cssText = `
-            position: fixed;
-            top: 50px;
-            right: 50px;
-            font-size: 4rem;
-            z-index: 5;
-            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
-            transition: opacity 1s ease;
-            opacity: 1;
-            pointer-events: none;
-        `;
-        container.appendChild(sol);
-
-        // ESTRELAS (8 estrelas em posições aleatórias)
-        for (let i = 0; i < 8; i++) {
-            const estrela = document.createElement('div');
-            estrela.className = 'estrela-element';
-            estrela.innerHTML = '⭐';
-            estrela.style.cssText = `
-                position: fixed;
-                top: ${10 + Math.random() * 60}%;
-                left: ${10 + Math.random() * 80}%;
-                font-size: ${1.5 + Math.random() * 1.5}rem;
-                z-index: 5;
-                opacity: 0;
-                transition: opacity 1s ease;
-                animation: twinkle ${2 + Math.random() * 2}s ease-in-out infinite;
-                pointer-events: none;
-            `;
-            container.appendChild(estrela);
-        }
-
-        console.log('✨ Sol e estrelas injetados');
-    },
 
     // Atualizar janela móvel de 3 degraus
     updateVisibleFloors: function() {
@@ -229,249 +185,34 @@ const ESCALADA = {
             layer3.style.transform = `translateY(-${movePercent * 1.0}%)`;
         }
 
-        // ✅ GRADUAÇÃO DE 8 FAIXAS
-        this.applyGraduation(progress);
-
         console.log(`🎬 Parallax: progresso ${Math.round(progress * 100)}%, move ${Math.round(movePercent)}%`);
-
-        // ✅ NOVO: Verificar checkpoints de elementos
-        this.checkElementCheckpoints(progress);
     },
 
-    // Aplicar graduação visual (céu, sol, estrelas)
-    applyGraduation: function(progress) {
+    // Aplicar graduação do céu (8 cores fixas)
+    applySkyGraduation: function(step) {
         const layer1 = document.querySelector('.bg-layer-1');
-        const sol = document.getElementById('sol-element');
-        const estrelas = document.querySelectorAll('.estrela-element');
+        if (!layer1) return;
 
-        // 1. COR DO CÉU (transição suave)
-        // 0% = #87CEEB (azul claro)
-        // 50% = #1e3a5f (azul escuro)
-        // 100% = #0a1929 (quase preto)
-        if (layer1) {
-            let skyColor;
-            if (progress < 0.5) {
-                // Primeira metade: azul claro → azul escuro
-                const t = progress * 2; // 0 a 1
-                skyColor = this.interpolateColor('#87CEEB', '#1e3a5f', t);
-            } else {
-                // Segunda metade: azul escuro → quase preto
-                const t = (progress - 0.5) * 2; // 0 a 1
-                skyColor = this.interpolateColor('#1e3a5f', '#0a1929', t);
-            }
-            layer1.style.background = skyColor;
-        }
+        // 8 cores representando manhã → noite
+        const skyColors = [
+            '#87CEEB', // 0 - Azul claro (manhã)
+            '#6FB1D8', // 1 - Azul médio (meio da manhã)
+            '#5A9BC5', // 2 - Azul (tarde)
+            '#FF8C42', // 3 - Laranja (pôr do sol)
+            '#FF6B6B', // 4 - Vermelho/rosa (entardecer)
+            '#4A5899', // 5 - Roxo escuro (crepúsculo)
+            '#2E3A59', // 6 - Azul escuro (noite inicial)
+            '#1A1F3A'  // 7 - Quase preto (noite profunda)
+        ];
 
-        // 2. SOL (fade out gradual)
-        // Opacidade: 1.0 (0%) → 0.0 (100%)
-        if (sol) {
-            const solOpacity = Math.max(0, 1 - progress * 1.2); // Desaparece mais rápido
-            sol.style.opacity = solOpacity;
-        }
+        // Garantir que step está no range
+        const currentColor = skyColors[Math.min(step, 7)];
 
-        // 3. ESTRELAS (fade in gradual)
-        // Opacidade: 0.0 (0%) → 1.0 (100%)
-        if (estrelas.length > 0) {
-            const estrelasOpacity = Math.min(1, progress * 1.5); // Aparecem progressivamente
-            estrelas.forEach(estrela => {
-                estrela.style.opacity = estrelasOpacity;
-            });
-        }
+        // Aplicar cor com transição suave
+        layer1.style.transition = 'background 1.5s ease';
+        layer1.style.background = currentColor;
 
-        console.log(`🌈 Graduação aplicada: ${Math.round(progress * 100)}% (céu, sol, estrelas)`);
-    },
-
-    // Interpolar entre duas cores hexadecimais
-    interpolateColor: function(color1, color2, t) {
-        // Converter hex para RGB
-        const c1 = this.hexToRgb(color1);
-        const c2 = this.hexToRgb(color2);
-
-        // Interpolar
-        const r = Math.round(c1.r + (c2.r - c1.r) * t);
-        const g = Math.round(c1.g + (c2.g - c1.g) * t);
-        const b = Math.round(c1.b + (c2.b - c1.b) * t);
-
-        return `rgb(${r}, ${g}, ${b})`;
-    },
-
-    // Converter hex para RGB
-    hexToRgb: function(hex) {
-        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ? {
-            r: parseInt(result[1], 16),
-            g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16)
-        } : { r: 0, g: 0, b: 0 };
-    },
-
-    // ===== SISTEMA DE CHECKPOINTS (Elementos Progressivos) =====
-
-    checkElementCheckpoints: function(progress) {
-        // 25% - 2 Pássaros
-        if (progress >= 0.25 && !this.checkpoints.passaros) {
-            this.spawnElement({
-                id: 'passaro1',
-                emoji: '🐦',
-                nome: 'Pássaro 1',
-                posicao: { right: '250px', top: '70%' },
-                animacao: 'voar-horizontal',
-                tamanho: '2.5rem',
-                delay: '0s'
-            });
-            this.spawnElement({
-                id: 'passaro2',
-                emoji: '🐦',
-                nome: 'Pássaro 2',
-                posicao: { right: '300px', top: '65%' },
-                animacao: 'voar-horizontal',
-                tamanho: '2.5rem',
-                delay: '0.5s'
-            });
-            this.checkpoints.passaros = true;
-            console.log('🐦 2 pássaros apareceram (25%)');
-        }
-
-        // 40% - Nuvens brancas
-        if (progress >= 0.40 && !this.checkpoints.nuvensBrancas) {
-            this.spawnElement({
-                id: 'nuvem-branca1',
-                emoji: '☁️',
-                nome: 'Nuvem Branca',
-                posicao: { right: '150px', top: '50%' },
-                animacao: 'flutuar-lento',
-                tamanho: '3rem',
-                delay: '0s'
-            });
-            this.spawnElement({
-                id: 'nuvem-branca2',
-                emoji: '☁️',
-                nome: 'Nuvem Branca',
-                posicao: { right: '400px', top: '55%' },
-                animacao: 'flutuar-lento',
-                tamanho: '2.5rem',
-                delay: '1s'
-            });
-            this.checkpoints.nuvensBrancas = true;
-            console.log('☁️ Nuvens brancas apareceram (40%)');
-        }
-
-        // 60% - Nuvens escuras
-        if (progress >= 0.60 && !this.checkpoints.nuvensEscuras) {
-            this.spawnElement({
-                id: 'nuvem-escura1',
-                emoji: '🌫️',
-                nome: 'Nuvem Escura',
-                posicao: { right: '200px', top: '35%' },
-                animacao: 'flutuar-medio',
-                tamanho: '3.5rem',
-                delay: '0s'
-            });
-            this.spawnElement({
-                id: 'nuvem-escura2',
-                emoji: '🌫️',
-                nome: 'Nuvem Escura',
-                posicao: { right: '350px', top: '40%' },
-                animacao: 'flutuar-medio',
-                tamanho: '3rem',
-                delay: '0.7s'
-            });
-            this.checkpoints.nuvensEscuras = true;
-            console.log('🌫️ Nuvens escuras apareceram (60%)');
-        }
-
-        // 70% - Urubus
-        if (progress >= 0.70 && !this.checkpoints.urubus) {
-            this.spawnElement({
-                id: 'urubu1',
-                emoji: '🦅',
-                nome: 'Urubu',
-                posicao: { right: '280px', top: '25%' },
-                animacao: 'voar-circular',
-                tamanho: '3.5rem',
-                delay: '0s'
-            });
-            this.spawnElement({
-                id: 'urubu2',
-                emoji: '🦅',
-                nome: 'Urubu',
-                posicao: { right: '320px', top: '30%' },
-                animacao: 'voar-circular',
-                tamanho: '3rem',
-                delay: '1s'
-            });
-            this.checkpoints.urubus = true;
-            console.log('🦅 Urubus apareceram (70%)');
-        }
-
-        // 80% - Céu escuro e estrelas
-        if (progress >= 0.80 && !this.checkpoints.estrelas) {
-            // Escurecer camada 1 (fundo/céu)
-            this.escurecerCeu();
-
-            // Criar constelação de estrelas
-            for (let i = 0; i < 8; i++) {
-                const randomRight = 100 + Math.random() * 300;
-                const randomTop = 5 + Math.random() * 20;
-                const randomSize = 1 + Math.random() * 1.5;
-                const randomDelay = Math.random() * 2;
-
-                this.spawnElement({
-                    id: `estrela${i}`,
-                    emoji: ['⭐', '✨', '🌟'][Math.floor(Math.random() * 3)],
-                    nome: `Estrela ${i}`,
-                    posicao: { right: `${randomRight}px`, top: `${randomTop}%` },
-                    animacao: 'piscar',
-                    tamanho: `${randomSize}rem`,
-                    delay: `${randomDelay}s`
-                });
-            }
-
-            this.checkpoints.estrelas = true;
-            console.log('⭐ Céu escureceu e estrelas apareceram (80%)');
-        }
-    },
-
-    escurecerCeu: function() {
-        const layer1 = document.querySelector('.bg-layer-1');
-        if (layer1) {
-            layer1.style.transition = 'filter 2s ease-in-out';
-            layer1.style.filter = 'brightness(0.3)';
-            console.log('🌙 Céu escurecido');
-        }
-    },
-
-    spawnElement: function(config) {
-        // Evitar duplicação
-        if (document.getElementById(config.id)) {
-            return;
-        }
-
-        const elemento = document.createElement('div');
-        elemento.id = config.id;
-        elemento.className = `checkpoint-element ${config.nome.toLowerCase().replace(/\s/g, '-')}`;
-        elemento.innerHTML = config.emoji;
-        elemento.style.cssText = `
-            position: absolute;
-            ${config.posicao.right ? 'right: ' + config.posicao.right + ';' : ''}
-            ${config.posicao.left ? 'left: ' + config.posicao.left + ';' : ''}
-            ${config.posicao.top ? 'top: ' + config.posicao.top + ';' : ''}
-            ${config.posicao.bottom ? 'bottom: ' + config.posicao.bottom + ';' : ''}
-            font-size: ${config.tamanho || '3rem'};
-            animation: ${config.animacao} 3s ease-in-out infinite;
-            animation-delay: ${config.delay || '0s'};
-            z-index: 50;
-            filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
-            pointer-events: none;
-        `;
-
-        // Adicionar ao container
-        const container = document.querySelector('.game-container');
-        if (container) {
-            container.appendChild(elemento);
-        }
-
-        console.log(`🎨 Elemento "${config.nome}" (${config.emoji}) apareceu em ${config.posicao.top || config.posicao.bottom}`);
+        console.log(`🌈 Céu atualizado: Step ${step} → ${currentColor}`);
     },
 
     // Injetar HTML da montanha
@@ -921,6 +662,9 @@ const ESCALADA = {
 
         // ✅ Mover backgrounds em parallax
         this.moveParallax();
+
+        // ✅ Atualizar graduação do céu (baseado no step)
+        this.applySkyGraduation(this.currentStep);
 
         // ✅ NOVO: Atualizar barra de progresso
         this.updateProgressBar();

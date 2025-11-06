@@ -230,11 +230,14 @@ function startAdventure() {
 function nextPhase() {
     playSound('click');
     const nextPhaseNumber = gameState.currentPhase + 1;
-    
+
+    // ✅ CORREÇÃO: Usar window.totalPhases (setado pelo Game Engine) ao invés de gameState.totalPhases
+    const totalPhases = window.totalPhases || gameState.totalPhases;
+
     console.log('nextPhase chamado. Fase atual:', gameState.currentPhase, 'Proxima:', nextPhaseNumber);
-    console.log('totalPhases:', gameState.totalPhases);
-    
-    if (nextPhaseNumber <= gameState.totalPhases) {
+    console.log('totalPhases:', totalPhases);
+
+    if (nextPhaseNumber <= totalPhases) {
         // Apenas ir para próxima fase (o quiz já subiu o Lume)
         goToPhase(nextPhaseNumber);
     } else {

@@ -255,7 +255,7 @@ const ESCALADA = {
             const isTop = i === 9;
 
             floorsHTML += `
-                <div class="floor" data-floor="${i}" style="opacity: 0; visibility: hidden;">
+                <div class="floor" data-floor="${i}">
                     <div class="floor-platform ${isTop ? 'top' : ''}">
                         <span class="floor-label">DEGRAU ${i}</span>
                         ${isTop ? '<span class="victory-flag">🚩</span>' : ''}

@@ -5,30 +5,116 @@ const ESCALADA = {
     name: 'escalada',
     currentStep: 0,
     totalSteps: 5, // Fase 0-4
-    
+    cenario: 'montanha-nevada', // ← NOVO: Cenário padrão
+
     // Inicializar mecânica
     init: function(config) {
         console.log('🏔️ ESCALADA.init() chamado com config:', config);
-        
+
         if (!config || !config.totalSteps) {
             console.error('❌ ERRO: config.totalSteps não fornecido!');
             return;
         }
-        
+
         this.totalSteps = config.totalSteps;
         this.currentStep = 0;
-        
+        this.cenario = config.cenario || 'montanha-nevada'; // ← NOVO: Pegar cenário do config
+
         console.log('✅ Mecânica ESCALADA inicializada');
         console.log('   Total de andares (totalSteps):', this.totalSteps);
         console.log('   Andar atual (currentStep):', this.currentStep);
+        console.log('   🎨 Cenário escolhido:', this.cenario);
         console.log('   ✅ OPÇÃO A: 4 fases = 4 andares (BASE=0, ANDAR 1, ANDAR 2, TOPO=3)');
         console.log('   Andares a criar: BASE (0) até TOPO (' + (this.totalSteps - 1) + ')');
-        
+
+        this.injectBackground(); // ← NOVO: Injetar backgrounds PRIMEIRO
         this.injectHTML();
         this.injectCSS();
         this.updatePosition();
     },
-    
+
+    // ===== NOVO: Sistema de Parallax =====
+    // Injetar backgrounds com 3 camadas
+    injectBackground: function() {
+        const container = document.querySelector('.game-container');
+
+        // Verificar se container existe
+        if (!container) {
+            console.warn('⚠️ .game-container não encontrado, tentando novamente...');
+            setTimeout(() => this.injectBackground(), 100);
+            return;
+        }
+
+        // Verificar se já existe (evitar duplicação)
+        if (document.getElementById('escalada-background')) {
+            console.log('⏭️ Background já injetado');
+            return;
+        }
+
+        console.log('🎨 Injetando backgrounds mockados (cenário:', this.cenario + ')');
+
+        // Definir cores por cenário (mockup com gradientes CSS)
+        const cenarios = {
+            'montanha-nevada': {
+                layer1: 'linear-gradient(180deg, #87CEEB 0%, #B0E0E6 100%)', // Céu azul
+                layer2: 'linear-gradient(180deg, #708090 0%, #A9A9A9 60%)', // Montanhas cinzas
+                layer3: 'linear-gradient(180deg, transparent 0%, #F5F5F5 80%)' // Neve
+            },
+            'vulcao': {
+                layer1: 'linear-gradient(180deg, #FF4500 0%, #8B0000 100%)', // Céu laranja/vermelho
+                layer2: 'linear-gradient(180deg, #2F4F4F 0%, #696969 60%)', // Rochas escuras
+                layer3: 'linear-gradient(180deg, transparent 0%, #FF6347 80%)' // Lava
+            }
+        };
+
+        const bg = cenarios[this.cenario] || cenarios['montanha-nevada'];
+
+        // Criar estrutura HTML dos backgrounds
+        const bgHTML = `
+            <div id="escalada-background" class="escalada-background">
+                <div class="bg-layer bg-layer-1" style="background: ${bg.layer1}"></div>
+                <div class="bg-layer bg-layer-2" style="background: ${bg.layer2}"></div>
+                <div class="bg-layer bg-layer-3" style="background: ${bg.layer3}"></div>
+            </div>
+        `;
+
+        // Injetar ANTES de tudo (para ficar atrás)
+        container.insertAdjacentHTML('afterbegin', bgHTML);
+
+        console.log('✅ Backgrounds mockados injetados (3 camadas)');
+    },
+
+    // Mover backgrounds com parallax
+    moveParallax: function() {
+        // Calcular progresso (0 a 1)
+        const progress = this.currentStep / (this.totalSteps - 1);
+
+        // Porcentagem de movimento (0% a 100%)
+        const movePercent = progress * 100;
+
+        // Aplicar parallax com velocidades diferentes
+        const layer1 = document.querySelector('.bg-layer-1');
+        const layer2 = document.querySelector('.bg-layer-2');
+        const layer3 = document.querySelector('.bg-layer-3');
+
+        if (layer1) {
+            // Fundo: move devagar (20%)
+            layer1.style.transform = `translateY(-${movePercent * 0.2}%)`;
+        }
+
+        if (layer2) {
+            // Meio: move médio (50%)
+            layer2.style.transform = `translateY(-${movePercent * 0.5}%)`;
+        }
+
+        if (layer3) {
+            // Frente: move rápido (100%)
+            layer3.style.transform = `translateY(-${movePercent * 1.0}%)`;
+        }
+
+        console.log(`🎬 Parallax: progresso ${Math.round(progress * 100)}%, move ${Math.round(movePercent)}%`);
+    },
+
     // Injetar HTML da montanha
     injectHTML: function() {
         const container = document.querySelector('.game-container');
@@ -104,6 +190,39 @@ const ESCALADA = {
         const style = document.createElement('style');
         style.id = 'escalada-styles';
         style.textContent = `
+            /* ===== SISTEMA DE BACKGROUNDS PARALLAX ===== */
+
+            /* Container dos backgrounds */
+            .escalada-background {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                overflow: hidden;
+                z-index: 0; /* Atrás de tudo */
+            }
+
+            /* Camadas de parallax */
+            .bg-layer {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 120%; /* Extra 20% para movimento */
+                background-size: cover;
+                background-position: center bottom;
+                transition: transform 1s cubic-bezier(0.25, 0.1, 0.25, 1);
+                will-change: transform; /* GPU acceleration */
+            }
+
+            /* Z-index de cada camada */
+            .bg-layer-1 { z-index: 1; } /* Fundo (mais longe) */
+            .bg-layer-2 { z-index: 2; } /* Meio */
+            .bg-layer-3 { z-index: 3; } /* Frente (mais perto) */
+
+            /* ===== MECÂNICA ESCALADA ===== */
+
             /* Container da mecânica */
             #escalada-container {
                 position: absolute;
@@ -308,10 +427,13 @@ const ESCALADA = {
         
         // Criar partículas
         this.createParticles();
-        
+
         // Atualizar posição
         this.updatePosition();
-        
+
+        // ✅ NOVO: Mover backgrounds em parallax
+        this.moveParallax();
+
         // Remover classe após animação
         setTimeout(() => {
             lume.classList.remove('climbing');
@@ -431,11 +553,8 @@ const ESCALADA = {
         // Pequeno delay para transição de opacity
         setTimeout(() => {
             this.climb();
-
-            // Esconder mecânica após animação
-            setTimeout(() => {
-                this.hideMechanic();
-            }, 1200); // Duração da animação de subida + partículas
+            // ✅ CORREÇÃO: Não esconde mais automaticamente
+            // base.js vai esconder no timing certo (após trocar fase)
         }, 100);
     },
 
@@ -453,9 +572,8 @@ const ESCALADA = {
             lume.style.animation = 'shake 0.5s';
             setTimeout(() => {
                 lume.style.animation = '';
-
-                // Esconder mecânica após animação
-                this.hideMechanic();
+                // ✅ CORREÇÃO: Não esconde mais automaticamente
+                // base.js vai esconder no timing certo
             }, 500);
         }, 100);
     },

@@ -41,9 +41,19 @@ const GAME_ENGINE = {
             const Mechanic = this.getMechanic(gameConfig.mecanica);
             if (Mechanic) {
                 console.log('🎮 Inicializando mecânica:', gameConfig.mecanica);
-                Mechanic.init({
+
+                // ✅ NOVO: Passar cenário para mecânicas com parallax
+                const mechanicConfig = {
                     totalSteps: totalSteps
-                });
+                };
+
+                // Se tiver cenário definido, passar para a mecânica
+                if (gameConfig.cenario) {
+                    mechanicConfig.cenario = gameConfig.cenario;
+                    console.log('🎨 Cenário definido:', gameConfig.cenario);
+                }
+
+                Mechanic.init(mechanicConfig);
             } else {
                 console.warn('⚠️ Mecânica não encontrada:', gameConfig.mecanica);
             }

@@ -94,8 +94,8 @@ const FILL_BLANKS = {
             .fb-header { text-align: center; margin-bottom: 30px; }
             .fb-icon { font-size: 3.5rem; margin-bottom: 10px; }
             .fb-title { font-size: 1.3rem; font-weight: 600; color: #495057; }
-            .fb-sentence { background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15)); border: 3px solid #667eea; border-radius: 20px; padding: 40px; margin-bottom: 30px; font-size: 1.8rem; font-weight: 600; color: #212529; line-height: 2.5; text-align: center; }
-            .fb-input { display: inline-block; min-width: 150px; padding: 10px 20px; font-size: 1.8rem; font-weight: 700; text-align: center; border: 3px solid #667eea; border-radius: 10px; background: white; color: #212529; outline: none; }
+            .fb-sentence { background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15)); border: 3px solid #667eea; border-radius: 20px; padding: 40px; margin-bottom: 30px; font-size: 1.8rem; font-weight: 600; color: #212529; line-height: 2.5; text-align: center; box-sizing: border-box; overflow-wrap: break-word; word-break: break-word; }
+            .fb-input { display: inline-block; min-width: 150px; max-width: 90%; padding: 10px 20px; font-size: 1.8rem; font-weight: 700; text-align: center; border: 3px solid #667eea; border-radius: 10px; background: white; color: #212529; outline: none; }
             .fb-input:focus { border-color: #5a67d8; box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2); transform: scale(1.05); }
             .fb-input.correct { background: linear-gradient(135deg, #51cf66, #38d9a9); border-color: #37b24d; color: white; }
             .fb-input.wrong { background: linear-gradient(135deg, #ff6b6b, #ff8787); border-color: #f03e3e; color: white; animation: shake 0.5s; }
@@ -107,6 +107,12 @@ const FILL_BLANKS = {
             .fb-button:disabled { opacity: 0.6; cursor: not-allowed; }
             .fb-button.correct { background: linear-gradient(135deg, #51cf66, #38d9a9); }
             .fb-button.wrong { background: linear-gradient(135deg, #ff6b6b, #ff8787); }
+
+            /* Mobile: input menor e responsivo */
+            @media (max-width: 768px) {
+                .fb-sentence { font-size: 1.4rem; padding: 25px; line-height: 2; }
+                .fb-input { min-width: 120px; max-width: 80%; font-size: 1.4rem; padding: 8px 15px; }
+            }
         `;
         document.head.appendChild(style);
     }

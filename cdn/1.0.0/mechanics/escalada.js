@@ -327,21 +327,21 @@ const ESCALADA = {
                 pointer-events: none;
             }
             
-            /* Montanha - CENTRALIZADA HORIZONTALMENTE */
+            /* Montanha - CONTAINER LIVRE (sem centralização) */
             .mountain {
                 position: absolute;
-                left: 50%;
-                transform: translateX(-50%);
+                left: 0;
+                right: 0;
                 top: 0;
                 bottom: 0;
-                width: 250px;
+                width: 100%;
                 pointer-events: none;
             }
 
             /* Floor - POSIÇÃO ABSOLUTA COM TRANSIÇÃO */
             .floor {
                 position: absolute;
-                width: 200px; /* Largura fixa para cada degrau */
+                width: 80px; /* Largura reduzida em 60% (200px → 80px) */
                 height: 40px;
                 display: flex;
                 align-items: flex-end;
@@ -368,14 +368,21 @@ const ESCALADA = {
 
             /* Posições horizontais específicas de cada degrau */
             .floor[data-floor="1"] { left: 5%; } /* Esquerda */
-            .floor[data-floor="2"] { left: 50%; transform: translateX(-50%) translateY(50%); } /* Centro */
-            .floor[data-floor="3"] { left: auto; right: 5%; } /* Direita */
-            .floor[data-floor="4"] { left: auto; right: 5%; } /* Direita */
-            .floor[data-floor="5"] { left: 50%; transform: translateX(-50%) translateY(50%); } /* Centro */
+            .floor[data-floor="2"] { left: 50%; } /* Centro */
+            .floor[data-floor="3"] { right: 5%; left: auto; } /* Direita */
+            .floor[data-floor="4"] { right: 5%; left: auto; } /* Direita */
+            .floor[data-floor="5"] { left: 50%; } /* Centro */
             .floor[data-floor="6"] { left: 5%; } /* Esquerda */
             .floor[data-floor="7"] { left: 5%; } /* Esquerda */
-            .floor[data-floor="8"] { left: 50%; transform: translateX(-50%) translateY(50%); } /* Centro */
-            .floor[data-floor="9"] { left: auto; right: 5%; } /* Direita */
+            .floor[data-floor="8"] { left: 50%; } /* Centro */
+            .floor[data-floor="9"] { right: 5%; left: auto; } /* Direita */
+
+            /* Ajuste de transform para degraus centralizados */
+            .floor[data-floor="2"],
+            .floor[data-floor="5"],
+            .floor[data-floor="8"] {
+                transform: translateX(-50%) translateY(50%);
+            }
 
             /* Quando visível */
             .floor.visible {
@@ -431,7 +438,7 @@ const ESCALADA = {
                 50% { transform: rotate(10deg); }
             }
             
-            /* Lume escalador - COM TRANSIÇÃO HORIZONTAL */
+            /* Lume escalador - COM TRANSIÇÃO HORIZONTAL + OPACITY */
             .lume-climber {
                 position: absolute;
                 left: 50%;
@@ -441,9 +448,11 @@ const ESCALADA = {
                 filter: drop-shadow(0 0 20px #fff8dc);
                 transition: bottom 1s cubic-bezier(0.68, -0.55, 0.265, 1.55),
                             left 1s cubic-bezier(0.68, -0.55, 0.265, 1.55),
+                            opacity 0.6s ease,
                             transform 0.3s ease;
                 z-index: 101;
                 pointer-events: none;
+                opacity: 1;
             }
             
             /* Animação de subida */
@@ -464,6 +473,26 @@ const ESCALADA = {
                 25% { transform: translateX(-50%) translateY(-10px); }
                 50% { transform: translateX(-50%) translateY(5px); }
                 75% { transform: translateX(-50%) translateY(-5px); }
+            }
+
+            /* Animação de pulo ao reaparecer (truque de mágica) */
+            @keyframes jumpIn {
+                0% {
+                    opacity: 0;
+                    transform: translateX(-50%) translateY(100px) scale(0.5);
+                }
+                50% {
+                    opacity: 1;
+                    transform: translateX(-50%) translateY(-20px) scale(1.1);
+                }
+                100% {
+                    opacity: 1;
+                    transform: translateX(-50%) translateY(0) scale(1);
+                }
+            }
+
+            .lume-climber.jumping-in {
+                animation: jumpIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             }
             
             /* Partículas ao subir */
@@ -622,17 +651,17 @@ const ESCALADA = {
         // Posição dentro do grupo (0=inferior, 1=médio, 2=superior)
         const positionInGroup = this.currentStep % 3;
 
-        // Posições horizontais de cada degrau (centro do degrau)
+        // Posições horizontais de cada degrau (correspondendo às plataformas de 80px)
         const horizontalPositions = {
-            1: '15%',      // Esquerda (5% + metade de 200px)
-            2: '50%',      // Centro
-            3: '85%',      // Direita (95% - metade de 200px)
-            4: '85%',      // Direita
-            5: '50%',      // Centro
-            6: '15%',      // Esquerda
-            7: '15%',      // Esquerda
-            8: '50%',      // Centro
-            9: '85%'       // Direita
+            1: 'calc(5% + 40px)',   // Esquerda (5% + metade da plataforma 80px)
+            2: '50%',               // Centro
+            3: 'calc(95% - 40px)',  // Direita (95% - metade da plataforma)
+            4: 'calc(95% - 40px)',  // Direita
+            5: '50%',               // Centro
+            6: 'calc(5% + 40px)',   // Esquerda
+            7: 'calc(5% + 40px)',   // Esquerda
+            8: '50%',               // Centro
+            9: 'calc(95% - 40px)'   // Direita
         };
 
         // Determinar posição vertical
@@ -664,46 +693,85 @@ const ESCALADA = {
     // Subir um andar (quando acerta)
     climb: function() {
         console.log('⬆️ climb() chamado. Andar atual:', this.currentStep, '/ Total:', this.totalSteps);
-        
+
         if (this.currentStep >= this.totalSteps - 1) {
             console.log('🚫 Lume já está no topo! (andar', this.currentStep, '=', this.totalSteps - 1, ')');
             return;
         }
-        
+
+        const oldStep = this.currentStep;
         this.currentStep++;
         console.log('✅ Subindo para andar', this.currentStep);
-        
-        // Adicionar classe de animação
+
         const lume = document.getElementById('lume-climber');
-        lume.classList.add('climbing');
-        
-        // Criar partículas
-        this.createParticles();
 
-        // Atualizar posição
-        this.updatePosition();
+        // ✨ DETECTAR MUDANÇA DE GRUPO (3→4 ou 6→7) - "Truque de mágica"
+        const isChangingGroup = (this.currentStep % 3 === 0) && (this.currentStep > 0);
 
-        // ✅ Atualizar janela móvel (mostrar degraus corretos)
-        this.updateVisibleFloors();
+        if (isChangingGroup) {
+            console.log('🎩 MUDANÇA DE GRUPO! Aplicando truque de mágica...');
 
-        // ✅ Mover backgrounds em parallax
-        this.moveParallax();
+            // 1️⃣ Lume pula e SOME
+            lume.classList.add('climbing');
+            this.createParticles();
 
-        // ✅ Atualizar graduação do céu (baseado no step)
-        this.applySkyGraduation(this.currentStep);
+            setTimeout(() => {
+                lume.style.opacity = '0';
+                console.log('👻 Lume sumiu (pulou para nível invisível)');
+            }, 300);
 
-        // ✅ NOVO: Atualizar barra de progresso
-        this.updateProgressBar();
+            // 2️⃣ Atualizar janela móvel e parallax ENQUANTO Lume está invisível
+            setTimeout(() => {
+                this.updateVisibleFloors();
+                this.moveParallax();
+                this.applySkyGraduation(this.currentStep);
+                this.updateProgressBar();
+                console.log('🎬 Cenário mudou (novo grupo visível)');
+            }, 500);
 
-        // Remover classe após animação
-        setTimeout(() => {
-            lume.classList.remove('climbing');
-        }, 1000);
-        
+            // 3️⃣ Teleportar Lume para o degrau inferior do novo grupo (SEM transição)
+            setTimeout(() => {
+                lume.style.transition = 'none'; // Desativa transição
+                lume.style.opacity = '0'; // Garantir invisibilidade
+                this.updatePosition(); // Posiciona no degrau 4 ou 7
+                console.log('📍 Lume teleportado para novo grupo (bottom: 10%)');
+
+                // 4️⃣ REAPARECER PULANDO (animação jumpIn)
+                setTimeout(() => {
+                    lume.style.transition = 'bottom 1s cubic-bezier(0.68, -0.55, 0.265, 1.55), left 1s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.6s ease, transform 0.3s ease';
+                    lume.style.opacity = ''; // ✅ REMOVER inline style para permitir animação
+                    lume.classList.remove('climbing');
+                    lume.classList.add('jumping-in');
+                    console.log('✨ Lume PULANDO para dentro! 🦘');
+
+                    // Remover classe após animação
+                    setTimeout(() => {
+                        lume.classList.remove('jumping-in');
+                    }, 600);
+                }, 50);
+            }, 800);
+
+        } else {
+            // ✅ TRANSIÇÃO NORMAL (dentro do mesmo grupo)
+            console.log('➡️ Transição normal (mesmo grupo)');
+
+            lume.classList.add('climbing');
+            this.createParticles();
+            this.updatePosition();
+            this.updateVisibleFloors();
+            this.moveParallax();
+            this.applySkyGraduation(this.currentStep);
+            this.updateProgressBar();
+
+            setTimeout(() => {
+                lume.classList.remove('climbing');
+            }, 1000);
+        }
+
         // VERIFICAÇÃO CORRETA: Chegou no topo?
         const isAtTop = this.currentStep === this.totalSteps - 1;
         console.log('🎯 Está no topo?', isAtTop, '(currentStep:', this.currentStep, '=== totalSteps-1:', this.totalSteps - 1, ')');
-        
+
         if (isAtTop) {
             console.log('🎉 CHEGOU NO TOPO! Disparando efeito de vitória...');
             setTimeout(() => {

@@ -106,7 +106,7 @@ const ESCALADA = {
         style.textContent = `
             /* Container da mecânica */
             #escalada-container {
-                position: fixed;
+                position: absolute;
                 right: 40px;
                 top: 100px;
                 bottom: 40px;
@@ -240,9 +240,13 @@ const ESCALADA = {
             /* Responsivo */
             @media (max-width: 768px) {
                 #escalada-container {
-                    right: 10px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    right: auto;
                     top: 80px;
-                    width: 120px;
+                    bottom: 80px;
+                    width: 60%;
+                    max-width: 300px;
                 }
                 
                 .floor-platform {

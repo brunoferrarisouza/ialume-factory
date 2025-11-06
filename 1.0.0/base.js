@@ -190,11 +190,25 @@ function onAnswerChecked(isCorrect, phaseNumber) {
     }
 
     // 4️⃣ PRÓXIMA FASE (após delay para animações)
-    const delay = isCorrect ? 2500 : 3000;
+    // ✅ CORREÇÃO: Trocar fase ANTES de esconder mecânica
+    // para evitar mostrar questão antiga por 1 segundo
+    const delay = isCorrect ? 1500 : 2000;
     console.log('⏱️ Avançando para próxima fase em', delay, 'ms');
 
     setTimeout(() => {
+        // Trocar fase enquanto mecânica ainda está visível
         nextPhase();
+
+        // Aguardar um pouco e então esconder mecânica
+        // (agora content-area já vai estar com nova fase)
+        setTimeout(() => {
+            if (window.ESCALADA && window.ESCALADA.hideMechanic) {
+                ESCALADA.hideMechanic();
+            }
+            if (window.PERSEGUICAO && window.PERSEGUICAO.hideMechanic) {
+                PERSEGUICAO.hideMechanic();
+            }
+        }, 300);
     }, delay);
 }
 

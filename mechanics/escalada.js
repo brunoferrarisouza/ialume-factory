@@ -431,11 +431,8 @@ const ESCALADA = {
         // Pequeno delay para transição de opacity
         setTimeout(() => {
             this.climb();
-
-            // Esconder mecânica após animação
-            setTimeout(() => {
-                this.hideMechanic();
-            }, 1200); // Duração da animação de subida + partículas
+            // ✅ CORREÇÃO: Não esconde mais automaticamente
+            // base.js vai esconder no timing certo (após trocar fase)
         }, 100);
     },
 
@@ -453,9 +450,8 @@ const ESCALADA = {
             lume.style.animation = 'shake 0.5s';
             setTimeout(() => {
                 lume.style.animation = '';
-
-                // Esconder mecânica após animação
-                this.hideMechanic();
+                // ✅ CORREÇÃO: Não esconde mais automaticamente
+                // base.js vai esconder no timing certo
             }, 500);
         }, 100);
     },

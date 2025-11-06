@@ -577,11 +577,8 @@ const PERSEGUICAO = {
         // Pequeno delay para transição de opacity
         setTimeout(() => {
             this.runForward();
-
-            // Esconder mecânica após animação
-            setTimeout(() => {
-                this.hideMechanic();
-            }, 1000); // Duração da animação de corrida
+            // ✅ CORREÇÃO: Não esconde mais automaticamente
+            // base.js vai esconder no timing certo (após trocar fase)
         }, 100);
     },
 
@@ -600,10 +597,9 @@ const PERSEGUICAO = {
             lume.style.animation = 'tremble 0.5s';
             setTimeout(() => {
                 lume.style.animation = '';
-
-                // Esconder mecânica após animação
-                this.hideMechanic();
-            }, 1100); // Duração da animação de perigo + shake
+                // ✅ CORREÇÃO: Não esconde mais automaticamente
+                // base.js vai esconder no timing certo
+            }, 1100);
         }, 100);
     },
 

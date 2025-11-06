@@ -341,8 +341,7 @@ const ESCALADA = {
             /* Floor - POSIÇÃO ABSOLUTA COM TRANSIÇÃO */
             .floor {
                 position: absolute;
-                left: 0;
-                right: 0;
+                width: 200px; /* Largura fixa para cada degrau */
                 height: 40px;
                 display: flex;
                 align-items: flex-end;
@@ -352,7 +351,7 @@ const ESCALADA = {
                 transition: opacity 0.6s ease, visibility 0.6s ease;
             }
 
-            /* Posições dos 3 degraus visíveis (margem simétrica 10%) */
+            /* Posições verticais dos degraus */
             .floor[data-floor="1"], .floor[data-floor="4"], .floor[data-floor="7"] {
                 bottom: 10%; /* INFERIOR */
             }
@@ -366,6 +365,17 @@ const ESCALADA = {
                 bottom: 90%; /* SUPERIOR */
                 transform: translateY(50%);
             }
+
+            /* Posições horizontais específicas de cada degrau */
+            .floor[data-floor="1"] { left: 5%; } /* Esquerda */
+            .floor[data-floor="2"] { left: 50%; transform: translateX(-50%) translateY(50%); } /* Centro */
+            .floor[data-floor="3"] { left: auto; right: 5%; } /* Direita */
+            .floor[data-floor="4"] { left: auto; right: 5%; } /* Direita */
+            .floor[data-floor="5"] { left: 50%; transform: translateX(-50%) translateY(50%); } /* Centro */
+            .floor[data-floor="6"] { left: 5%; } /* Esquerda */
+            .floor[data-floor="7"] { left: 5%; } /* Esquerda */
+            .floor[data-floor="8"] { left: 50%; transform: translateX(-50%) translateY(50%); } /* Centro */
+            .floor[data-floor="9"] { left: auto; right: 5%; } /* Direita */
 
             /* Quando visível */
             .floor.visible {
@@ -421,7 +431,7 @@ const ESCALADA = {
                 50% { transform: rotate(10deg); }
             }
             
-            /* Lume escalador - CORRIGIDO */
+            /* Lume escalador - COM TRANSIÇÃO HORIZONTAL */
             .lume-climber {
                 position: absolute;
                 left: 50%;
@@ -429,7 +439,8 @@ const ESCALADA = {
                 transform: translateX(-50%);
                 font-size: 3rem;
                 filter: drop-shadow(0 0 20px #fff8dc);
-                transition: bottom 1s cubic-bezier(0.68, -0.55, 0.265, 1.55), 
+                transition: bottom 1s cubic-bezier(0.68, -0.55, 0.265, 1.55),
+                            left 1s cubic-bezier(0.68, -0.55, 0.265, 1.55),
                             transform 0.3s ease;
                 z-index: 101;
                 pointer-events: none;
@@ -611,6 +622,19 @@ const ESCALADA = {
         // Posição dentro do grupo (0=inferior, 1=médio, 2=superior)
         const positionInGroup = this.currentStep % 3;
 
+        // Posições horizontais de cada degrau (centro do degrau)
+        const horizontalPositions = {
+            1: '15%',      // Esquerda (5% + metade de 200px)
+            2: '50%',      // Centro
+            3: '85%',      // Direita (95% - metade de 200px)
+            4: '85%',      // Direita
+            5: '50%',      // Centro
+            6: '15%',      // Esquerda
+            7: '15%',      // Esquerda
+            8: '50%',      // Centro
+            9: '85%'       // Direita
+        };
+
         // Determinar posição vertical
         let targetBottom;
         let positionName;
@@ -629,10 +653,12 @@ const ESCALADA = {
             positionName = 'SUPERIOR';
         }
 
-        // Posicionar Lume
+        // Posicionar Lume (vertical + horizontal)
         lume.style.bottom = targetBottom;
+        lume.style.left = horizontalPositions[currentFloor];
+        lume.style.transform = 'translateX(-50%)'; // Centralizar em relação à própria largura
 
-        console.log(`🏔️ Lume no degrau ${currentFloor} (posição ${positionName} do grupo)`);
+        console.log(`🏔️ Lume no degrau ${currentFloor} (${positionName}, horizontal: ${horizontalPositions[currentFloor]})`);
     },
     
     // Subir um andar (quando acerta)

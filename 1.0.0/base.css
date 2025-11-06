@@ -216,39 +216,68 @@ body {
         border-radius: 15px;
         min-height: 400px;
     }
-    
+
     .lume-char {
         font-size: 4rem;
     }
-    
+
     #content-area {
         padding: 20px;
+        position: relative;
+        z-index: 2;
+        transition: opacity 0.5s ease;
     }
-    
+
     .story-box, .question-box {
         padding: 25px;
     }
-    
+
     .story-box h1, .question-box h2 {
         font-size: 1.5rem;
     }
-    
+
     .btn {
         padding: 12px 30px;
         font-size: 1rem;
     }
-    
+
     .score-container {
         top: 10px;
         left: 10px;
         padding: 10px 15px;
         font-size: 0.9rem;
     }
-    
+
     #feedback-zone {
         top: 10px;
         right: 10px;
         padding: 15px 20px;
         font-size: 1rem;
+    }
+
+    /* ===== MOBILE UX: Mechanic as Background ===== */
+    /* Mechanics start with low opacity as background */
+    .mechanic-container {
+        opacity: 0.2 !important;
+        z-index: 1 !important;
+        transition: opacity 0.6s ease, z-index 0s 0.6s;
+    }
+
+    /* When showing mechanic (during answer feedback) */
+    .game-container.showing-mechanic .mechanic-container {
+        opacity: 1 !important;
+        z-index: 100 !important;
+        transition: opacity 0.6s ease, z-index 0s;
+    }
+
+    /* Dim content when showing mechanic */
+    .game-container.showing-mechanic #content-area {
+        opacity: 0.3;
+    }
+
+    /* Keep score and feedback visible */
+    .game-container.showing-mechanic .score-container,
+    .game-container.showing-mechanic #feedback-zone {
+        z-index: 200;
     }
 }

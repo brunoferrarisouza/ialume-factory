@@ -154,7 +154,7 @@ body {
 
 /* ===== FEEDBACK ===== */
 #feedback-zone {
-    position: fixed;
+    position: absolute;
     top: 20px;
     right: 20px;
     padding: 20px 30px;

@@ -133,7 +133,7 @@ const PERSEGUICAO = {
         style.textContent = `
             /* Container da mecânica */
             #perseguicao-container {
-                position: fixed;
+                position: absolute;
                 left: 40px;
                 right: 40px;
                 bottom: 40px;
@@ -351,10 +351,13 @@ const PERSEGUICAO = {
             /* Responsivo */
             @media (max-width: 768px) {
                 #perseguicao-container {
-                    left: 20px;
-                    right: 20px;
-                    bottom: 20px;
-                    height: 120px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    right: auto;
+                    width: 85%;
+                    max-width: 400px;
+                    bottom: 60px;
+                    height: 100px;
                 }
 
                 .lume-runner,

@@ -1,5 +1,5 @@
 /**
- * N8N PARSE GPT OUTPUT - VERSÃO SUPER ROBUSTA
+ * N8N PARSE GPT OUTPUT - VERSÃO SUPER ROBUSTA V2
  *
  * Limpa e valida JSON gerado por Claude que pode ter:
  * - Markdown code blocks (```json)
@@ -8,13 +8,14 @@
  * - Comentários // ou /* */
  * - Aspas simples ao invés de duplas
  * - Quebras de linha mal formatadas
+ * - Caracteres de controle em strings (newline, tab, etc)
  *
  * INSTRUÇÕES:
  * 1. Copie TODO este código
  * 2. Cole no Code Node "Parse Analyzer" no N8N
  * 3. Salve e teste
  *
- * Última atualização: 2025-11-05
+ * Última atualização: 2025-11-06
  */
 
 // ========== PEGAR INPUT ==========
@@ -51,11 +52,22 @@ console.log('🧹 [5/7] Corrigindo zeros à esquerda...');
 analyzerResponse = analyzerResponse.replace(/([:,\[])\s*0+([1-9]\d*)/g, '$1$2');
 
 // 6. Remover múltiplas quebras de linha
-console.log('🧹 [6/7] Normalizando quebras de linha...');
+console.log('🧹 [6/8] Normalizando quebras de linha...');
 analyzerResponse = analyzerResponse.replace(/\n{3,}/g, '\n\n');
 
-// 7. Tentar corrigir aspas simples (só se não tiver duplas)
-console.log('🧹 [7/7] Verificando aspas...');
+// 7. Limpar caracteres de controle DENTRO de strings JSON
+console.log('🧹 [7/8] Limpando caracteres de controle em strings...');
+// Procura strings entre aspas e substitui quebras de linha por espaços
+analyzerResponse = analyzerResponse.replace(/"([^"\\]|\\.)*"/g, function(match) {
+  // Dentro de cada string, substitui \n, \r, \t literais por espaços
+  return match
+    .replace(/\r\n/g, ' ')
+    .replace(/[\r\n\t]/g, ' ')
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, ' ');
+});
+
+// 8. Tentar corrigir aspas simples (só se não tiver duplas)
+console.log('🧹 [8/8] Verificando aspas...');
 const hasDoubleQuotes = analyzerResponse.includes('"');
 const hasSingleQuotes = analyzerResponse.includes("'");
 

@@ -154,51 +154,58 @@ function onAnswerChecked(isCorrect, phaseNumber) {
         console.log('📊 Score atualizado:', gameState.score, 'pontos,', gameState.correctAnswers, 'acertos');
     }
 
-    // 3️⃣ FEEDBACK VISUAL DA MECÂNICA (se existir)
-    // Suporta múltiplas mecânicas: escalada, perseguicao, corrida, labirinto, etc
-    if (window.ESCALADA) {
-        console.log('🏔️ Acionando mecânica ESCALADA');
-        if (isCorrect) {
-            ESCALADA.onCorrect();
-        } else {
-            ESCALADA.onWrong();
-        }
-    } else if (window.PERSEGUICAO) {
-        console.log('🏃‍♂️ Acionando mecânica PERSEGUIÇÃO');
-        if (isCorrect) {
-            PERSEGUICAO.onCorrect();
-        } else {
-            PERSEGUICAO.onWrong();
-        }
-    } else if (window.CORRIDA) {
-        console.log('🏃 Acionando mecânica CORRIDA');
-        if (isCorrect) {
-            CORRIDA.onCorrect();
-        } else {
-            CORRIDA.onWrong();
-        }
-    } else if (window.LABIRINTO) {
-        console.log('🌀 Acionando mecânica LABIRINTO');
-        if (isCorrect) {
-            LABIRINTO.onCorrect();
-        } else {
-            LABIRINTO.onWrong();
-        }
-    } else {
-        // Sem mecânica = jogo linear simples
-        console.log('⏭️  Sem mecânica visual (modo linear)');
+    // 3️⃣ FADEOUT DO POPUP ATUAL
+    const currentPhase = document.querySelector('.phase.active');
+    if (currentPhase) {
+        console.log('🪟 Fazendo fadeout do popup...');
+        currentPhase.classList.remove('active'); // Remove active = fadeout automático via CSS
     }
 
-    // 4️⃣ PRÓXIMA FASE (após delay para animações)
-    // ✅ CORREÇÃO: Trocar fase ANTES de esconder mecânica
-    // para evitar mostrar questão antiga por 1 segundo
-    const delay = isCorrect ? 1500 : 2000;
-    console.log('⏱️ Avançando para próxima fase em', delay, 'ms');
-
+    // 4️⃣ AGUARDAR FADEOUT + DISPARAR MECÂNICA
     setTimeout(() => {
-        // Trocar fase após animação da mecânica
-        nextPhase();
-    }, delay);
+        // Feedback visual da mecânica (escalada, perseguicao, etc)
+        if (window.ESCALADA) {
+            console.log('🏔️ Acionando mecânica ESCALADA');
+            if (isCorrect) {
+                ESCALADA.onCorrect();
+            } else {
+                ESCALADA.onWrong();
+            }
+        } else if (window.PERSEGUICAO) {
+            console.log('🏃‍♂️ Acionando mecânica PERSEGUIÇÃO');
+            if (isCorrect) {
+                PERSEGUICAO.onCorrect();
+            } else {
+                PERSEGUICAO.onWrong();
+            }
+        } else if (window.CORRIDA) {
+            console.log('🏃 Acionando mecânica CORRIDA');
+            if (isCorrect) {
+                CORRIDA.onCorrect();
+            } else {
+                CORRIDA.onWrong();
+            }
+        } else if (window.LABIRINTO) {
+            console.log('🌀 Acionando mecânica LABIRINTO');
+            if (isCorrect) {
+                LABIRINTO.onCorrect();
+            } else {
+                LABIRINTO.onWrong();
+            }
+        } else {
+            // Sem mecânica = jogo linear simples
+            console.log('⏭️  Sem mecânica visual (modo linear)');
+        }
+
+        // 5️⃣ AGUARDAR ANIMAÇÃO DE SUBIDA + MOSTRAR PRÓXIMA FASE
+        const climbDelay = isCorrect ? 1500 : 1800; // Tempo para ver Lume subindo
+        console.log('⏱️ Aguardando', climbDelay, 'ms para ver Lume subir...');
+
+        setTimeout(() => {
+            nextPhase();
+        }, climbDelay);
+
+    }, 500); // 500ms para fadeout do popup
 }
 
 // Expor globalmente para as modalidades

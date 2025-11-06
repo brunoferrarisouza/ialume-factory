@@ -34,7 +34,6 @@ const ESCALADA = {
         this.injectHTML();
         this.injectCSS();
         this.updatePosition();
-        this.updateVisibleFloors(); // ← NOVO: Mostrar apenas 3 degraus iniciais
     },
 
     // ===== NOVO: Sistema de Parallax =====
@@ -127,33 +126,6 @@ const ESCALADA = {
 
             console.log(`📊 Barra atualizada: ${currentQuestion}/${this.totalSteps} (${Math.round(percentage)}%)`);
         }
-    },
-
-    // ===== JANELA MÓVEL DE DEGRAUS (3 visíveis) =====
-
-    updateVisibleFloors: function() {
-        const floors = document.querySelectorAll('.floor');
-
-        floors.forEach(floor => {
-            const floorNumber = parseInt(floor.dataset.floor);
-            const distance = Math.abs(floorNumber - this.currentStep);
-
-            // Mostrar apenas degraus próximos (distância <= 1)
-            // Isso cria janela de 3 degraus: anterior + atual + próximo
-            if (distance <= 1) {
-                floor.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-                floor.style.opacity = '1';
-                floor.style.transform = 'scale(1)';
-                floor.style.visibility = 'visible';
-            } else {
-                floor.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-                floor.style.opacity = '0';
-                floor.style.transform = 'scale(0.9)';
-                floor.style.visibility = 'hidden';
-            }
-        });
-
-        console.log(`🪟 Janela móvel atualizada: mostrando degraus ${Math.max(0, this.currentStep-1)} a ${Math.min(this.totalSteps-1, this.currentStep+1)}`);
     },
 
     // Mover backgrounds com parallax
@@ -388,36 +360,35 @@ const ESCALADA = {
         container.insertAdjacentHTML('beforeend', mechanicHTML);
     },
     
-    // Gerar andares da montanha
+    // Gerar apenas 3 degraus fixos (BASE, MEIO, TOPO)
     generateFloors: function() {
-        console.log('🏭️ Gerando andares da montanha...');
-        console.log('   Criando', this.totalSteps, 'andares (BASE=0 até TOPO=' + (this.totalSteps - 1) + ')');
-        
-        let floorsHTML = '';
-        
-        // ✅ Loop de (totalSteps - 1) até 0
-        for (let i = this.totalSteps - 1; i >= 0; i--) {
-            const floorNumber = i;
-            
-            // ✅ Label: BASE para 0, "ANDAR X" para os outros
-            const floorLabel = i === 0 ? 'BASE' : `ANDAR ${i}`;
-            
-            // ✅ Topo é o último andar (totalSteps - 1)
-            const isTop = i === this.totalSteps - 1;
-            
-            console.log('   Criando:', floorLabel, '(índice', i + ')', isTop ? '🏆 TOPO' : '');
-            
-            floorsHTML += `
-                <div class="floor" data-floor="${floorNumber}">
-                    <div class="floor-platform ${isTop ? 'top' : ''}">
-                        <span class="floor-label">${floorLabel}</span>
-                        ${isTop ? '<span class="victory-flag">🚩</span>' : ''}
-                    </div>
+        console.log('🏭️ Gerando 3 degraus fixos (BASE, MEIO, TOPO)...');
+
+        const floorsHTML = `
+            <!-- TOPO (100% altura) -->
+            <div class="floor floor-top" data-floor="top">
+                <div class="floor-platform top">
+                    <span class="floor-label">TOPO</span>
+                    <span class="victory-flag">🚩</span>
                 </div>
-            `;
-        }
-        
-        console.log('✅ Todos os', this.totalSteps, 'andares gerados!');
+            </div>
+
+            <!-- MEIO (50% altura) -->
+            <div class="floor floor-middle" data-floor="middle">
+                <div class="floor-platform">
+                    <span class="floor-label">MEIO</span>
+                </div>
+            </div>
+
+            <!-- BASE (0% altura) -->
+            <div class="floor floor-base" data-floor="base">
+                <div class="floor-platform">
+                    <span class="floor-label">BASE</span>
+                </div>
+            </div>
+        `;
+
+        console.log('✅ 3 degraus fixos gerados (BASE 0%, MEIO 50%, TOPO 100%)');
         return floorsHTML;
     },
     
@@ -480,25 +451,43 @@ const ESCALADA = {
                 pointer-events: none;
             }
             
-            /* Montanha - CENTRALIZADA */
+            /* Montanha - CENTRALIZADA HORIZONTALMENTE */
             .mountain {
                 position: absolute;
-                right: 50px;
-                top: 50px;
-                bottom: 50px;
+                left: 50%;
+                transform: translateX(-50%);
+                top: 0;
+                bottom: 0;
                 width: 250px;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
+                pointer-events: none;
             }
-            
-            /* Andar - ✅ ALTURA DINÂMICA */
+
+            /* Floor - POSIÇÃO ABSOLUTA FIXA */
             .floor {
-                position: relative;
-                height: ${floorHeightPercent}%; /* Calculado dinamicamente! */
+                position: absolute;
+                left: 0;
+                right: 0;
+                height: 40px;
                 display: flex;
                 align-items: flex-end;
                 justify-content: center;
+                opacity: 1;
+                visibility: visible;
+                transition: opacity 0.3s ease;
+            }
+
+            /* Posições fixas dos 3 degraus */
+            .floor-base {
+                bottom: 80px; /* BASE: próximo ao chão */
+            }
+
+            .floor-middle {
+                bottom: 50%; /* MEIO: centro da tela */
+                transform: translateY(50%);
+            }
+
+            .floor-top {
+                bottom: calc(100% - 120px); /* TOPO: quase no topo */
             }
             
             /* Plataforma do andar */
@@ -716,23 +705,36 @@ const ESCALADA = {
         document.head.appendChild(style);
     },
     
-    // Atualizar posição do Lume - CORRIGIDO
+    // Atualizar posição do Lume - 3 POSIÇÕES FIXAS
     updatePosition: function() {
         const lume = document.getElementById('lume-climber');
         if (!lume) return;
-        
-        // Calcular posição (0 = base, 4 = topo)
-        // Lume fica EM CIMA da plataforma
-        const floorHeight = 100 / this.totalSteps;
-        const platformHeight = 40; // Altura da plataforma em px
-        const lumeOffset = 20; // Ajuste fino para centralizar
-        
-        const bottomPosition = (this.currentStep * floorHeight);
-        
-        // Posicionar em cima da plataforma
-        lume.style.bottom = `calc(${bottomPosition}% + ${platformHeight - lumeOffset}px)`;
-        
-        console.log(`🏔️ Lume no andar ${this.currentStep}/${this.totalSteps - 1}`);
+
+        // Calcular progresso (0.0 a 1.0)
+        const progress = this.currentStep / (this.totalSteps - 1);
+
+        // Determinar qual dos 3 degraus Lume deve estar
+        let targetBottom;
+        let floorName;
+
+        if (progress < 0.34) {
+            // BASE (primeiros 33%)
+            targetBottom = '120px'; // 80px do floor + 40px de altura
+            floorName = 'BASE';
+        } else if (progress < 0.67) {
+            // MEIO (33% a 67%)
+            targetBottom = '50%'; // Centro da tela
+            floorName = 'MEIO';
+        } else {
+            // TOPO (últimos 33%)
+            targetBottom = 'calc(100% - 80px)'; // Quase no topo
+            floorName = 'TOPO';
+        }
+
+        // Posicionar Lume
+        lume.style.bottom = targetBottom;
+
+        console.log(`🏔️ Lume no ${floorName} (step ${this.currentStep}/${this.totalSteps - 1}, progress ${Math.round(progress * 100)}%)`);
     },
     
     // Subir um andar (quando acerta)
@@ -762,9 +764,6 @@ const ESCALADA = {
 
         // ✅ NOVO: Atualizar barra de progresso
         this.updateProgressBar();
-
-        // ✅ NOVO: Atualizar janela móvel de degraus
-        this.updateVisibleFloors();
 
         // Remover classe após animação
         setTimeout(() => {
@@ -867,19 +866,19 @@ const ESCALADA = {
         }, 100);
     },
 
-    // Feedback de erro
+    // Feedback de erro - AGORA TAMBÉM SOBE
     onWrong: function() {
-        console.log('❌ Resposta errada!');
-        // Não desce, só não sobe
+        console.log('❌ Resposta errada, mas Lume sobe mesmo assim!');
 
-        // Shake effect
+        // Shake effect rápido antes de subir
+        const lume = document.getElementById('lume-climber');
+        lume.style.animation = 'shake 0.3s';
+
         setTimeout(() => {
-            const lume = document.getElementById('lume-climber');
-            lume.style.animation = 'shake 0.5s';
-            setTimeout(() => {
-                lume.style.animation = '';
-            }, 500);
-        }, 100);
+            lume.style.animation = '';
+            // SOBE mesmo com erro
+            this.climb();
+        }, 300);
     },
     
     // Resetar mecânica
@@ -913,10 +912,7 @@ const ESCALADA = {
         // ✅ NOVO: Resetar barra de progresso
         this.updateProgressBar();
 
-        // ✅ NOVO: Resetar janela móvel de degraus
-        this.updateVisibleFloors();
-
-        console.log('🔄 Reset completo (checkpoints + elementos + parallax + barra + janela)');
+        console.log('🔄 Reset completo (checkpoints + elementos + parallax + barra)');
     },
     
     // Destruir mecânica

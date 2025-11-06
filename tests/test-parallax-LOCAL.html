@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Parallax - LOCAL</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+        }
+        .game-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: white;
+        }
+        .phase-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            background: rgba(255,255,255,0.95);
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 600px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: 600;
+        }
+        .btn-subir {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        .btn-reset {
+            background: linear-gradient(135deg, #ff6b6b, #ff8787);
+            color: white;
+        }
+        .btn-cenario {
+            background: linear-gradient(135deg, #ffd700, #ffa500);
+            color: #333;
+            font-size: 1rem;
+            padding: 10px 20px;
+        }
+        .info {
+            background: rgba(102, 126, 234, 0.1);
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="phase-container">
+            <h2>🎨 Teste de Parallax - Escalada</h2>
+
+            <div class="info">
+                <strong>Como testar:</strong><br>
+                1. Clique em "⬆️ SUBIR" para ver o parallax<br>
+                2. Observe as 3 camadas de fundo se movendo<br>
+                3. Troque de cenário e teste novamente
+            </div>
+
+            <div style="margin: 20px 0;">
+                <button class="btn-subir" onclick="testarSubida()">⬆️ SUBIR</button>
+                <button class="btn-reset" onclick="testarReset()">🔄 RESETAR</button>
+            </div>
+
+            <div style="margin: 20px 0;">
+                <strong>Cenários:</strong><br>
+                <button class="btn-cenario" onclick="trocarCenario('montanha-nevada')">⛰️ Montanha Nevada</button>
+                <button class="btn-cenario" onclick="trocarCenario('vulcao')">🌋 Vulcão</button>
+            </div>
+
+            <div id="debug-info" style="font-size: 0.9rem; color: #666; margin-top: 20px; font-family: monospace;">
+                Aguardando ação...
+            </div>
+        </div>
+    </div>
+
+    <!-- Carregar arquivos LOCAIS (não CDN) -->
+    <script src="../base/scripts/base.js"></script>
+    <script src="../mechanics/escalada.js"></script>
+
+    <script>
+        let cenarioAtual = 'montanha-nevada';
+
+        function log(msg) {
+            const debug = document.getElementById('debug-info');
+            const timestamp = new Date().toLocaleTimeString();
+            debug.innerHTML = `[${timestamp}] ${msg}<br>` + debug.innerHTML;
+        }
+
+        function testarSubida() {
+            if (!window.ESCALADA) {
+                log('❌ ERRO: ESCALADA não encontrado!');
+                return;
+            }
+
+            log('⬆️ Chamando ESCALADA.climb()...');
+            ESCALADA.climb();
+
+            setTimeout(() => {
+                const progresso = Math.round((ESCALADA.currentStep / (ESCALADA.totalSteps - 1)) * 100);
+                log(`✅ Subiu! Progresso: ${ESCALADA.currentStep}/${ESCALADA.totalSteps - 1} (${progresso}%)`);
+            }, 100);
+        }
+
+        function testarReset() {
+            if (!window.ESCALADA) {
+                log('❌ ERRO: ESCALADA não encontrado!');
+                return;
+            }
+
+            log('🔄 Resetando...');
+            ESCALADA.reset();
+
+            // Resetar parallax também
+            const layer1 = document.querySelector('.bg-layer-1');
+            const layer2 = document.querySelector('.bg-layer-2');
+            const layer3 = document.querySelector('.bg-layer-3');
+
+            if (layer1) layer1.style.transform = 'translateY(0)';
+            if (layer2) layer2.style.transform = 'translateY(0)';
+            if (layer3) layer3.style.transform = 'translateY(0)';
+
+            log('✅ Reset completo!');
+        }
+
+        function trocarCenario(novoCenario) {
+            cenarioAtual = novoCenario;
+            log(`🎨 Trocando para cenário: ${novoCenario}...`);
+
+            // Destruir escalada atual
+            if (window.ESCALADA && ESCALADA.destroy) {
+                ESCALADA.destroy();
+            }
+
+            // Remover background antigo
+            const oldBg = document.getElementById('escalada-background');
+            if (oldBg) oldBg.remove();
+
+            // Reinicializar com novo cenário
+            setTimeout(() => {
+                ESCALADA.init({
+                    totalSteps: 10,  // ← 10 andares
+                    cenario: novoCenario
+                });
+                log(`✅ Cenário ${novoCenario} carregado!`);
+            }, 300);
+        }
+
+        // Inicializar ao carregar
+        window.addEventListener('DOMContentLoaded', () => {
+            log('🎮 Iniciando teste...');
+
+            if (!window.ESCALADA) {
+                log('❌ ERRO: ESCALADA não carregado!');
+                log('Verifique se escalada.js está no caminho correto.');
+                return;
+            }
+
+            log('✅ ESCALADA carregado!');
+
+            // Inicializar mecânica com MAIS andares para ver todos os checkpoints
+            ESCALADA.init({
+                totalSteps: 10,  // ← 10 andares para ver todos os checkpoints
+                cenario: cenarioAtual
+            });
+
+            log('✅ Parallax inicializado! Clique em SUBIR para testar.');
+            log(`🎨 Cenário atual: ${cenarioAtual}`);
+
+            // Verificar se backgrounds foram injetados
+            setTimeout(() => {
+                const bg = document.getElementById('escalada-background');
+                if (bg) {
+                    log('✅ Backgrounds injetados (3 camadas detectadas)');
+                } else {
+                    log('⚠️ Backgrounds não encontrados! Verifique console.');
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>

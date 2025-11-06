@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lume e a Montanha do Conhecimento - Geografia</title>
+
+    <!-- Carregar CSS base -->
+    <link rel="stylesheet" href="../base/styles/base.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f8f9fa;
+            overflow-x: hidden;
+        }
+
+        .game-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: white;
+        }
+
+        /* Fases */
+        .phase {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 700px;
+            z-index: 10;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease-in-out, visibility 0.5s;
+        }
+
+        .phase.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Fase 0 - Abertura */
+        .welcome-screen {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 30px;
+            padding: 50px 40px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .welcome-screen h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .welcome-screen .lume-intro {
+            font-size: 5rem;
+            margin: 30px 0;
+            animation: float 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(255,255,255,0.8));
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .welcome-screen p {
+            font-size: 1.3rem;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            opacity: 0.95;
+        }
+
+        .btn-start {
+            padding: 20px 50px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: white;
+            color: #667eea;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .btn-start:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        /* Feedback zone - compatível com base.js */
+        #feedback-zone {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 20px 40px;
+            border-radius: 15px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        #feedback-zone.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #feedback-zone.correct {
+            background: linear-gradient(135deg, #51cf66, #38d9a9);
+            color: white;
+        }
+
+        #feedback-zone.wrong {
+            background: linear-gradient(135deg, #ff6b6b, #ff8787);
+            color: white;
+        }
+
+
+        /* Loading */
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            color: #667eea;
+            z-index: 10000;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- FASE 0: Abertura -->
+        <div id="phase-0" class="phase active">
+            <div class="welcome-screen">
+                <h1>🏔️ A Montanha do Conhecimento</h1>
+                <div class="lume-intro">🌟</div>
+                <p>
+                    <strong>Lume</strong> precisa escalar a <strong>Montanha do Saber</strong>
+                    para recuperar o <strong>Mapa Mundi</strong> roubado pelo Corvo das Trevas!
+                </p>
+                <p>
+                    Responda as perguntas de Geografia e ajude Lume a chegar ao topo.
+                    A cada resposta correta, ele sobe mais alto! 🦅⭐
+                </p>
+                <button class="btn-start" onclick="startGame()">🚀 COMEÇAR AVENTURA</button>
+            </div>
+        </div>
+
+        <!-- FASES 1-8: Serão injetadas pelo Game Engine -->
+        <div id="phase-1" class="phase"></div>
+        <div id="phase-2" class="phase"></div>
+        <div id="phase-3" class="phase"></div>
+        <div id="phase-4" class="phase"></div>
+        <div id="phase-5" class="phase"></div>
+        <div id="phase-6" class="phase"></div>
+        <div id="phase-7" class="phase"></div>
+        <div id="phase-8" class="phase"></div>
+    </div>
+
+    <!-- Toast de feedback (nome correto para base.js) -->
+    <div id="feedback-zone" class="feedback"></div>
+
+    <!-- Carregar todos os componentes CDN LOCAIS -->
+    <script src="../base/scripts/base.js"></script>
+    <script src="../base/scripts/game-engine.js"></script>
+    <script src="../mechanics/escalada.js"></script>
+    <script src="../modalities/quiz.js"></script>
+    <script src="../modalities/fill-blanks.js"></script>
+    <script src="../modalities/true-false.js"></script>
+    <script src="../modalities/sequence.js"></script>
+
+    <script>
+        // ===== CONFIGURAÇÃO DO JOGO =====
+        const gameConfig = {
+            titulo: "Lume e a Montanha do Conhecimento",
+            tema: "Geografia",
+            mecanica: "escalada",
+            cenario: "montanha-nevada",  // ← ATIVA PARALLAX + CHECKPOINTS
+            fases: [
+                // FASE 0: Abertura (já no HTML)
+                {
+                    numero: 0,
+                    type: 'welcome'
+                },
+
+                // FASE 1: Quiz (25% - Pássaros aparecem)
+                {
+                    numero: 1,
+                    modalidade: 'quiz',
+                    dados: {
+                        pergunta: "Qual é o maior país do mundo em área?",
+                        alternativas: ["Rússia", "Canadá", "China", "Estados Unidos"],
+                        correta: 0,
+                        feedback_correto: "✅ Isso! A Rússia tem 17 milhões de km²!",
+                        feedback_errado: "❌ Era Rússia! É enorme!"
+                    }
+                },
+
+                // FASE 2: Fill-blanks
+                {
+                    numero: 2,
+                    modalidade: 'fill-blanks',
+                    dados: {
+                        frase: "A capital do Brasil é ____",
+                        resposta: "Brasília",
+                        variacoes_aceitas: ["Brasília", "brasilia", "Brasilia"],
+                        dica: "Cidade planejada no Centro-Oeste",
+                        feedback_correto: "✅ Perfeito! Brasília é a capital desde 1960!",
+                        feedback_errado: "❌ A capital do Brasil é Brasília!"
+                    }
+                },
+
+                // FASE 3: True-False (40% - Nuvens brancas aparecem)
+                {
+                    numero: 3,
+                    modalidade: 'true-false',
+                    dados: {
+                        afirmacao: "O Rio Nilo está localizado no continente africano",
+                        correta: true,
+                        feedback_correto: "✅ Verdadeiro! O Nilo passa por 11 países da África!",
+                        feedback_errado: "❌ É verdadeiro! O Nilo fica na África."
+                    }
+                },
+
+                // FASE 4: Quiz
+                {
+                    numero: 4,
+                    modalidade: 'quiz',
+                    dados: {
+                        pergunta: "Qual oceano banha a costa leste do Brasil?",
+                        alternativas: ["Atlântico", "Pacífico", "Índico", "Ártico"],
+                        correta: 0,
+                        feedback_correto: "✅ Correto! O Oceano Atlântico banha toda nossa costa!",
+                        feedback_errado: "❌ É o Oceano Atlântico!"
+                    }
+                },
+
+                // FASE 5: Sequence (60% - Nuvens escuras aparecem)
+                {
+                    numero: 5,
+                    modalidade: 'sequence',
+                    dados: {
+                        instrucao: "Ordene os países por população (maior → menor):",
+                        itens: ["Japão", "China", "Índia"],
+                        ordem_correta: ["China", "Índia", "Japão"],
+                        feedback_correto: "✅ Ordem perfeita! China e Índia são os mais populosos!",
+                        feedback_errado: "❌ Ordem: China, Índia, Japão"
+                    }
+                },
+
+                // FASE 6: Fill-blanks
+                {
+                    numero: 6,
+                    modalidade: 'fill-blanks',
+                    dados: {
+                        frase: "O continente com mais países é a ____",
+                        resposta: "África",
+                        variacoes_aceitas: ["África", "africa", "Africa"],
+                        dica: "Tem 54 países!",
+                        feedback_correto: "✅ Isso! A África tem 54 países!",
+                        feedback_errado: "❌ Era África, com 54 países!"
+                    }
+                },
+
+                // FASE 7: True-False (70% - Urubus aparecem)
+                {
+                    numero: 7,
+                    modalidade: 'true-false',
+                    dados: {
+                        afirmacao: "A Cordilheira dos Andes fica na América do Sul",
+                        correta: true,
+                        feedback_correto: "✅ Verdadeiro! É a cadeia montanhosa mais longa do mundo!",
+                        feedback_errado: "❌ É verdadeiro! Os Andes ficam na América do Sul."
+                    }
+                },
+
+                // FASE 8: Quiz (TOPO - 8 questões!)
+                {
+                    numero: 8,
+                    modalidade: 'true-false',
+                    dados: {
+                        afirmacao: "O Monte Everest é a montanha mais alta do mundo",
+                        correta: true,
+                        feedback_correto: "✅ VERDADEIRO! E você chegou ao topo como o Everest! 🏔️⭐",
+                        feedback_errado: "❌ É verdadeiro! O Everest tem 8.848 metros!"
+                    }
+                }
+            ]
+        };
+
+        // ===== INICIAR JOGO =====
+        function startGame() {
+            console.log('🎮 Iniciando jogo completo...');
+
+            // Esconder fase 0
+            document.getElementById('phase-0').classList.remove('active');
+
+            // Aguardar transição e então mostrar fase 1
+            setTimeout(() => {
+                // Inicializar Game Engine
+                const success = GAME_ENGINE.init(gameConfig);
+
+                if (success) {
+                    console.log('✅ Game Engine inicializado com sucesso!');
+                    console.log('📊 Total de fases:', gameConfig.fases.length);
+                    console.log('🎨 Cenário:', gameConfig.cenario);
+                    console.log('🎮 Mecânica:', gameConfig.mecanica);
+
+                    // ✅ CORREÇÃO: Sincronizar gameState.totalPhases com window.totalPhases
+                    if (window.gameState && window.totalPhases) {
+                        window.gameState.totalPhases = window.totalPhases;
+                        console.log('✅ gameState.totalPhases atualizado para:', window.totalPhases);
+                    }
+
+                    // Mostrar fase 1
+                    nextPhase();
+                } else {
+                    console.error('❌ Erro ao inicializar Game Engine!');
+                    alert('Erro ao carregar o jogo. Verifique o console.');
+                }
+            }, 500);
+        }
+
+        // Aguardar carregamento completo
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('📦 Todos os componentes carregados!');
+            console.log('✅ Base:', typeof window.showFeedback !== 'undefined');
+            console.log('✅ Game Engine:', typeof window.GAME_ENGINE !== 'undefined');
+            console.log('✅ Escalada:', typeof window.ESCALADA !== 'undefined');
+            console.log('✅ Quiz:', typeof window.QUIZ !== 'undefined');
+            console.log('✅ Fill-blanks:', typeof window.FILL_BLANKS !== 'undefined');
+            console.log('✅ True-false:', typeof window.TRUE_FALSE !== 'undefined');
+            console.log('✅ Sequence:', typeof window.SEQUENCE !== 'undefined');
+            console.log('');
+            console.log('🎮 Clique em "COMEÇAR AVENTURA" para iniciar!');
+        });
+    </script>
+</body>
+</html>

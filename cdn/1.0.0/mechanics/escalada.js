@@ -33,7 +33,10 @@ const ESCALADA = {
         this.injectProgressBar(); // ← NOVO: Barra de progresso
         this.injectHTML();
         this.injectCSS();
+        this.injectVisualElements(); // ← Sol e estrelas
         this.updatePosition();
+        this.updateVisibleFloors(); // ← Mostrar degraus iniciais (1,2,3)
+        this.applyGraduation(0); // ← Estado inicial (dia claro, sol visível)
     },
 
     // ===== NOVO: Sistema de Parallax =====
@@ -128,7 +131,77 @@ const ESCALADA = {
         }
     },
 
-    // Mover backgrounds com parallax
+    // Injetar elementos visuais (sol, estrelas)
+    injectVisualElements: function() {
+        const container = document.querySelector('.game-container');
+        if (!container) return;
+
+        // SOL (canto superior direito)
+        const sol = document.createElement('div');
+        sol.id = 'sol-element';
+        sol.innerHTML = '☀️';
+        sol.style.cssText = `
+            position: fixed;
+            top: 50px;
+            right: 50px;
+            font-size: 4rem;
+            z-index: 5;
+            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+            transition: opacity 1s ease;
+            opacity: 1;
+            pointer-events: none;
+        `;
+        container.appendChild(sol);
+
+        // ESTRELAS (8 estrelas em posições aleatórias)
+        for (let i = 0; i < 8; i++) {
+            const estrela = document.createElement('div');
+            estrela.className = 'estrela-element';
+            estrela.innerHTML = '⭐';
+            estrela.style.cssText = `
+                position: fixed;
+                top: ${10 + Math.random() * 60}%;
+                left: ${10 + Math.random() * 80}%;
+                font-size: ${1.5 + Math.random() * 1.5}rem;
+                z-index: 5;
+                opacity: 0;
+                transition: opacity 1s ease;
+                animation: twinkle ${2 + Math.random() * 2}s ease-in-out infinite;
+                pointer-events: none;
+            `;
+            container.appendChild(estrela);
+        }
+
+        console.log('✨ Sol e estrelas injetados');
+    },
+
+    // Atualizar janela móvel de 3 degraus
+    updateVisibleFloors: function() {
+        // Determinar grupo atual (0, 1, ou 2)
+        const groupIndex = Math.floor(this.currentStep / 3);
+        const firstFloor = groupIndex * 3 + 1; // 1, 4, ou 7
+
+        // Degraus visíveis do grupo atual
+        const visibleFloors = [firstFloor, firstFloor + 1, firstFloor + 2];
+
+        console.log(`🪟 Janela móvel: Grupo ${groupIndex + 1}, mostrando degraus ${visibleFloors.join(', ')}`);
+
+        // Mostrar/esconder degraus
+        const allFloors = document.querySelectorAll('.floor');
+        allFloors.forEach(floor => {
+            const floorNumber = parseInt(floor.dataset.floor);
+
+            if (visibleFloors.includes(floorNumber)) {
+                // Mostrar (com transição)
+                floor.classList.add('visible');
+            } else {
+                // Esconder (com transição)
+                floor.classList.remove('visible');
+            }
+        });
+    },
+
+    // Mover backgrounds com parallax + graduação de 8 faixas
     moveParallax: function() {
         // Calcular progresso (0 a 1)
         const progress = this.currentStep / (this.totalSteps - 1);
@@ -156,10 +229,80 @@ const ESCALADA = {
             layer3.style.transform = `translateY(-${movePercent * 1.0}%)`;
         }
 
+        // ✅ GRADUAÇÃO DE 8 FAIXAS
+        this.applyGraduation(progress);
+
         console.log(`🎬 Parallax: progresso ${Math.round(progress * 100)}%, move ${Math.round(movePercent)}%`);
 
         // ✅ NOVO: Verificar checkpoints de elementos
         this.checkElementCheckpoints(progress);
+    },
+
+    // Aplicar graduação visual (céu, sol, estrelas)
+    applyGraduation: function(progress) {
+        const layer1 = document.querySelector('.bg-layer-1');
+        const sol = document.getElementById('sol-element');
+        const estrelas = document.querySelectorAll('.estrela-element');
+
+        // 1. COR DO CÉU (transição suave)
+        // 0% = #87CEEB (azul claro)
+        // 50% = #1e3a5f (azul escuro)
+        // 100% = #0a1929 (quase preto)
+        if (layer1) {
+            let skyColor;
+            if (progress < 0.5) {
+                // Primeira metade: azul claro → azul escuro
+                const t = progress * 2; // 0 a 1
+                skyColor = this.interpolateColor('#87CEEB', '#1e3a5f', t);
+            } else {
+                // Segunda metade: azul escuro → quase preto
+                const t = (progress - 0.5) * 2; // 0 a 1
+                skyColor = this.interpolateColor('#1e3a5f', '#0a1929', t);
+            }
+            layer1.style.background = skyColor;
+        }
+
+        // 2. SOL (fade out gradual)
+        // Opacidade: 1.0 (0%) → 0.0 (100%)
+        if (sol) {
+            const solOpacity = Math.max(0, 1 - progress * 1.2); // Desaparece mais rápido
+            sol.style.opacity = solOpacity;
+        }
+
+        // 3. ESTRELAS (fade in gradual)
+        // Opacidade: 0.0 (0%) → 1.0 (100%)
+        if (estrelas.length > 0) {
+            const estrelasOpacity = Math.min(1, progress * 1.5); // Aparecem progressivamente
+            estrelas.forEach(estrela => {
+                estrela.style.opacity = estrelasOpacity;
+            });
+        }
+
+        console.log(`🌈 Graduação aplicada: ${Math.round(progress * 100)}% (céu, sol, estrelas)`);
+    },
+
+    // Interpolar entre duas cores hexadecimais
+    interpolateColor: function(color1, color2, t) {
+        // Converter hex para RGB
+        const c1 = this.hexToRgb(color1);
+        const c2 = this.hexToRgb(color2);
+
+        // Interpolar
+        const r = Math.round(c1.r + (c2.r - c1.r) * t);
+        const g = Math.round(c1.g + (c2.g - c1.g) * t);
+        const b = Math.round(c1.b + (c2.b - c1.b) * t);
+
+        return `rgb(${r}, ${g}, ${b})`;
+    },
+
+    // Converter hex para RGB
+    hexToRgb: function(hex) {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : { r: 0, g: 0, b: 0 };
     },
 
     // ===== SISTEMA DE CHECKPOINTS (Elementos Progressivos) =====
@@ -360,35 +503,27 @@ const ESCALADA = {
         container.insertAdjacentHTML('beforeend', mechanicHTML);
     },
     
-    // Gerar apenas 3 degraus fixos (BASE, MEIO, TOPO)
+    // Gerar 9 degraus físicos (para 8 questões + chegada)
     generateFloors: function() {
-        console.log('🏭️ Gerando 3 degraus fixos (BASE, MEIO, TOPO)...');
+        console.log('🏭️ Gerando 9 degraus físicos (janela móvel de 3)...');
 
-        const floorsHTML = `
-            <!-- TOPO (100% altura) -->
-            <div class="floor floor-top" data-floor="top">
-                <div class="floor-platform top">
-                    <span class="floor-label">TOPO</span>
-                    <span class="victory-flag">🚩</span>
+        let floorsHTML = '';
+
+        // Criar 9 degraus (numerados de 1 a 9)
+        for (let i = 9; i >= 1; i--) {
+            const isTop = i === 9;
+
+            floorsHTML += `
+                <div class="floor" data-floor="${i}" style="opacity: 0; visibility: hidden;">
+                    <div class="floor-platform ${isTop ? 'top' : ''}">
+                        <span class="floor-label">DEGRAU ${i}</span>
+                        ${isTop ? '<span class="victory-flag">🚩</span>' : ''}
+                    </div>
                 </div>
-            </div>
+            `;
+        }
 
-            <!-- MEIO (50% altura) -->
-            <div class="floor floor-middle" data-floor="middle">
-                <div class="floor-platform">
-                    <span class="floor-label">MEIO</span>
-                </div>
-            </div>
-
-            <!-- BASE (0% altura) -->
-            <div class="floor floor-base" data-floor="base">
-                <div class="floor-platform">
-                    <span class="floor-label">BASE</span>
-                </div>
-            </div>
-        `;
-
-        console.log('✅ 3 degraus fixos gerados (BASE 0%, MEIO 50%, TOPO 100%)');
+        console.log('✅ 9 degraus físicos gerados (1-9)');
         return floorsHTML;
     },
     
@@ -462,7 +597,7 @@ const ESCALADA = {
                 pointer-events: none;
             }
 
-            /* Floor - POSIÇÃO ABSOLUTA FIXA */
+            /* Floor - POSIÇÃO ABSOLUTA COM TRANSIÇÃO */
             .floor {
                 position: absolute;
                 left: 0;
@@ -471,23 +606,30 @@ const ESCALADA = {
                 display: flex;
                 align-items: flex-end;
                 justify-content: center;
-                opacity: 1;
-                visibility: visible;
-                transition: opacity 0.3s ease;
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity 0.6s ease, visibility 0.6s ease;
             }
 
-            /* Posições fixas dos 3 degraus */
-            .floor-base {
-                bottom: 80px; /* BASE: próximo ao chão */
+            /* Posições dos 3 degraus visíveis (margem simétrica 10%) */
+            .floor[data-floor="1"], .floor[data-floor="4"], .floor[data-floor="7"] {
+                bottom: 10%; /* INFERIOR */
             }
 
-            .floor-middle {
-                bottom: 50%; /* MEIO: centro da tela */
+            .floor[data-floor="2"], .floor[data-floor="5"], .floor[data-floor="8"] {
+                bottom: 50%; /* MÉDIO (centro) */
                 transform: translateY(50%);
             }
 
-            .floor-top {
-                bottom: calc(100% - 120px); /* TOPO: quase no topo */
+            .floor[data-floor="3"], .floor[data-floor="6"], .floor[data-floor="9"] {
+                bottom: 90%; /* SUPERIOR */
+                transform: translateY(50%);
+            }
+
+            /* Quando visível */
+            .floor.visible {
+                opacity: 1;
+                visibility: visible;
             }
             
             /* Plataforma do andar */
@@ -666,6 +808,18 @@ const ESCALADA = {
                 }
             }
 
+            /* Twinkle para estrelas do céu */
+            @keyframes twinkle {
+                0%, 100% {
+                    opacity: inherit;
+                    transform: scale(1);
+                }
+                50% {
+                    opacity: calc(inherit * 0.5);
+                    transform: scale(1.2);
+                }
+            }
+
             /* Estilos dos elementos checkpoint */
             .checkpoint-element {
                 transition: opacity 0.5s ease-in-out;
@@ -705,36 +859,39 @@ const ESCALADA = {
         document.head.appendChild(style);
     },
     
-    // Atualizar posição do Lume - 3 POSIÇÕES FIXAS
+    // Atualizar posição do Lume - BASEADO NO DEGRAU ATUAL
     updatePosition: function() {
         const lume = document.getElementById('lume-climber');
         if (!lume) return;
 
-        // Calcular progresso (0.0 a 1.0)
-        const progress = this.currentStep / (this.totalSteps - 1);
+        // Número do degrau atual (1-9)
+        const currentFloor = this.currentStep + 1;
 
-        // Determinar qual dos 3 degraus Lume deve estar
+        // Posição dentro do grupo (0=inferior, 1=médio, 2=superior)
+        const positionInGroup = this.currentStep % 3;
+
+        // Determinar posição vertical
         let targetBottom;
-        let floorName;
+        let positionName;
 
-        if (progress < 0.34) {
-            // BASE (primeiros 33%)
-            targetBottom = '120px'; // 80px do floor + 40px de altura
-            floorName = 'BASE';
-        } else if (progress < 0.67) {
-            // MEIO (33% a 67%)
-            targetBottom = '50%'; // Centro da tela
-            floorName = 'MEIO';
+        if (positionInGroup === 0) {
+            // INFERIOR
+            targetBottom = 'calc(10% + 40px)'; // 10% + altura da plataforma
+            positionName = 'INFERIOR';
+        } else if (positionInGroup === 1) {
+            // MÉDIO
+            targetBottom = '50%';
+            positionName = 'MÉDIO';
         } else {
-            // TOPO (últimos 33%)
-            targetBottom = 'calc(100% - 80px)'; // Quase no topo
-            floorName = 'TOPO';
+            // SUPERIOR
+            targetBottom = 'calc(90% + 20px)';
+            positionName = 'SUPERIOR';
         }
 
         // Posicionar Lume
         lume.style.bottom = targetBottom;
 
-        console.log(`🏔️ Lume no ${floorName} (step ${this.currentStep}/${this.totalSteps - 1}, progress ${Math.round(progress * 100)}%)`);
+        console.log(`🏔️ Lume no degrau ${currentFloor} (posição ${positionName} do grupo)`);
     },
     
     // Subir um andar (quando acerta)
@@ -758,6 +915,9 @@ const ESCALADA = {
 
         // Atualizar posição
         this.updatePosition();
+
+        // ✅ Atualizar janela móvel (mostrar degraus corretos)
+        this.updateVisibleFloors();
 
         // ✅ Mover backgrounds em parallax
         this.moveParallax();

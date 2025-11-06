@@ -173,6 +173,22 @@ const html = `<!DOCTYPE html>
     <!-- CSS -->
     <link rel="stylesheet" href="${CDN_BASE}base.css">
 
+    <!-- OVERRIDE: Remove body flexbox para funcionar no Bubble -->
+    <style>
+        body {
+            background: transparent !important;
+            min-height: auto !important;
+            display: block !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .game-container {
+            margin: 0 auto;
+            max-width: 100% !important;
+        }
+    </style>
+
     <!-- Bubble API Key (injetada antes dos scripts) -->
     <script>
         window.BUBBLE_API_KEY = '88e05eb46922dfdd80c8bce8a7fea914';

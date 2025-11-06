@@ -6,6 +6,7 @@ const ESCALADA = {
     currentStep: 0,
     totalSteps: 5, // Fase 0-4
     cenario: 'montanha-nevada', // ← NOVO: Cenário padrão
+    checkpoints: {}, // ← NOVO: Rastrear elementos que já apareceram
 
     // Inicializar mecânica
     init: function(config) {
@@ -19,6 +20,7 @@ const ESCALADA = {
         this.totalSteps = config.totalSteps;
         this.currentStep = 0;
         this.cenario = config.cenario || 'montanha-nevada'; // ← NOVO: Pegar cenário do config
+        this.checkpoints = {}; // ← NOVO: Resetar checkpoints
 
         console.log('✅ Mecânica ESCALADA inicializada');
         console.log('   Total de andares (totalSteps):', this.totalSteps);
@@ -113,6 +115,178 @@ const ESCALADA = {
         }
 
         console.log(`🎬 Parallax: progresso ${Math.round(progress * 100)}%, move ${Math.round(movePercent)}%`);
+
+        // ✅ NOVO: Verificar checkpoints de elementos
+        this.checkElementCheckpoints(progress);
+    },
+
+    // ===== SISTEMA DE CHECKPOINTS (Elementos Progressivos) =====
+
+    checkElementCheckpoints: function(progress) {
+        // 25% - 2 Pássaros
+        if (progress >= 0.25 && !this.checkpoints.passaros) {
+            this.spawnElement({
+                id: 'passaro1',
+                emoji: '🐦',
+                nome: 'Pássaro 1',
+                posicao: { right: '250px', top: '70%' },
+                animacao: 'voar-horizontal',
+                tamanho: '2.5rem',
+                delay: '0s'
+            });
+            this.spawnElement({
+                id: 'passaro2',
+                emoji: '🐦',
+                nome: 'Pássaro 2',
+                posicao: { right: '300px', top: '65%' },
+                animacao: 'voar-horizontal',
+                tamanho: '2.5rem',
+                delay: '0.5s'
+            });
+            this.checkpoints.passaros = true;
+            console.log('🐦 2 pássaros apareceram (25%)');
+        }
+
+        // 40% - Nuvens brancas
+        if (progress >= 0.40 && !this.checkpoints.nuvensBrancas) {
+            this.spawnElement({
+                id: 'nuvem-branca1',
+                emoji: '☁️',
+                nome: 'Nuvem Branca',
+                posicao: { right: '150px', top: '50%' },
+                animacao: 'flutuar-lento',
+                tamanho: '3rem',
+                delay: '0s'
+            });
+            this.spawnElement({
+                id: 'nuvem-branca2',
+                emoji: '☁️',
+                nome: 'Nuvem Branca',
+                posicao: { right: '400px', top: '55%' },
+                animacao: 'flutuar-lento',
+                tamanho: '2.5rem',
+                delay: '1s'
+            });
+            this.checkpoints.nuvensBrancas = true;
+            console.log('☁️ Nuvens brancas apareceram (40%)');
+        }
+
+        // 60% - Nuvens escuras
+        if (progress >= 0.60 && !this.checkpoints.nuvensEscuras) {
+            this.spawnElement({
+                id: 'nuvem-escura1',
+                emoji: '🌫️',
+                nome: 'Nuvem Escura',
+                posicao: { right: '200px', top: '35%' },
+                animacao: 'flutuar-medio',
+                tamanho: '3.5rem',
+                delay: '0s'
+            });
+            this.spawnElement({
+                id: 'nuvem-escura2',
+                emoji: '🌫️',
+                nome: 'Nuvem Escura',
+                posicao: { right: '350px', top: '40%' },
+                animacao: 'flutuar-medio',
+                tamanho: '3rem',
+                delay: '0.7s'
+            });
+            this.checkpoints.nuvensEscuras = true;
+            console.log('🌫️ Nuvens escuras apareceram (60%)');
+        }
+
+        // 70% - Urubus
+        if (progress >= 0.70 && !this.checkpoints.urubus) {
+            this.spawnElement({
+                id: 'urubu1',
+                emoji: '🦅',
+                nome: 'Urubu',
+                posicao: { right: '280px', top: '25%' },
+                animacao: 'voar-circular',
+                tamanho: '3.5rem',
+                delay: '0s'
+            });
+            this.spawnElement({
+                id: 'urubu2',
+                emoji: '🦅',
+                nome: 'Urubu',
+                posicao: { right: '320px', top: '30%' },
+                animacao: 'voar-circular',
+                tamanho: '3rem',
+                delay: '1s'
+            });
+            this.checkpoints.urubus = true;
+            console.log('🦅 Urubus apareceram (70%)');
+        }
+
+        // 80% - Céu escuro e estrelas
+        if (progress >= 0.80 && !this.checkpoints.estrelas) {
+            // Escurecer camada 1 (fundo/céu)
+            this.escurecerCeu();
+
+            // Criar constelação de estrelas
+            for (let i = 0; i < 8; i++) {
+                const randomRight = 100 + Math.random() * 300;
+                const randomTop = 5 + Math.random() * 20;
+                const randomSize = 1 + Math.random() * 1.5;
+                const randomDelay = Math.random() * 2;
+
+                this.spawnElement({
+                    id: `estrela${i}`,
+                    emoji: ['⭐', '✨', '🌟'][Math.floor(Math.random() * 3)],
+                    nome: `Estrela ${i}`,
+                    posicao: { right: `${randomRight}px`, top: `${randomTop}%` },
+                    animacao: 'piscar',
+                    tamanho: `${randomSize}rem`,
+                    delay: `${randomDelay}s`
+                });
+            }
+
+            this.checkpoints.estrelas = true;
+            console.log('⭐ Céu escureceu e estrelas apareceram (80%)');
+        }
+    },
+
+    escurecerCeu: function() {
+        const layer1 = document.querySelector('.bg-layer-1');
+        if (layer1) {
+            layer1.style.transition = 'filter 2s ease-in-out';
+            layer1.style.filter = 'brightness(0.3)';
+            console.log('🌙 Céu escurecido');
+        }
+    },
+
+    spawnElement: function(config) {
+        // Evitar duplicação
+        if (document.getElementById(config.id)) {
+            return;
+        }
+
+        const elemento = document.createElement('div');
+        elemento.id = config.id;
+        elemento.className = `checkpoint-element ${config.nome.toLowerCase().replace(/\s/g, '-')}`;
+        elemento.innerHTML = config.emoji;
+        elemento.style.cssText = `
+            position: absolute;
+            ${config.posicao.right ? 'right: ' + config.posicao.right + ';' : ''}
+            ${config.posicao.left ? 'left: ' + config.posicao.left + ';' : ''}
+            ${config.posicao.top ? 'top: ' + config.posicao.top + ';' : ''}
+            ${config.posicao.bottom ? 'bottom: ' + config.posicao.bottom + ';' : ''}
+            font-size: ${config.tamanho || '3rem'};
+            animation: ${config.animacao} 3s ease-in-out infinite;
+            animation-delay: ${config.delay || '0s'};
+            z-index: 50;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
+            pointer-events: none;
+        `;
+
+        // Adicionar ao container
+        const container = document.querySelector('.game-container');
+        if (container) {
+            container.appendChild(elemento);
+        }
+
+        console.log(`🎨 Elemento "${config.nome}" (${config.emoji}) apareceu em ${config.posicao.top || config.posicao.bottom}`);
     },
 
     // Injetar HTML da montanha
@@ -355,7 +529,84 @@ const ESCALADA = {
                     transform: translateY(-100px) scale(0);
                 }
             }
-            
+
+            /* ===== ANIMAÇÕES DOS CHECKPOINTS ===== */
+
+            /* Pássaros voando horizontal */
+            @keyframes voar-horizontal {
+                0%, 100% {
+                    transform: translateX(0) translateY(0) rotate(-5deg);
+                }
+                25% {
+                    transform: translateX(-15px) translateY(-8px) rotate(-10deg);
+                }
+                50% {
+                    transform: translateX(-30px) translateY(5px) rotate(0deg);
+                }
+                75% {
+                    transform: translateX(-15px) translateY(-3px) rotate(5deg);
+                }
+            }
+
+            /* Nuvens flutuando lento */
+            @keyframes flutuar-lento {
+                0%, 100% {
+                    transform: translateX(0) translateY(0);
+                }
+                50% {
+                    transform: translateX(20px) translateY(-10px);
+                }
+            }
+
+            /* Nuvens flutuando médio */
+            @keyframes flutuar-medio {
+                0%, 100% {
+                    transform: translateX(0) translateY(0);
+                }
+                33% {
+                    transform: translateX(15px) translateY(-15px);
+                }
+                66% {
+                    transform: translateX(-10px) translateY(-8px);
+                }
+            }
+
+            /* Urubus voando circular */
+            @keyframes voar-circular {
+                0% {
+                    transform: translateX(0) translateY(0) rotate(0deg);
+                }
+                25% {
+                    transform: translateX(30px) translateY(-20px) rotate(-15deg);
+                }
+                50% {
+                    transform: translateX(40px) translateY(10px) rotate(10deg);
+                }
+                75% {
+                    transform: translateX(10px) translateY(20px) rotate(-5deg);
+                }
+                100% {
+                    transform: translateX(0) translateY(0) rotate(0deg);
+                }
+            }
+
+            /* Estrelas piscando */
+            @keyframes piscar {
+                0%, 100% {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+                50% {
+                    opacity: 0.3;
+                    transform: scale(0.8);
+                }
+            }
+
+            /* Estilos dos elementos checkpoint */
+            .checkpoint-element {
+                transition: opacity 0.5s ease-in-out;
+            }
+
             /* Responsivo */
             @media (max-width: 768px) {
                 #escalada-container {
@@ -581,12 +832,32 @@ const ESCALADA = {
     // Resetar mecânica
     reset: function() {
         this.currentStep = 0;
+        this.checkpoints = {}; // ← Resetar checkpoints
         this.updatePosition();
-        
+
         const lume = document.getElementById('lume-climber');
         if (lume) {
             lume.style.transform = 'translateX(-50%) scale(1)';
         }
+
+        // ✅ NOVO: Remover todos os elementos checkpoint
+        const checkpointElements = document.querySelectorAll('.checkpoint-element');
+        checkpointElements.forEach(el => el.remove());
+
+        // ✅ NOVO: Restaurar brilho do céu
+        const layer1 = document.querySelector('.bg-layer-1');
+        if (layer1) {
+            layer1.style.filter = 'brightness(1)';
+        }
+
+        // ✅ NOVO: Resetar parallax também
+        const layer2 = document.querySelector('.bg-layer-2');
+        const layer3 = document.querySelector('.bg-layer-3');
+        if (layer1) layer1.style.transform = 'translateY(0)';
+        if (layer2) layer2.style.transform = 'translateY(0)';
+        if (layer3) layer3.style.transform = 'translateY(0)';
+
+        console.log('🔄 Reset completo (checkpoints + elementos + parallax)');
     },
     
     // Destruir mecânica

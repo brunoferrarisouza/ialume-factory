@@ -196,19 +196,8 @@ function onAnswerChecked(isCorrect, phaseNumber) {
     console.log('⏱️ Avançando para próxima fase em', delay, 'ms');
 
     setTimeout(() => {
-        // Trocar fase enquanto mecânica ainda está visível
+        // Trocar fase após animação da mecânica
         nextPhase();
-
-        // Aguardar um pouco e então esconder mecânica
-        // (agora content-area já vai estar com nova fase)
-        setTimeout(() => {
-            if (window.ESCALADA && window.ESCALADA.hideMechanic) {
-                ESCALADA.hideMechanic();
-            }
-            if (window.PERSEGUICAO && window.PERSEGUICAO.hideMechanic) {
-                PERSEGUICAO.hideMechanic();
-            }
-        }, 300);
     }, delay);
 }
 

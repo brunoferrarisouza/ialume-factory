@@ -16,59 +16,108 @@
 
 body {
     font-family: 'Segoe UI', Arial, sans-serif;
-    background: var(--primary-gradient);
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
+    background: #f0f0f0;
+    margin: 0;
+    padding: 0;
 }
 
 /* ===== CONTAINER ===== */
 .game-container {
-    background: white;
-    border-radius: 30px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    max-width: 800px;
-    width: 100%;
-    min-height: 500px;
-    overflow: auto;
     position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    background: #ffffff;
 }
 
-/* ===== HEADER ===== */
-.header {
-    background: linear-gradient(to bottom, #fff, #f8f9fa);
-    padding: 20px;
+/* ===== BARRA DE PROGRESSO ===== */
+.progress-bar {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    padding: 15px 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    z-index: 150;
+}
+
+.progress-track {
+    width: 100%;
+    height: 8px;
+    background: rgba(102, 126, 234, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ffd700, #ff8c00);
+    border-radius: 10px;
+    transition: width 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    width: 0%;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.progress-text {
+    display: block;
     text-align: center;
-    border-bottom: 2px solid #dee2e6;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #667eea;
+    letter-spacing: 0.5px;
 }
 
-#phase-title {
-    color: #212529;
-    font-size: 1.5rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
-
-/* ===== CONTEÚDO ===== */
-#content-area {
-    padding: 40px;
-    text-align: center;
-}
-
+/* ===== SISTEMA DE POPUP PARA FASES ===== */
 .phase {
-    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 30px;
+    padding: 40px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+
+    max-width: 90%;
+    width: 600px;
+    max-height: 85vh;
+    overflow-y: auto;
+
+    z-index: 100;
+
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 .phase.active {
-    display: block;
-    animation: fadeIn 0.5s;
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) scale(1);
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+/* Scrollbar customizada para popup */
+.phase::-webkit-scrollbar {
+    width: 8px;
+}
+
+.phase::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+}
+
+.phase::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.3);
+    border-radius: 10px;
+}
+
+.phase::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.5);
 }
 
 /* ===== LUME (flutua) ===== */
@@ -87,42 +136,46 @@ body {
 
 /* ===== STORY BOX ===== */
 .story-box {
-    background: rgba(102, 126, 234, 0.1);
+    background: rgba(255, 255, 255, 0.15);
     border-radius: 20px;
     padding: 40px;
     margin-bottom: 30px;
+    color: white;
 }
 
 .story-box h1 {
-    color: #212529;
+    color: white;
     font-size: 2rem;
     margin-bottom: 15px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
 }
 
 .story-box p {
     font-size: 1.2rem;
-    color: #6c757d;
+    color: rgba(255,255,255,0.95);
     line-height: 1.8;
 }
 
 /* ===== QUESTION BOX ===== */
 .question-box {
-    background: rgba(102, 126, 234, 0.05);
-    border: 2px solid #dee2e6;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255,255,255,0.3);
     border-radius: 20px;
     padding: 40px;
     margin-bottom: 30px;
+    color: white;
 }
 
 .question-box h2 {
-    color: #212529;
+    color: white;
     font-size: 1.8rem;
     margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
 }
 
 .question-box p {
     font-size: 1.1rem;
-    color: #6c757d;
+    color: rgba(255,255,255,0.9);
     margin-bottom: 20px;
 }
 
@@ -135,12 +188,12 @@ body {
     border-radius: 50px;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }
 
 .btn:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
 }
 
 .btn:active {
@@ -148,37 +201,40 @@ body {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
+    background: white;
+    color: #667eea;
 }
 
 /* ===== FEEDBACK ===== */
 #feedback-zone {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    padding: 20px 30px;
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    padding: 20px 40px;
     border-radius: 15px;
     font-weight: bold;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     opacity: 0;
-    transform: translateX(100%);
-    transition: all 0.5s ease;
-    z-index: 1000;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 200;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
 #feedback-zone.show {
     opacity: 1;
-    transform: translateX(0);
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
 }
 
 #feedback-zone.correct {
-    background: var(--correct);
+    background: linear-gradient(135deg, #51cf66, #38d9a9);
     color: white;
 }
 
 #feedback-zone.wrong {
-    background: var(--wrong);
+    background: linear-gradient(135deg, #ff6b6b, #ff8787);
     color: white;
 }
 
@@ -191,6 +247,7 @@ body {
     padding: 15px 20px;
     border-radius: 15px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    z-index: 150;
 }
 
 .score-item {
@@ -213,19 +270,27 @@ body {
 /* ===== RESPONSIVO ===== */
 @media (max-width: 768px) {
     .game-container {
-        border-radius: 15px;
-        min-height: 400px;
+        height: 100vh;
+    }
+
+    .progress-bar {
+        width: 250px;
+        padding: 12px 15px;
+        top: 15px;
+    }
+
+    .progress-text {
+        font-size: 0.8rem;
+    }
+
+    .phase {
+        max-width: 95%;
+        padding: 25px;
+        max-height: 80vh;
     }
 
     .lume-char {
         font-size: 4rem;
-    }
-
-    #content-area {
-        padding: 20px;
-        position: relative;
-        z-index: 2;
-        transition: opacity 0.5s ease;
     }
 
     .story-box, .question-box {
@@ -242,42 +307,16 @@ body {
     }
 
     .score-container {
-        top: 10px;
-        left: 10px;
+        top: 15px;
+        left: 15px;
         padding: 10px 15px;
         font-size: 0.9rem;
     }
 
     #feedback-zone {
-        top: 10px;
-        right: 10px;
-        padding: 15px 20px;
+        top: 70px;
+        padding: 15px 25px;
         font-size: 1rem;
-    }
-
-    /* ===== MOBILE UX: Mechanic as Background ===== */
-    /* Mechanics start with low opacity as background */
-    .mechanic-container {
-        opacity: 0.2 !important;
-        z-index: 1 !important;
-        transition: opacity 0.6s ease, z-index 0s 0.6s;
-    }
-
-    /* When showing mechanic (during answer feedback) */
-    .game-container.showing-mechanic .mechanic-container {
-        opacity: 1 !important;
-        z-index: 100 !important;
-        transition: opacity 0.6s ease, z-index 0s;
-    }
-
-    /* Hide content completely when showing mechanic */
-    .game-container.showing-mechanic #content-area {
-        opacity: 0;
-    }
-
-    /* Keep score and feedback visible */
-    .game-container.showing-mechanic .score-container,
-    .game-container.showing-mechanic #feedback-zone {
-        z-index: 200;
+        max-width: 90%;
     }
 }

@@ -29,10 +29,12 @@ const ESCALADA = {
         console.log('   ✅ OPÇÃO A: 4 fases = 4 andares (BASE=0, ANDAR 1, ANDAR 2, TOPO=3)');
         console.log('   Andares a criar: BASE (0) até TOPO (' + (this.totalSteps - 1) + ')');
 
-        this.injectBackground(); // ← NOVO: Injetar backgrounds PRIMEIRO
+        this.injectBackground(); // ← Injetar backgrounds PRIMEIRO
+        this.injectProgressBar(); // ← NOVO: Barra de progresso
         this.injectHTML();
         this.injectCSS();
         this.updatePosition();
+        this.updateVisibleFloors(); // ← NOVO: Mostrar apenas 3 degraus iniciais
     },
 
     // ===== NOVO: Sistema de Parallax =====
@@ -84,6 +86,74 @@ const ESCALADA = {
         container.insertAdjacentHTML('afterbegin', bgHTML);
 
         console.log('✅ Backgrounds mockados injetados (3 camadas)');
+    },
+
+    // ===== BARRA DE PROGRESSO =====
+
+    injectProgressBar: function() {
+        const container = document.querySelector('.game-container');
+        if (!container) return;
+
+        // Verificar se já existe
+        if (document.getElementById('escalada-progress')) {
+            console.log('⏭️ Barra de progresso já injetada');
+            return;
+        }
+
+        const progressHTML = `
+            <div id="escalada-progress" class="progress-bar">
+                <div class="progress-track">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <span class="progress-text" id="progress-text">Questão 1/${this.totalSteps}</span>
+            </div>
+        `;
+
+        container.insertAdjacentHTML('beforeend', progressHTML);
+        console.log('✅ Barra de progresso injetada');
+    },
+
+    updateProgressBar: function() {
+        const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
+
+        if (progressFill && progressText) {
+            const percentage = (this.currentStep / (this.totalSteps - 1)) * 100;
+            progressFill.style.width = percentage + '%';
+
+            // Questão atual (currentStep vai de 0 a totalSteps-1, mas questões vão de 1 a totalSteps)
+            const currentQuestion = this.currentStep + 1;
+            progressText.textContent = `Questão ${currentQuestion}/${this.totalSteps}`;
+
+            console.log(`📊 Barra atualizada: ${currentQuestion}/${this.totalSteps} (${Math.round(percentage)}%)`);
+        }
+    },
+
+    // ===== JANELA MÓVEL DE DEGRAUS (3 visíveis) =====
+
+    updateVisibleFloors: function() {
+        const floors = document.querySelectorAll('.floor');
+
+        floors.forEach(floor => {
+            const floorNumber = parseInt(floor.dataset.floor);
+            const distance = Math.abs(floorNumber - this.currentStep);
+
+            // Mostrar apenas degraus próximos (distância <= 1)
+            // Isso cria janela de 3 degraus: anterior + atual + próximo
+            if (distance <= 1) {
+                floor.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                floor.style.opacity = '1';
+                floor.style.transform = 'scale(1)';
+                floor.style.visibility = 'visible';
+            } else {
+                floor.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                floor.style.opacity = '0';
+                floor.style.transform = 'scale(0.9)';
+                floor.style.visibility = 'hidden';
+            }
+        });
+
+        console.log(`🪟 Janela móvel atualizada: mostrando degraus ${Math.max(0, this.currentStep-1)} a ${Math.min(this.totalSteps-1, this.currentStep+1)}`);
     },
 
     // Mover backgrounds com parallax
@@ -397,21 +467,26 @@ const ESCALADA = {
 
             /* ===== MECÂNICA ESCALADA ===== */
 
-            /* Container da mecânica */
+            /* Container da mecânica - OCUPA 100% DA TELA */
             #escalada-container {
                 position: absolute;
-                right: 40px;
-                top: 100px;
-                bottom: 40px;
-                width: 200px;
-                z-index: 100;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 1; /* Atrás dos popups */
                 pointer-events: none;
             }
             
-            /* Montanha */
+            /* Montanha - CENTRALIZADA */
             .mountain {
-                position: relative;
-                height: 100%;
+                position: absolute;
+                right: 50px;
+                top: 50px;
+                bottom: 50px;
+                width: 250px;
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
@@ -682,8 +757,14 @@ const ESCALADA = {
         // Atualizar posição
         this.updatePosition();
 
-        // ✅ NOVO: Mover backgrounds em parallax
+        // ✅ Mover backgrounds em parallax
         this.moveParallax();
+
+        // ✅ NOVO: Atualizar barra de progresso
+        this.updateProgressBar();
+
+        // ✅ NOVO: Atualizar janela móvel de degraus
+        this.updateVisibleFloors();
 
         // Remover classe após animação
         setTimeout(() => {
@@ -776,36 +857,13 @@ const ESCALADA = {
         }
     },
     
-    // Mostrar mecânica (mobile: trazer para frente)
-    showMechanic: function() {
-        const gameContainer = document.querySelector('.game-container');
-        if (gameContainer && window.innerWidth <= 768) {
-            console.log('📱 Mostrando mecânica (mobile)');
-            gameContainer.classList.add('showing-mechanic');
-        }
-    },
-
-    // Esconder mecânica (mobile: voltar para fundo)
-    hideMechanic: function() {
-        const gameContainer = document.querySelector('.game-container');
-        if (gameContainer && window.innerWidth <= 768) {
-            console.log('📱 Escondendo mecânica (mobile)');
-            gameContainer.classList.remove('showing-mechanic');
-        }
-    },
-
     // Feedback de acerto
     onCorrect: function() {
         console.log('✅ Resposta correta! Subindo...');
 
-        // Mobile: mostrar mecânica antes da animação
-        this.showMechanic();
-
-        // Pequeno delay para transição de opacity
+        // Pequeno delay para animação
         setTimeout(() => {
             this.climb();
-            // ✅ CORREÇÃO: Não esconde mais automaticamente
-            // base.js vai esconder no timing certo (após trocar fase)
         }, 100);
     },
 
@@ -814,17 +872,12 @@ const ESCALADA = {
         console.log('❌ Resposta errada!');
         // Não desce, só não sobe
 
-        // Mobile: mostrar mecânica antes da animação
-        this.showMechanic();
-
         // Shake effect
         setTimeout(() => {
             const lume = document.getElementById('lume-climber');
             lume.style.animation = 'shake 0.5s';
             setTimeout(() => {
                 lume.style.animation = '';
-                // ✅ CORREÇÃO: Não esconde mais automaticamente
-                // base.js vai esconder no timing certo
             }, 500);
         }, 100);
     },
@@ -832,7 +885,7 @@ const ESCALADA = {
     // Resetar mecânica
     reset: function() {
         this.currentStep = 0;
-        this.checkpoints = {}; // ← Resetar checkpoints
+        this.checkpoints = {}; // Resetar checkpoints
         this.updatePosition();
 
         const lume = document.getElementById('lume-climber');
@@ -840,24 +893,30 @@ const ESCALADA = {
             lume.style.transform = 'translateX(-50%) scale(1)';
         }
 
-        // ✅ NOVO: Remover todos os elementos checkpoint
+        // Remover todos os elementos checkpoint
         const checkpointElements = document.querySelectorAll('.checkpoint-element');
         checkpointElements.forEach(el => el.remove());
 
-        // ✅ NOVO: Restaurar brilho do céu
+        // Restaurar brilho do céu
         const layer1 = document.querySelector('.bg-layer-1');
         if (layer1) {
             layer1.style.filter = 'brightness(1)';
         }
 
-        // ✅ NOVO: Resetar parallax também
+        // Resetar parallax
         const layer2 = document.querySelector('.bg-layer-2');
         const layer3 = document.querySelector('.bg-layer-3');
         if (layer1) layer1.style.transform = 'translateY(0)';
         if (layer2) layer2.style.transform = 'translateY(0)';
         if (layer3) layer3.style.transform = 'translateY(0)';
 
-        console.log('🔄 Reset completo (checkpoints + elementos + parallax)');
+        // ✅ NOVO: Resetar barra de progresso
+        this.updateProgressBar();
+
+        // ✅ NOVO: Resetar janela móvel de degraus
+        this.updateVisibleFloors();
+
+        console.log('🔄 Reset completo (checkpoints + elementos + parallax + barra + janela)');
     },
     
     // Destruir mecânica

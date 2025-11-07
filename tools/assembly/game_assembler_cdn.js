@@ -77,14 +77,16 @@ function gerarJogoCompleto(config) {
 
     <!-- Scripts do CDN -->
     <!-- Core -->
+    <script src="${cdnPath}/particles.js"></script>
+    <script src="${cdnPath}/audio.js"></script>
     <script src="${cdnPath}/base.js"></script>
     <script src="${cdnPath}/game-engine.js"></script>
     <script src="${cdnPath}/bubble-integration.js"></script>
-    
+
     <!-- Mechanics -->
     <script src="${cdnPath}/mechanics/escalada.js"></script>
     <script src="${cdnPath}/mechanics/perseguicao.js"></script>
-    
+
     <!-- Modalities -->
     <script src="${cdnPath}/modalities/quiz.js"></script>
     <script src="${cdnPath}/modalities/true-false.js"></script>

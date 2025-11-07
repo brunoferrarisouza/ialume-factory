@@ -55,12 +55,14 @@ const filesToCopy = [
   { from: 'base/scripts/base.js', to: 'base.js' },
   { from: 'base/scripts/game-engine.js', to: 'game-engine.js' },
   { from: 'base/scripts/bubble-integration.js', to: 'bubble-integration.js' },
+  { from: 'base/scripts/particles.js', to: 'particles.js' },
+  { from: 'base/scripts/audio.js', to: 'audio.js' },
   { from: 'base/styles/base.css', to: 'base.css' },
-  
+
   // Mechanics
   { from: 'mechanics/escalada.js', to: 'mechanics/escalada.js' },
   { from: 'mechanics/perseguicao.js', to: 'mechanics/perseguicao.js' },
-  
+
   // Modalities
   { from: 'modalities/quiz.js', to: 'modalities/quiz.js' },
   { from: 'modalities/true-false.js', to: 'modalities/true-false.js' },

@@ -164,12 +164,8 @@ const ESCALADA = {
             return;
         }
 
-        console.log('🦅 Inicializando decorações dinâmicas...');
-
-        // Inicializar sistema DECORATIONS com config do Supabase
-        window.DECORATIONS.init(window.gameConfig.decorations);
-
-        console.log('✅ Decorações dinâmicas ativadas!');
+        // ✅ Decorações são inicializadas no game-engine.js (após botão "Começar")
+        console.log('⏭️ Decorações serão iniciadas pelo game-engine após intro');
     },
 
     // Mostrar pássaros em checkpoints específicos (25%, 50%, 75%)

@@ -63,7 +63,7 @@ const DECORATIONS = {
         this.container = document.createElement('div');
         this.container.id = 'decorations-container';
         this.container.style.cssText = `
-            position: fixed;
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
@@ -73,7 +73,14 @@ const DECORATIONS = {
             overflow: hidden;
         `;
 
-        document.body.appendChild(this.container);
+        // Adicionar dentro do game-container (não no body!)
+        const gameContainer = document.querySelector('.game-container');
+        if (gameContainer) {
+            gameContainer.appendChild(this.container);
+            console.log('✅ Container de decorações adicionado dentro do jogo');
+        } else {
+            console.error('❌ .game-container não encontrado! Decorações não serão exibidas.');
+        }
     },
 
     /**
@@ -317,7 +324,7 @@ const DECORATIONS = {
         style.textContent = `
             /* Container de decorações */
             #decorations-container {
-                position: fixed;
+                position: absolute;
                 top: 0;
                 left: 0;
                 width: 100%;

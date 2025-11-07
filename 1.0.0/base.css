@@ -205,6 +205,19 @@ body {
     color: #667eea;
 }
 
+/* ===== MODALIDADES (z-index para ficar acima de decorações) ===== */
+.quiz-container,
+.true-false-container,
+.fill-blanks-container,
+.sequence-container,
+.input-container,
+.slider-container,
+.drag-drop-container,
+.matching-container {
+    position: relative;
+    z-index: 100;
+}
+
 /* ===== FEEDBACK ===== */
 #feedback-zone {
     position: fixed;

@@ -7,13 +7,26 @@ const FILL_BLANKS = {
      */
     init: function(phaseData) {
         console.log('🎯 FILL_BLANKS.init() chamado com:', phaseData);
-        
+
         // Criar e retornar a UI
         const ui = this.createUI(phaseData);
-        
+
         return ui;
     },
-    
+
+    /**
+     * Normalizar texto removendo acentos e convertendo para lowercase
+     * Exemplo: "leões" → "leoes", "MÃOS" → "maos"
+     */
+    normalizeText: function(text) {
+        if (!text) return '';
+        return text
+            .normalize('NFD')                    // Decompõe: é → e + ´
+            .replace(/[\u0300-\u036f]/g, '')     // Remove diacríticos: ´ ` ^ ~ ã õ
+            .toLowerCase()
+            .trim();
+    },
+
     createUI: function(data) {
         const container = document.createElement('div');
         container.className = 'fill-blanks-container';
@@ -48,11 +61,12 @@ const FILL_BLANKS = {
         const input = document.getElementById('fb-answer');
         const button = document.querySelector('.fb-button');
         if (!input || !button) return;
-        
-        const userAnswer = input.value.trim().toLowerCase();
-        const correctAnswer = data.resposta.toLowerCase();
-        const aceitas = data.variacoes_aceitas || [correctAnswer];
-        const isCorrect = aceitas.some(v => userAnswer === v.toLowerCase());
+
+        // ✅ CORREÇÃO: Normalizar respostas removendo acentos
+        const userAnswer = this.normalizeText(input.value);
+        const correctAnswer = this.normalizeText(data.resposta);
+        const aceitas = data.variacoes_aceitas || [data.resposta];
+        const isCorrect = aceitas.some(v => this.normalizeText(v) === userAnswer);
         
         input.disabled = true;
         button.disabled = true;

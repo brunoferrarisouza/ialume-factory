@@ -79,6 +79,7 @@ function gerarJogoCompleto(config) {
     <!-- Core -->
     <script src="${cdnPath}/particles.js"></script>
     <script src="${cdnPath}/audio.js"></script>
+    <script src="${cdnPath}/decorations.js"></script>
     <script src="${cdnPath}/base.js"></script>
     <script src="${cdnPath}/game-engine.js"></script>
     <script src="${cdnPath}/bubble-integration.js"></script>

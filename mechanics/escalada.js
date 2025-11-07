@@ -137,41 +137,26 @@ const ESCALADA = {
 
     // ===== SISTEMA DE DECORAÇÕES (Nuvens + Pássaros) =====
     injectDecorations: function() {
-        const container = document.querySelector('.game-container');
-        if (!container) return;
+        // ✅ NOVO: Sistema dinâmico de decorações via DECORATIONS.js
 
-        // Verificar se já existe
-        if (document.getElementById('escalada-decorations')) {
-            console.log('⏭️ Decorações já injetadas');
+        // Verificar se DECORATIONS está disponível
+        if (typeof window.DECORATIONS === 'undefined') {
+            console.warn('⚠️ DECORATIONS.js não carregado - decorações desabilitadas');
             return;
         }
 
-        console.log('🎨 Injetando decorações (nuvens flutuando + pássaros)');
-
-        // Criar container de decorações
-        const decorHTML = `
-            <div id="escalada-decorations" class="escalada-decorations">
-                <!-- Nuvens flutuantes (sempre visíveis) -->
-                <img src="../assets/decorations/clouds/cloud-1.png" class="cloud cloud-1" alt="">
-                <img src="../assets/decorations/clouds/cloud-2.png" class="cloud cloud-2" alt="">
-                <img src="../assets/decorations/clouds/cloud-1.png" class="cloud cloud-3" alt="">
-
-                <!-- Pássaros (aparecem em checkpoints) -->
-                <img src="../assets/decorations/birds/bird_2_eagle.png" class="bird bird-eagle" alt="" style="display: none;">
-                <img src="../assets/decorations/birds/bird_2_cardinal.png" class="bird bird-cardinal" alt="" style="display: none;">
-                <img src="../assets/decorations/birds/bird_1_bluejay.png" class="bird bird-bluejay" alt="" style="display: none;">
-            </div>
-        `;
-
-        // Injetar após backgrounds, antes das fases
-        const bgDiv = document.getElementById('escalada-background');
-        if (bgDiv) {
-            bgDiv.insertAdjacentHTML('afterend', decorHTML);
-        } else {
-            container.insertAdjacentHTML('afterbegin', decorHTML);
+        // Verificar se há configuração de decorações
+        if (!window.gameConfig || !window.gameConfig.decorations || window.gameConfig.decorations.length === 0) {
+            console.log('ℹ️ Nenhuma decoração configurada para este cenário');
+            return;
         }
 
-        console.log('✅ Decorações injetadas (3 nuvens + 3 pássaros)');
+        console.log('🦅 Inicializando decorações dinâmicas...');
+
+        // Inicializar sistema DECORATIONS com config do Supabase
+        window.DECORATIONS.init(window.gameConfig.decorations);
+
+        console.log('✅ Decorações dinâmicas ativadas!');
     },
 
     // Mostrar pássaros em checkpoints específicos (25%, 50%, 75%)

@@ -57,6 +57,7 @@ const filesToCopy = [
   { from: 'base/scripts/bubble-integration.js', to: 'bubble-integration.js' },
   { from: 'base/scripts/particles.js', to: 'particles.js' },
   { from: 'base/scripts/audio.js', to: 'audio.js' },
+  { from: 'base/scripts/decorations.js', to: 'decorations.js' },
   { from: 'base/styles/base.css', to: 'base.css' },
 
   // Mechanics

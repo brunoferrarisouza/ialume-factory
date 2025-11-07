@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Besouro Blindado - Antagonista</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #f0f0f0;
+        }
+
+        .beetle-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            animation: levitate 2.5s ease-in-out infinite;
+        }
+
+        @keyframes levitate {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .beetle {
+            width: 100px;
+            height: 100px;
+            position: relative;
+        }
+
+        /* Cabeça */
+        .head {
+            width: 32px;
+            height: 24px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+            border-radius: 50% 50% 30% 30%;
+            position: absolute;
+            left: 34px;
+            top: 8px;
+            border: 3px solid #000;
+            z-index: 5;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.1);
+        }
+
+        /* Olhos (pequenos e ameaçadores) */
+        .eye {
+            width: 8px;
+            height: 8px;
+            background: #ff0000;
+            border-radius: 50%;
+            position: absolute;
+            top: 8px;
+            animation: blink 5s infinite;
+            z-index: 6;
+            box-shadow: 0 0 6px #ff0000;
+        }
+
+        .eye.left { left: 38px; }
+        .eye.right { left: 54px; }
+
+        @keyframes blink {
+            0%, 48%, 52%, 100% { height: 8px; opacity: 1; }
+            50% { height: 2px; opacity: 0.5; }
+        }
+
+        /* Pupila */
+        .pupil {
+            width: 4px;
+            height: 4px;
+            background: #000;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+        }
+
+        /* Chifre/Mandíbula central (ameaçador) */
+        .horn {
+            width: 6px;
+            height: 14px;
+            background: linear-gradient(180deg, #2a2a2a 0%, #000 100%);
+            border-radius: 50% 50% 0 0;
+            position: absolute;
+            left: 47px;
+            top: 0px;
+            z-index: 7;
+            border: 1px solid #000;
+            box-shadow: inset 1px 0 2px rgba(255,255,255,0.2);
+        }
+
+        /* Mandíbulas laterais */
+        .mandible {
+            width: 8px;
+            height: 12px;
+            background: #1a1a1a;
+            position: absolute;
+            top: 18px;
+            border: 2px solid #000;
+            z-index: 6;
+            box-shadow: inset 0 1px 2px rgba(255,255,255,0.15);
+        }
+
+        .mandible.left {
+            left: 32px;
+            border-radius: 50% 0 0 50%;
+            transform: rotate(-20deg);
+        }
+
+        .mandible.right {
+            right: 32px;
+            border-radius: 0 50% 50% 0;
+            transform: rotate(20deg);
+        }
+
+        /* Antenas (curtas e grossas) */
+        .antenna {
+            width: 3px;
+            height: 10px;
+            background: #1a1a1a;
+            position: absolute;
+            border-radius: 50% 50% 0 0;
+            z-index: 8;
+            border: 1px solid #000;
+        }
+
+        .antenna.left {
+            left: 36px;
+            top: 6px;
+            transform: rotate(-35deg);
+            transform-origin: bottom;
+        }
+
+        .antenna.right {
+            right: 36px;
+            top: 6px;
+            transform: rotate(35deg);
+            transform-origin: bottom;
+        }
+
+        /* Tórax (blindado) */
+        .thorax {
+            width: 40px;
+            height: 28px;
+            background: linear-gradient(135deg, #2a2a2a 0%, #0f0f0f 100%);
+            border-radius: 40% 40% 50% 50%;
+            position: absolute;
+            left: 30px;
+            top: 26px;
+            border: 3px solid #000;
+            z-index: 4;
+            box-shadow: inset 0 3px 6px rgba(255,255,255,0.1);
+        }
+
+        /* Detalhes de armadura do tórax */
+        .thorax-armor {
+            width: 80%;
+            height: 3px;
+            background: rgba(255,255,255,0.1);
+            position: absolute;
+            left: 10%;
+            border-radius: 50%;
+        }
+
+        .thorax-armor:nth-child(1) { top: 8px; }
+        .thorax-armor:nth-child(2) { top: 14px; }
+        .thorax-armor:nth-child(3) { top: 20px; }
+
+        /* Élitros (asas duras fechadas) */
+        .elytron {
+            width: 26px;
+            height: 48px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);
+            border-radius: 60% 60% 70% 70%;
+            position: absolute;
+            top: 48px;
+            border: 3px solid #000;
+            z-index: 3;
+            box-shadow: inset 2px 2px 4px rgba(255,255,255,0.15);
+        }
+
+        .elytron.left {
+            left: 24px;
+            transform: rotate(-3deg);
+        }
+
+        .elytron.right {
+            right: 24px;
+            transform: rotate(3deg);
+        }
+
+        /* Linha central dos élitros */
+        .elytron-line {
+            width: 2px;
+            height: 90%;
+            background: rgba(255,255,255,0.1);
+            position: absolute;
+            left: 50%;
+            top: 5%;
+            transform: translateX(-50%);
+        }
+
+        /* Detalhes nos élitros (listras) */
+        .elytron-detail {
+            width: 70%;
+            height: 2px;
+            background: rgba(255,255,255,0.08);
+            position: absolute;
+            left: 15%;
+            border-radius: 50%;
+        }
+
+        .elytron-detail:nth-child(2) { top: 15%; }
+        .elytron-detail:nth-child(3) { top: 30%; }
+        .elytron-detail:nth-child(4) { top: 45%; }
+        .elytron-detail:nth-child(5) { top: 60%; }
+
+        /* Pernas robustas (6 pernas) */
+        .leg {
+            width: 4px;
+            background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%);
+            position: absolute;
+            z-index: 2;
+            border-radius: 3px;
+            border: 1px solid #000;
+        }
+
+        /* Par frontal */
+        .leg.front-left {
+            height: 20px;
+            left: 28px;
+            top: 32px;
+            transform: rotate(-55deg);
+            transform-origin: top;
+        }
+
+        .leg.front-right {
+            height: 20px;
+            right: 28px;
+            top: 32px;
+            transform: rotate(55deg);
+            transform-origin: top;
+        }
+
+        /* Par do meio */
+        .leg.middle-left {
+            height: 24px;
+            left: 22px;
+            top: 50px;
+            transform: rotate(-40deg);
+            transform-origin: top;
+        }
+
+        .leg.middle-right {
+            height: 24px;
+            right: 22px;
+            top: 50px;
+            transform: rotate(40deg);
+            transform-origin: top;
+        }
+
+        /* Par traseiro */
+        .leg.back-left {
+            height: 26px;
+            left: 20px;
+            top: 68px;
+            transform: rotate(-25deg);
+            transform-origin: top;
+        }
+
+        .leg.back-right {
+            height: 26px;
+            right: 20px;
+            top: 68px;
+            transform: rotate(25deg);
+            transform-origin: top;
+        }
+
+        /* Brilho metálico sutil */
+        @keyframes metalShine {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.15); }
+        }
+
+        .beetle {
+            animation: metalShine 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="beetle-container">
+        <div class="beetle">
+            <div class="horn"></div>
+            <div class="antenna left"></div>
+            <div class="antenna right"></div>
+
+            <div class="mandible left"></div>
+            <div class="mandible right"></div>
+
+            <!-- Pernas (atrás dos élitros) -->
+            <div class="leg front-left"></div>
+            <div class="leg front-right"></div>
+            <div class="leg middle-left"></div>
+            <div class="leg middle-right"></div>
+            <div class="leg back-left"></div>
+            <div class="leg back-right"></div>
+
+            <div class="head"></div>
+
+            <div class="eye left">
+                <div class="pupil"></div>
+            </div>
+            <div class="eye right">
+                <div class="pupil"></div>
+            </div>
+
+            <div class="thorax">
+                <div class="thorax-armor"></div>
+                <div class="thorax-armor"></div>
+                <div class="thorax-armor"></div>
+            </div>
+
+            <div class="elytron left">
+                <div class="elytron-line"></div>
+                <div class="elytron-detail"></div>
+                <div class="elytron-detail"></div>
+                <div class="elytron-detail"></div>
+                <div class="elytron-detail"></div>
+            </div>
+
+            <div class="elytron right">
+                <div class="elytron-line"></div>
+                <div class="elytron-detail"></div>
+                <div class="elytron-detail"></div>
+                <div class="elytron-detail"></div>
+                <div class="elytron-detail"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

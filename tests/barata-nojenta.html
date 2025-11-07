@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barata Nojenta Suja Doente - Antagonista</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #f0f0f0;
+        }
+
+        .cockroach-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            animation: scuttle 0.3s ease-in-out infinite;
+        }
+
+        @keyframes scuttle {
+            0%, 100% { transform: translateX(0px) rotate(-5deg); }
+            25% { transform: translateX(-2px) rotate(-7deg); }
+            50% { transform: translateX(0px) rotate(-3deg); }
+            75% { transform: translateX(2px) rotate(-7deg); }
+        }
+
+        .cockroach {
+            width: 100px;
+            height: 100px;
+            position: relative;
+        }
+
+        /* Corpo oval achatado */
+        .body {
+            width: 40px;
+            height: 50px;
+            background: linear-gradient(135deg, #3d2817 0%, #2a1a0f 100%);
+            border-radius: 50% 50% 55% 55%;
+            position: absolute;
+            left: 30px;
+            top: 36px;
+            border: 3px solid #1a0f08;
+            z-index: 5;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
+            animation: breathe 1.5s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(1.03); }
+        }
+
+        /* Manchas sujas no corpo */
+        .dirt-spot {
+            background: rgba(0,0,0,0.4);
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .dirt-spot:nth-child(1) {
+            width: 7px;
+            height: 6px;
+            top: 18%;
+            left: 22%;
+        }
+
+        .dirt-spot:nth-child(2) {
+            width: 6px;
+            height: 7px;
+            top: 40%;
+            right: 18%;
+        }
+
+        .dirt-spot:nth-child(3) {
+            width: 8px;
+            height: 6px;
+            top: 65%;
+            left: 28%;
+        }
+
+        /* Cabeça pequena */
+        .head {
+            width: 20px;
+            height: 18px;
+            background: linear-gradient(135deg, #4d3520 0%, #3d2817 100%);
+            border-radius: 50%;
+            position: absolute;
+            left: 40px;
+            top: 24px;
+            border: 3px solid #2a1a0f;
+            z-index: 6;
+            box-shadow: inset 0 2px 3px rgba(0,0,0,0.6);
+        }
+
+        /* Boca nojenta na cabeça */
+        .mouth {
+            width: 8px;
+            height: 5px;
+            background: #0d0604;
+            border-radius: 0 0 50% 50%;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 2px;
+            border: 1px solid #000;
+            z-index: 7;
+            animation: mouthTwitch 2s ease-in-out infinite;
+        }
+
+        @keyframes mouthTwitch {
+            0%, 100% { transform: translateX(-50%) scaleY(1); }
+            50% { transform: translateX(-50%) scaleY(1.15); }
+        }
+
+        /* Antenas LONGAS com olhos nas pontas */
+        .antenna {
+            width: 2px;
+            height: 26px;
+            background: linear-gradient(180deg, #3d2817 0%, #2a1a0f 100%);
+            position: absolute;
+            border-radius: 50% 50% 0 0;
+            z-index: 8;
+            border: 1px solid #1a0f08;
+            transform-origin: bottom;
+        }
+
+        .antenna.left {
+            left: 50%;
+            margin-left: -18px;
+            top: 16px;
+            animation: antennaShiver 0.5s ease-in-out infinite;
+        }
+
+        .antenna.right {
+            left: 50%;
+            margin-left: 14px;
+            top: 16px;
+            animation: antennaShiverRight 0.5s ease-in-out infinite;
+        }
+
+        @keyframes antennaShiver {
+            0%, 100% { transform: rotate(-55deg); }
+            25% { transform: rotate(-60deg); }
+            50% { transform: rotate(-50deg); }
+            75% { transform: rotate(-58deg); }
+        }
+
+        @keyframes antennaShiverRight {
+            0%, 100% { transform: rotate(55deg); }
+            25% { transform: rotate(60deg); }
+            50% { transform: rotate(50deg); }
+            75% { transform: rotate(58deg); }
+        }
+
+        /* OLHO na ponta de cada antena */
+        .antenna-eye {
+            width: 6px;
+            height: 6px;
+            background: radial-gradient(circle, #8b0000 30%, #4a0000 100%);
+            border-radius: 50%;
+            position: absolute;
+            top: -3px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9;
+            border: 2px solid #1a0f08;
+            box-shadow: 0 0 8px rgba(139, 0, 0, 0.8);
+            animation: eyeBulge 3s ease-in-out infinite;
+        }
+
+        @keyframes eyeBulge {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.2); }
+        }
+
+        /* Pupila no olho da antena */
+        .antenna-pupil {
+            width: 2px;
+            height: 2px;
+            background: #000;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+
+        /* Brilho no olho */
+        .antenna-shine {
+            width: 1px;
+            height: 1px;
+            background: rgba(200, 100, 100, 0.9);
+            border-radius: 50%;
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            z-index: 11;
+        }
+
+        /* Asas translúcidas sujas */
+        .wing {
+            width: 18px;
+            height: 34px;
+            background: linear-gradient(135deg, rgba(80, 60, 40, 0.5) 0%, rgba(50, 35, 25, 0.6) 100%);
+            border-radius: 45% 45% 50% 50%;
+            position: absolute;
+            top: 40px;
+            border: 2px solid rgba(42, 26, 15, 0.8);
+            z-index: 4;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+        }
+
+        .wing.left {
+            left: 50%;
+            margin-left: -28px;
+            transform: rotate(-6deg);
+        }
+
+        .wing.right {
+            left: 50%;
+            margin-left: 10px;
+            transform: rotate(6deg);
+        }
+
+        /* Patas espinhosas */
+        .leg {
+            width: 3px;
+            background: linear-gradient(180deg, #3d2817 0%, #2a1a0f 100%);
+            position: absolute;
+            z-index: 3;
+            border-radius: 2px;
+            border: 1px solid #1a0f08;
+        }
+
+        /* Par frontal */
+        .leg.front-left {
+            height: 24px;
+            left: 50%;
+            margin-left: -18px;
+            top: 32px;
+            transform: rotate(-60deg);
+            transform-origin: top;
+            animation: legTwitch 0.4s ease-in-out infinite;
+        }
+
+        .leg.front-right {
+            height: 24px;
+            left: 50%;
+            margin-left: 15px;
+            top: 32px;
+            transform: rotate(60deg);
+            transform-origin: top;
+            animation: legTwitchRight 0.4s ease-in-out infinite;
+        }
+
+        @keyframes legTwitch {
+            0%, 100% { transform: rotate(-60deg); }
+            50% { transform: rotate(-65deg); }
+        }
+
+        @keyframes legTwitchRight {
+            0%, 100% { transform: rotate(60deg); }
+            50% { transform: rotate(65deg); }
+        }
+
+        /* Par do meio */
+        .leg.middle-left {
+            height: 26px;
+            left: 50%;
+            margin-left: -19px;
+            top: 48px;
+            transform: rotate(-70deg);
+            transform-origin: top;
+        }
+
+        .leg.middle-right {
+            height: 26px;
+            left: 50%;
+            margin-left: 16px;
+            top: 48px;
+            transform: rotate(70deg);
+            transform-origin: top;
+        }
+
+        /* Par traseiro */
+        .leg.back-left {
+            height: 28px;
+            left: 50%;
+            margin-left: -18px;
+            top: 64px;
+            transform: rotate(-55deg);
+            transform-origin: top;
+        }
+
+        .leg.back-right {
+            height: 28px;
+            left: 50%;
+            margin-left: 15px;
+            top: 64px;
+            transform: rotate(55deg);
+            transform-origin: top;
+        }
+
+        /* Espinhos peludos nas patas */
+        .leg-hair {
+            width: 5px;
+            height: 1px;
+            background: #2a1a0f;
+            position: absolute;
+            left: -1px;
+        }
+
+        .leg-hair:nth-child(1) { top: 25%; }
+        .leg-hair:nth-child(2) { top: 50%; }
+        .leg-hair:nth-child(3) { top: 75%; }
+
+        /* Germes flutuantes */
+        .germ {
+            width: 5px;
+            height: 5px;
+            background: rgba(100, 150, 50, 0.7);
+            border-radius: 50%;
+            position: absolute;
+            animation: floatGerm 3s ease-in-out infinite;
+            z-index: 2;
+        }
+
+        .germ:nth-child(1) {
+            left: 12%;
+            top: 20%;
+            animation-delay: 0s;
+        }
+
+        .germ:nth-child(2) {
+            right: 18%;
+            top: 40%;
+            animation-delay: 1s;
+        }
+
+        .germ:nth-child(3) {
+            left: 22%;
+            top: 68%;
+            animation-delay: 2s;
+        }
+
+        @keyframes floatGerm {
+            0%, 100% {
+                transform: translateY(0px) scale(1);
+                opacity: 0.6;
+            }
+            50% {
+                transform: translateY(-14px) scale(1.4);
+                opacity: 1;
+            }
+        }
+
+        /* Aura doentia */
+        @keyframes sickAura {
+            0%, 100% {
+                filter: drop-shadow(0 0 6px rgba(100, 150, 50, 0.4));
+            }
+            50% {
+                filter: drop-shadow(0 0 12px rgba(100, 150, 50, 0.6));
+            }
+        }
+
+        .cockroach {
+            animation: sickAura 2s ease-in-out infinite;
+        }
+
+        /* Ondas de mau cheiro */
+        .stink-wave {
+            position: absolute;
+            width: 60px;
+            height: 22px;
+            border: 2px solid rgba(150, 180, 100, 0.3);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: expandStink 3s ease-out infinite;
+            z-index: 1;
+        }
+
+        .stink-wave:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .stink-wave:nth-child(2) {
+            animation-delay: 1s;
+        }
+
+        .stink-wave:nth-child(3) {
+            animation-delay: 2s;
+        }
+
+        @keyframes expandStink {
+            0% {
+                width: 60px;
+                height: 22px;
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.5;
+            }
+            100% {
+                width: 130px;
+                height: 55px;
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cockroach-container">
+        <!-- Ondas de mau cheiro -->
+        <div class="stink-wave"></div>
+        <div class="stink-wave"></div>
+        <div class="stink-wave"></div>
+
+        <!-- Germes flutuantes -->
+        <div class="germ"></div>
+        <div class="germ"></div>
+        <div class="germ"></div>
+
+        <div class="cockroach">
+            <!-- Asas sujas -->
+            <div class="wing left"></div>
+            <div class="wing right"></div>
+
+            <!-- Patas traseiras -->
+            <div class="leg back-left">
+                <div class="leg-hair"></div>
+                <div class="leg-hair"></div>
+                <div class="leg-hair"></div>
+            </div>
+            <div class="leg back-right">
+                <div class="leg-hair"></div>
+                <div class="leg-hair"></div>
+                <div class="leg-hair"></div>
+            </div>
+
+            <!-- Patas do meio -->
+            <div class="leg middle-left">
+                <div class="leg-hair"></div>
+                <div class="leg-hair"></div>
+                <div class="leg-hair"></div>
+            </div>
+            <div class="leg middle-right">
+                <div class="leg-hair"></div>
+                <div class="leg-hair"></div>
+                <div class="leg-hair"></div>
+            </div>
+
+            <!-- Corpo com manchas -->
+            <div class="body">
+                <div class="dirt-spot"></div>
+                <div class="dirt-spot"></div>
+                <div class="dirt-spot"></div>
+            </div>
+
+            <!-- Patas dianteiras -->
+            <div class="leg front-left">
+                <div class="leg-hair"></div>
+                <div class="leg-hair"></div>
+                <div class="leg-hair"></div>
+            </div>
+            <div class="leg front-right">
+                <div class="leg-hair"></div>
+                <div class="leg-hair"></div>
+                <div class="leg-hair"></div>
+            </div>
+
+            <!-- Cabeça com boca -->
+            <div class="head">
+                <div class="mouth"></div>
+            </div>
+
+            <!-- Antena ESQUERDA com OLHO na ponta -->
+            <div class="antenna left">
+                <div class="antenna-eye">
+                    <div class="antenna-pupil"></div>
+                    <div class="antenna-shine"></div>
+                </div>
+            </div>
+
+            <!-- Antena DIREITA com OLHO na ponta -->
+            <div class="antenna right">
+                <div class="antenna-eye">
+                    <div class="antenna-pupil"></div>
+                    <div class="antenna-shine"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

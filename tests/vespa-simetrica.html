@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vespa - Marimbondo Sentinela (Simétrica)</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #f0f0f0;
+        }
+
+        .wasp-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            animation: levitate 1.5s ease-in-out infinite;
+        }
+
+        @keyframes levitate {
+            0%, 100% { transform: translateY(0px) rotate(-5deg); }
+            50% { transform: translateY(-12px) rotate(-5deg); }
+        }
+
+        .wasp {
+            width: 100px;
+            height: 100px;
+            position: relative;
+        }
+
+        /* Cabeça */
+        .head {
+            width: 16px;
+            height: 16px;
+            background: #1a1a1a;
+            border-radius: 50%;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 15px;
+            border: 2px solid #000;
+            z-index: 5;
+        }
+
+        /* Olhos */
+        .eye {
+            width: 6px;
+            height: 6px;
+            background: #ff3838;
+            border-radius: 50%;
+            position: absolute;
+            top: 4px;
+            animation: blink 3.5s infinite;
+        }
+
+        .eye.left { left: 2px; }
+        .eye.right { right: 2px; }
+
+        @keyframes blink {
+            0%, 48%, 52%, 100% { height: 6px; opacity: 1; }
+            50% { height: 2px; opacity: 0.7; }
+        }
+
+        /* Pupila */
+        .pupil {
+            width: 3px;
+            height: 3px;
+            background: #000;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+        }
+
+        /* Antenas */
+        .antenna {
+            width: 2px;
+            height: 12px;
+            background: #1a1a1a;
+            position: absolute;
+            border-radius: 50% 50% 0 0;
+            z-index: 6;
+        }
+
+        .antenna.left {
+            left: 50%;
+            margin-left: -9px;
+            top: 10px;
+            transform: rotate(-40deg);
+            transform-origin: bottom;
+        }
+        .antenna.right {
+            left: 50%;
+            margin-left: 3px;
+            top: 10px;
+            transform: rotate(40deg);
+            transform-origin: bottom;
+        }
+
+        /* Conexão cabeça-tórax (pescoço) */
+        .neck {
+            width: 7px;
+            height: 12px;
+            background: #1a1a1a;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 24px;
+            border-radius: 30%;
+            z-index: 4;
+        }
+
+        /* Tórax */
+        .thorax {
+            width: 18px;
+            height: 20px;
+            background: #1a1a1a;
+            border-radius: 45% 45% 50% 50%;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 28px;
+            border: 2px solid #000;
+            z-index: 3;
+        }
+
+        /* Listra do tórax */
+        .thorax-stripe {
+            width: 100%;
+            height: 6px;
+            background: #e6b800;
+            position: absolute;
+            left: 0;
+            top: 9px;
+        }
+
+        /* Conexão tórax-abdômen (cintura) */
+        .waist {
+            width: 5px;
+            height: 6px;
+            background: #1a1a1a;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 40px;
+            border-radius: 30%;
+            z-index: 2;
+        }
+
+        /* Abdômen (mais alongado e pontudo) */
+        .abdomen {
+            width: 16px;
+            height: 36px;
+            background: #1a1a1a;
+            border-radius: 40% 40% 60% 60%;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%) rotate(10deg);
+            top: 38px;
+            border: 2px solid #000;
+            z-index: 2;
+        }
+
+        /* Listras do abdômen (irregulares) */
+        .stripe {
+            width: 100%;
+            background: #e6b800;
+            position: absolute;
+            left: 0;
+        }
+
+        .stripe:nth-child(1) {
+            top: 6px;
+            height: 5px;
+        }
+        .stripe:nth-child(2) {
+            top: 14px;
+            height: 6px;
+        }
+        .stripe:nth-child(3) {
+            top: 23px;
+            height: 5px;
+        }
+        .stripe:nth-child(4) {
+            top: 31px;
+            height: 4px;
+            width: 90%;
+            left: 5%;
+        }
+
+        /* Ferrão (mais proeminente) */
+        .stinger {
+            width: 0;
+            height: 0;
+            border-left: 3px solid transparent;
+            border-right: 3px solid transparent;
+            border-top: 10px solid #2a2a2a;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 72px;
+            filter: drop-shadow(0 0 4px #ff3838);
+            z-index: 3;
+            animation: stingerPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes stingerPulse {
+            0%, 100% { filter: drop-shadow(0 0 4px #ff3838); }
+            50% { filter: drop-shadow(0 0 8px #ff0000); }
+        }
+
+        /* Asas (posicionadas no tórax) */
+        .wing {
+            width: 28px;
+            height: 38px;
+            background: rgba(200, 200, 230, 0.5);
+            border-radius: 50% 50% 45% 50%;
+            position: absolute;
+            top: 26px;
+            border: 1px solid rgba(150, 150, 180, 0.7);
+            transform-origin: 30% 20%;
+            z-index: 1;
+        }
+
+        .wing.left {
+            left: 11px;
+            animation: flapLeft 0.12s ease-in-out infinite;
+        }
+
+        .wing.right {
+            right: 11px;
+            animation: flapRight 0.12s ease-in-out infinite;
+            opacity: 0.8;
+        }
+
+        @keyframes flapLeft {
+            0%, 100% { transform: rotate(-35deg) scaleY(1); }
+            50% { transform: rotate(-55deg) scaleY(0.85); }
+        }
+
+        @keyframes flapRight {
+            0%, 100% { transform: rotate(35deg) scaleY(1); }
+            50% { transform: rotate(55deg) scaleY(0.85); }
+        }
+
+        /* Pernas (3 pares simétricos) */
+        .leg {
+            width: 2px;
+            background: #1a1a1a;
+            position: absolute;
+            z-index: 4;
+            border-radius: 2px;
+        }
+
+        /* Par frontal - ESQUERDO */
+        .leg.front-left {
+            height: 16px;
+            left: 50%;
+            margin-left: -11px;
+            top: 32px;
+            transform: rotate(-60deg);
+            transform-origin: top;
+        }
+
+        /* Par frontal - DIREITO */
+        .leg.front-right {
+            height: 16px;
+            left: 50%;
+            margin-left: 9px;
+            top: 32px;
+            transform: rotate(60deg);
+            transform-origin: top;
+        }
+
+        /* Par do meio - ESQUERDO */
+        .leg.middle-left {
+            height: 18px;
+            left: 50%;
+            margin-left: -9px;
+            top: 40px;
+            transform: rotate(-40deg);
+            transform-origin: top;
+        }
+
+        /* Par do meio - DIREITO */
+        .leg.middle-right {
+            height: 18px;
+            left: 50%;
+            margin-left: 7px;
+            top: 40px;
+            transform: rotate(40deg);
+            transform-origin: top;
+        }
+
+        /* Par traseiro - ESQUERDO */
+        .leg.back-left {
+            height: 20px;
+            left: 50%;
+            margin-left: -7px;
+            top: 46px;
+            transform: rotate(-20deg);
+            transform-origin: top;
+        }
+
+        /* Par traseiro - DIREITO */
+        .leg.back-right {
+            height: 20px;
+            left: 50%;
+            margin-left: 5px;
+            top: 46px;
+            transform: rotate(20deg);
+            transform-origin: top;
+        }
+    </style>
+</head>
+<body>
+    <div class="wasp-container">
+        <div class="wasp">
+            <div class="antenna left"></div>
+            <div class="antenna right"></div>
+
+            <div class="wing left"></div>
+            <div class="wing right"></div>
+
+            <!-- PERNAS ESQUERDAS -->
+            <div class="leg front-left"></div>
+            <div class="leg middle-left"></div>
+            <div class="leg back-left"></div>
+
+            <!-- PERNAS DIREITAS -->
+            <div class="leg front-right"></div>
+            <div class="leg middle-right"></div>
+            <div class="leg back-right"></div>
+
+            <div class="head">
+                <div class="eye left">
+                    <div class="pupil"></div>
+                </div>
+                <div class="eye right">
+                    <div class="pupil"></div>
+                </div>
+            </div>
+
+            <div class="neck"></div>
+
+            <div class="thorax">
+                <div class="thorax-stripe"></div>
+            </div>
+
+            <div class="waist"></div>
+
+            <div class="abdomen">
+                <div class="stripe"></div>
+                <div class="stripe"></div>
+                <div class="stripe"></div>
+                <div class="stripe"></div>
+            </div>
+
+            <div class="stinger"></div>
+        </div>
+    </div>
+</body>
+</html>

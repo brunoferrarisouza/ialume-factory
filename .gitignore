@@ -142,3 +142,4 @@ vite.config.ts.timestamp-*
 # Assets pesados (usar CDN externo)
 audio/
 assets/
+.env.supabase

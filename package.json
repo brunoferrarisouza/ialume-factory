@@ -8,9 +8,21 @@
     "teste-completo": "npm run gerar-teste && npm run abrir-teste",
     "deploy": "node scripts/deploy-cdn.js",
     "push-cdn": "node scripts/push-cdn.js",
-    "deploy-push": "npm run deploy && npm run push-cdn"
+    "deploy-push": "npm run deploy && npm run push-cdn",
+    "supabase:buckets": "node supabase/create-buckets.js",
+    "supabase:upload": "node supabase/upload-assets.js",
+    "supabase:test": "node supabase/test-urls.js",
+    "supabase:setup": "npm run supabase:buckets && npm run supabase:upload"
   },
-  "keywords": ["educacao", "jogos", "lume"],
+  "keywords": [
+    "educacao",
+    "jogos",
+    "lume"
+  ],
   "author": "Bruno Ferrari",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@supabase/supabase-js": "^2.80.0",
+    "dotenv": "^17.2.3"
+  }
 }

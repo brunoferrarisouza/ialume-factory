@@ -28,27 +28,45 @@ const AUDIO = {
     /**
      * Inicializar sistema de áudio
      * IMPORTANTE: Em iOS, áudio precisa ser iniciado por interação do usuário
+     *
+     * @param {Object} audioConfig - URLs dos arquivos de áudio (opcional)
+     * @param {string} audioConfig.musicUrl - URL da música principal
+     * @param {string} audioConfig.windUrl - URL do som do vento
+     * @param {string} audioConfig.coinUrl - URL do som da moeda
+     * @param {string} audioConfig.flightUrl - URL do som do voo
+     * @param {string} audioConfig.questionUrl - URL do som da nova pergunta
      */
-    init: function() {
+    init: function(audioConfig = {}) {
         console.log('🎵 Inicializando sistema de áudio...');
 
-        // Criar instâncias de áudio
-        this.music = new Audio('../audio/musica-principal.mp3');
-        this.wind = new Audio('../audio/som-vento.mp3');
-        this.coin = new Audio('../audio/som-moeda.mp3');
-        this.flight = new Audio('../audio/som-voo-lume.mp3');
-        this.question = new Audio('../audio/som-nova-pergunta.mp3');
+        // Criar instâncias de áudio (aceita URLs ou usa caminhos padrão)
+        const defaultPaths = {
+            musicUrl: '../audio/musica-principal.mp3',
+            windUrl: '../audio/som-vento.mp3',
+            coinUrl: '../audio/som-moeda.mp3',
+            flightUrl: '../audio/som-voo-lume.mp3',
+            questionUrl: '../audio/som-nova-pergunta.mp3'
+        };
 
-        // Configurar loops
-        this.music.loop = true;
-        this.wind.loop = true;
+        // Usar URLs do config ou caminhos padrão
+        const paths = { ...defaultPaths, ...audioConfig };
 
-        // Configurar volumes
-        this.music.volume = this.volumes.music;
-        this.wind.volume = 0; // Começa em 0 para fade in
-        this.coin.volume = this.volumes.coin;
-        this.flight.volume = this.volumes.flight;
-        this.question.volume = this.volumes.question;
+        this.music = paths.musicUrl ? new Audio(paths.musicUrl) : null;
+        this.wind = paths.windUrl ? new Audio(paths.windUrl) : null;
+        this.coin = paths.coinUrl ? new Audio(paths.coinUrl) : null;
+        this.flight = paths.flightUrl ? new Audio(paths.flightUrl) : null;
+        this.question = paths.questionUrl ? new Audio(paths.questionUrl) : null;
+
+        // Configurar loops (só se existirem)
+        if (this.music) this.music.loop = true;
+        if (this.wind) this.wind.loop = true;
+
+        // Configurar volumes (só se existirem)
+        if (this.music) this.music.volume = this.volumes.music;
+        if (this.wind) this.wind.volume = 0; // Começa em 0 para fade in
+        if (this.coin) this.coin.volume = this.volumes.coin;
+        if (this.flight) this.flight.volume = this.volumes.flight;
+        if (this.question) this.question.volume = this.volumes.question;
 
         // Pré-carregar todos os áudios
         this.preloadAll();
@@ -61,9 +79,11 @@ const AUDIO = {
      * Pré-carregar todos os áudios
      */
     preloadAll: function() {
-        [this.music, this.wind, this.coin, this.flight, this.question].forEach(audio => {
-            audio.load();
-        });
+        [this.music, this.wind, this.coin, this.flight, this.question]
+            .filter(audio => audio !== null) // Filtrar apenas áudios que existem
+            .forEach(audio => {
+                audio.load();
+            });
         console.log('📦 Áudios pré-carregados');
     },
 

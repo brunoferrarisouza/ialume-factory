@@ -245,7 +245,7 @@ const GAME_ENGINE = {
                     console.log('🎬 Iniciando câmera intro (zoom in)...');
                     gameContainer.classList.add('camera-intro');
 
-                    // Após 3s: remover classe, iniciar vento e mostrar fase 1
+                    // Após 3s: remover classe, iniciar vento, decorações e mostrar fase 1
                     setTimeout(() => {
                         console.log('✅ Zoom in completo!');
                         gameContainer.classList.remove('camera-intro');
@@ -254,6 +254,18 @@ const GAME_ENGINE = {
                         if (window.AUDIO && typeof AUDIO.playWind === 'function') {
                             AUDIO.playWind();
                             console.log('💨 Som do vento iniciado!');
+                        }
+
+                        // 🦅 INICIAR DECORAÇÕES (nuvens, pássaros, etc)
+                        if (window.DECORATIONS && typeof DECORATIONS.init === 'function') {
+                            // Pegar decorações do gameConfig (vem do Supabase)
+                            const decorations = window.gameConfig?.decorations || [];
+                            if (decorations.length > 0) {
+                                DECORATIONS.init(decorations);
+                                console.log('🦅 Decorações iniciadas:', decorations.length);
+                            } else {
+                                console.log('⏭️ Sem decorações configuradas para este cenário');
+                            }
                         }
 
                         // Mostrar primeira fase

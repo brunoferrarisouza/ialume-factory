@@ -1,0 +1,329 @@
+#!/usr/bin/env node
+
+/**
+ * GERAR JOGO DE TESTE - CDN LIVE + SUPABASE LIVE
+ *
+ * Este jogo testa:
+ * - Scripts carregados do GitHub Pages (CDN)
+ * - Assets buscados do Supabase (live)
+ */
+
+const fs = require('fs');
+const path = require('path');
+
+// Config de teste
+const config = {
+  titulo: "Lume e a Montanha do Conhecimento",
+  tema: "Geografia",
+  mecanica: "escalada",
+  cenario: "montanha-nevada",  // ← Supabase vai buscar assets deste cenário!
+
+  fases: [
+    {
+      numero: 0,
+      type: "welcome",
+      narrativa: "🗺️ Lume descobriu que os segredos da Geografia estão escondidos no topo da Montanha do Conhecimento! Ajude Lume a escalar e desvendar os mistérios do mundo!",
+      botao: "Começar Aventura!"
+    },
+    {
+      numero: 1,
+      modalidade: "quiz",
+      dados: {
+        pergunta: "Qual é o maior país do mundo?",
+        alternativas: ["Rússia", "Canadá", "China", "EUA"],
+        correta: 0,
+        feedback_correto: "✅ Isso! A Rússia tem 17 milhões de km²!",
+        feedback_errado: "❌ Era Rússia! É enorme!"
+      }
+    },
+    {
+      numero: 2,
+      modalidade: "fill-blanks",
+      dados: {
+        frase: "A capital do Brasil é ____",
+        resposta: "Brasília",
+        variacoes_aceitas: ["Brasília", "brasilia", "Brasilia"],
+        dica: "Cidade planejada no Centro-Oeste",
+        feedback_correto: "✅ Perfeito! Brasília é a capital desde 1960!",
+        feedback_errado: "❌ A capital do Brasil é Brasília!"
+      }
+    },
+    {
+      numero: 3,
+      modalidade: "true-false",
+      dados: {
+        afirmacao: "O Rio Nilo está localizado no continente africano",
+        correta: true,
+        feedback_correto: "✅ Verdadeiro! O Nilo passa por 11 países da África!",
+        feedback_errado: "❌ É verdadeiro! O Nilo fica na África."
+      }
+    },
+    {
+      numero: 4,
+      modalidade: "sequence",
+      dados: {
+        instrucao: "Ordene os países por população (maior → menor):",
+        itens: ["Japão", "China", "Índia"],
+        ordem_correta: ["China", "Índia", "Japão"],
+        feedback_correto: "✅ Ordem perfeita!",
+        feedback_errado: "❌ Ordem: China, Índia, Japão"
+      }
+    }
+  ]
+};
+
+console.log('🎮 Gerando jogo de teste CDN LIVE + SUPABASE LIVE...\n');
+console.log('📋 Config:');
+console.log(`   Título: ${config.titulo}`);
+console.log(`   Mecânica: ${config.mecanica}`);
+console.log(`   Cenário: ${config.cenario} ← Assets do Supabase LIVE`);
+console.log(`   Fases: ${config.fases.length}\n`);
+
+// CDN Base URL
+const CDN_BASE = 'https://brunoferrarisouza.github.io/ialume-factory/1.0.0';
+
+// Gerar HTML
+const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${config.tema || 'Jogo IAlume'}</title>
+
+    <!-- CSS do CDN LIVE -->
+    <link rel="stylesheet" href="${CDN_BASE}/base.css">
+
+    <style>
+        /* Loader enquanto carrega scripts */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            color: white;
+        }
+        .spinner {
+            border: 8px solid rgba(255,255,255,0.3);
+            border-top: 8px solid white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ✨ CÂMERA INTRO: Zoom in suave (3s) */
+        @keyframes cameraZoomIn {
+            0% { transform: scale(0.6); }
+            100% { transform: scale(1); }
+        }
+        .game-container.camera-intro {
+            animation: cameraZoomIn 3s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+            transform-origin: center center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading overlay -->
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <p style="margin-top: 20px; font-size: 1.2rem;">Carregando do CDN...</p>
+        <p style="margin-top: 10px; font-size: 0.9rem; opacity: 0.8;">Scripts: GitHub Pages</p>
+        <p style="font-size: 0.9rem; opacity: 0.8;">Assets: Supabase</p>
+    </div>
+
+    <!-- Container do jogo -->
+    <div class="game-container" style="display: none;">
+        <!-- Feedback Zone -->
+        <div id="feedback-zone" class="feedback"></div>
+    </div>
+
+    <!-- Scripts do CDN LIVE -->
+    <!-- Core -->
+    <script src="${CDN_BASE}/particles.js"></script>
+    <script src="${CDN_BASE}/audio.js"></script>
+    <script src="${CDN_BASE}/decorations.js"></script>
+    <script src="${CDN_BASE}/base.js"></script>
+    <script src="${CDN_BASE}/game-engine.js"></script>
+    <script src="${CDN_BASE}/bubble-integration.js"></script>
+
+    <!-- Mechanics -->
+    <script src="${CDN_BASE}/mechanics/escalada.js"></script>
+    <script src="${CDN_BASE}/mechanics/perseguicao.js"></script>
+
+    <!-- Modalities -->
+    <script src="${CDN_BASE}/modalities/quiz.js"></script>
+    <script src="${CDN_BASE}/modalities/true-false.js"></script>
+    <script src="${CDN_BASE}/modalities/fill-blanks.js"></script>
+    <script src="${CDN_BASE}/modalities/sequence.js"></script>
+
+    <!-- Configuração e Inicialização -->
+    <script>
+        console.log('🌐 TESTE CDN LIVE + SUPABASE LIVE');
+        console.log('📦 CDN Base: ${CDN_BASE}');
+        console.log('🗄️  Supabase: snashefcgefkhyuzqpoz.supabase.co');
+        console.log('');
+
+        // Dados do jogo injetados
+        const GAME_CONFIG = ${JSON.stringify(config, null, 2)};
+        const ANALYZER_DATA = null;
+
+        // Configuração Supabase
+        const SUPABASE_URL = 'https://snashefcgefkhyuzqpoz.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNuYXNoZWZjZ2Vma2h5dXpxcG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI0NzE4MDYsImV4cCI6MjA3ODA0NzgwNn0.M3Apme4fyAn8QESnLf-0IMTGoCbt4AWSiCWJ3vnYfyc';
+
+        /**
+         * Buscar dados do Supabase
+         */
+        async function fetchSupabase(table, query = '') {
+            const url = \`\${SUPABASE_URL}/rest/v1/\${table}?\${query}\`;
+            const response = await fetch(url, {
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': \`Bearer \${SUPABASE_ANON_KEY}\`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(\`Erro ao buscar \${table}: \${response.statusText}\`);
+            }
+
+            return response.json();
+        }
+
+        /**
+         * Carregar assets do Supabase baseado no cenário
+         */
+        async function loadAssets(cenario) {
+            console.log(\`📦 Carregando assets do Supabase para cenário: \${cenario}\`);
+
+            try {
+                // Buscar em paralelo
+                const [decorations, sceneryData, audios] = await Promise.all([
+                    // Decorations
+                    fetchSupabase('scenery_decorations', \`scenery_id=eq.\${cenario}&is_active=eq.true\`),
+
+                    // Scenery backgrounds
+                    fetchSupabase('scenery_assets', \`scenery_id=eq.\${cenario}&is_active=eq.true\`),
+
+                    // Audios (todos, não específicos do cenário)
+                    fetchSupabase('media_assets', 'is_active=eq.true')
+                ]);
+
+                console.log(\`✅ Assets carregados:\`);
+                console.log(\`   - \${decorations.length} decorações\`);
+                console.log(\`   - \${sceneryData.length} cenário\`);
+                console.log(\`   - \${audios.length} áudios\`);
+
+                return { decorations, scenery: sceneryData[0] || null, audios };
+
+            } catch (error) {
+                console.warn('⚠️ Erro ao carregar assets do Supabase:', error.message);
+                console.warn('   Jogo continuará sem assets dinâmicos');
+                return { decorations: [], scenery: null, audios: [] };
+            }
+        }
+
+        /**
+         * Inicializar jogo com assets
+         */
+        async function initGame() {
+            console.log('🎮 Todos os scripts carregados do CDN');
+            console.log('📋 Config:', GAME_CONFIG);
+
+            try {
+                // Carregar assets do Supabase se houver cenário
+                if (GAME_CONFIG.cenario) {
+                    const assets = await loadAssets(GAME_CONFIG.cenario);
+
+                    // Adicionar assets ao config
+                    window.gameConfig = {
+                        ...GAME_CONFIG,
+                        decorations: assets.decorations,
+                        scenery: assets.scenery,
+                        audio: assets.audios.length > 0 ? {
+                            musicUrl: assets.audios.find(a => a.media_id === 'musica-principal')?.file_url,
+                            windUrl: assets.audios.find(a => a.media_id === 'som-vento')?.file_url,
+                            coinUrl: assets.audios.find(a => a.media_id === 'som-moeda')?.file_url,
+                            flightUrl: assets.audios.find(a => a.media_id === 'som-voo-lume')?.file_url,
+                            questionUrl: assets.audios.find(a => a.media_id === 'som-nova-pergunta')?.file_url
+                        } : undefined
+                    };
+                } else {
+                    window.gameConfig = GAME_CONFIG;
+                }
+
+                // Remove loading
+                document.getElementById('loading-overlay').style.display = 'none';
+                document.querySelector('.game-container').style.display = 'block';
+
+                // Inicializa o jogo
+                if (typeof GAME_ENGINE !== 'undefined') {
+                    GAME_ENGINE.init(window.gameConfig);
+                    console.log('✅ Jogo inicializado com sucesso!');
+                    console.log('');
+                    console.log('🎯 TESTE COMPLETO:');
+                    console.log('   ✅ Scripts carregados do CDN (GitHub Pages)');
+                    console.log('   ✅ Assets carregados do Supabase');
+                    console.log('   ✅ Game Engine inicializado');
+                } else {
+                    throw new Error('GAME_ENGINE não encontrado');
+                }
+
+            } catch (error) {
+                console.error('❌ Erro ao inicializar:', error);
+                document.getElementById('loading-overlay').style.display = 'none';
+                const container = document.querySelector('.game-container');
+                container.style.display = 'block';
+                container.innerHTML =
+                    '<div style="text-align: center; padding: 40px; color: #e74c3c;">' +
+                    '<h2>Erro ao carregar jogo</h2>' +
+                    '<p>' + error.message + '</p>' +
+                    '</div>';
+            }
+        }
+
+        // Aguarda todos os scripts carregarem
+        window.addEventListener('load', initGame);
+
+        // Debug: Log de erros de carregamento
+        window.addEventListener('error', function(e) {
+            if (e.target.tagName === 'SCRIPT') {
+                console.error('❌ Erro ao carregar script do CDN:', e.target.src);
+            }
+        });
+    </script>
+</body>
+</html>`;
+
+// Salvar
+const outputPath = path.join(__dirname, 'jogo-cdn-live.html');
+fs.writeFileSync(outputPath, html);
+
+console.log('✅ Jogo gerado com sucesso!');
+console.log(`📁 Arquivo: ${outputPath}\n`);
+
+console.log('🎯 O que o jogo vai fazer ao carregar:');
+console.log('   1. Carregar scripts do CDN (GitHub Pages)');
+console.log(`      ${CDN_BASE}/`);
+console.log('   2. Buscar decorations do Supabase (cenário: montanha-nevada)');
+console.log('   3. Buscar backgrounds do Supabase');
+console.log('   4. Buscar áudios do Supabase');
+console.log('   5. Inicializar jogo com tudo configurado\n');
+
+console.log('🚀 Para testar:');
+console.log('   open tests/jogo-cdn-live.html\n');
+
+console.log('⏳ IMPORTANTE:');
+console.log('   - GitHub Pages pode levar 2-3 minutos para atualizar');
+console.log('   - Se der erro 404, aguarde um pouco\n');

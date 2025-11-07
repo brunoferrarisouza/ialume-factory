@@ -195,10 +195,17 @@ const htmlGerado = `<!DOCTYPE html>
     ${modalityScripts}
 
     <script>
-        const GAME_CONFIG = ${JSON.stringify(adaptedConfig, null, 2)};
-        const ANALYZER_DATA = ${JSON.stringify(analyzer)};
-        const SUPABASE_URL = '${SUPABASE_URL}';
-        const SUPABASE_ANON_KEY = '${SUPABASE_ANON_KEY}';
+        // 🛡️ Proteção contra re-injeção do Bubble SPA
+        if (window.gameState?.initialized) {
+            console.log('🧹 Limpando jogo anterior (re-injeção detectada)');
+            window.gameState = null;
+        }
+
+        // 🎮 Configurações (var permite redeclaração em Bubble SPA reativo)
+        var GAME_CONFIG = ${JSON.stringify(adaptedConfig, null, 2)};
+        var ANALYZER_DATA = ${JSON.stringify(analyzer)};
+        var SUPABASE_URL = '${SUPABASE_URL}';
+        var SUPABASE_ANON_KEY = '${SUPABASE_ANON_KEY}';
 
         async function fetchSupabase(table, query = '') {
             const url = \`\${SUPABASE_URL}/rest/v1/\${table}?\${query}\`;

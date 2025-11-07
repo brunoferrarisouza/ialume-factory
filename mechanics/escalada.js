@@ -619,6 +619,7 @@ const ESCALADA = {
                 bottom: 0;
                 width: 100%;
                 pointer-events: none;
+                transition: scale 3s ease-in-out; /* ✨ Transição suave para intro zoom */
             }
 
             /* Floor - POSIÇÃO ABSOLUTA COM TRANSIÇÃO */

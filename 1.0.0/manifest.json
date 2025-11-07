@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "timestamp": "2025-11-06T01:54:30.392Z",
+  "timestamp": "2025-11-07T04:21:43.932Z",
   "files": [
     {
       "path": "/1.0.0/base.js",
@@ -13,6 +13,18 @@
     {
       "path": "/1.0.0/bubble-integration.js",
       "source": "base/scripts/bubble-integration.js"
+    },
+    {
+      "path": "/1.0.0/particles.js",
+      "source": "base/scripts/particles.js"
+    },
+    {
+      "path": "/1.0.0/audio.js",
+      "source": "base/scripts/audio.js"
+    },
+    {
+      "path": "/1.0.0/decorations.js",
+      "source": "base/scripts/decorations.js"
     },
     {
       "path": "/1.0.0/base.css",

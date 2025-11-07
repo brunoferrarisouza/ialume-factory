@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Áudio</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background: #f0f0f0;
+        }
+        button {
+            padding: 20px 40px;
+            font-size: 1.2rem;
+            margin: 10px;
+            cursor: pointer;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        #log {
+            background: white;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎵 Teste de Sistema de Áudio</h1>
+
+    <button onclick="testarAudio()">▶️ INICIALIZAR ÁUDIO</button>
+    <button onclick="testarMusica()">🎵 Música</button>
+    <button onclick="testarVento()">💨 Vento</button>
+    <button onclick="testarMoeda()">🪙 Moeda</button>
+    <button onclick="testarVoo()">🦅 Voo</button>
+    <button onclick="testarPergunta()">❓ Pergunta</button>
+
+    <div id="log"></div>
+
+    <script src="../base/scripts/audio.js"></script>
+
+    <script>
+        const log = document.getElementById('log');
+
+        function addLog(msg) {
+            log.textContent += msg + '\n';
+            console.log(msg);
+        }
+
+        function testarAudio() {
+            addLog('🎵 Inicializando sistema de áudio...');
+
+            if (window.AUDIO) {
+                AUDIO.init();
+                addLog('✅ AUDIO.init() executado');
+
+                addLog('\nVerificando instâncias de áudio:');
+                addLog('- Music: ' + (AUDIO.music ? '✅' : '❌'));
+                addLog('- Wind: ' + (AUDIO.wind ? '✅' : '❌'));
+                addLog('- Coin: ' + (AUDIO.coin ? '✅' : '❌'));
+                addLog('- Flight: ' + (AUDIO.flight ? '✅' : '❌'));
+                addLog('- Question: ' + (AUDIO.question ? '✅' : '❌'));
+            } else {
+                addLog('❌ window.AUDIO não encontrado!');
+            }
+        }
+
+        function testarMusica() {
+            addLog('\n🎵 Testando música...');
+            if (AUDIO.music) {
+                AUDIO.playMusic();
+                addLog('▶️ playMusic() chamado');
+            } else {
+                addLog('❌ Precisa inicializar primeiro!');
+            }
+        }
+
+        function testarVento() {
+            addLog('\n💨 Testando vento...');
+            if (AUDIO.wind) {
+                AUDIO.playWind();
+                addLog('▶️ playWind() chamado');
+            } else {
+                addLog('❌ Precisa inicializar primeiro!');
+            }
+        }
+
+        function testarMoeda() {
+            addLog('\n🪙 Testando moeda...');
+            if (AUDIO.coin) {
+                AUDIO.playCoin();
+                addLog('▶️ playCoin() chamado');
+            } else {
+                addLog('❌ Precisa inicializar primeiro!');
+            }
+        }
+
+        function testarVoo() {
+            addLog('\n🦅 Testando voo...');
+            if (AUDIO.flight) {
+                AUDIO.playFlight(0);
+                addLog('▶️ playFlight() chamado');
+            } else {
+                addLog('❌ Precisa inicializar primeiro!');
+            }
+        }
+
+        function testarPergunta() {
+            addLog('\n❓ Testando pergunta...');
+            if (AUDIO.question) {
+                AUDIO.playQuestion();
+                addLog('▶️ playQuestion() chamado');
+            } else {
+                addLog('❌ Precisa inicializar primeiro!');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            addLog('✅ Página carregada');
+            addLog('✅ audio.js: ' + (typeof window.AUDIO !== 'undefined' ? 'carregado' : 'NÃO carregado'));
+            addLog('\nClique em "INICIALIZAR ÁUDIO" para começar!');
+        });
+    </script>
+</body>
+</html>

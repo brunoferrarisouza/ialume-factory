@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lume - Geografia (NO CACHE)</title>
+    <link rel="stylesheet" href="../base/styles/base.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8f9fa; overflow-x: hidden; }
+        .game-container { position: relative; width: 100%; height: 100vh; overflow: hidden; background: white; }
+        .phase { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 700px; z-index: 10; opacity: 0; visibility: hidden; transition: opacity 0.5s ease-in-out, visibility 0.5s; }
+        .phase.active { opacity: 1; visibility: visible; }
+        .welcome-screen { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 30px; padding: 50px 40px; text-align: center; color: white; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .welcome-screen h1 { font-size: 2.5rem; margin-bottom: 20px; }
+        .welcome-screen .lume-intro { font-size: 5rem; margin: 30px 0; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+        .welcome-screen p { font-size: 1.3rem; line-height: 1.8; margin-bottom: 30px; }
+        .btn-start { padding: 20px 50px; font-size: 1.5rem; font-weight: 700; background: white; color: #667eea; border: none; border-radius: 15px; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .btn-start:hover { transform: translateY(-5px); }
+        #feedback-zone { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); padding: 20px 40px; border-radius: 15px; font-size: 1.3rem; font-weight: 600; z-index: 9999; opacity: 0; visibility: hidden; transition: all 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        #feedback-zone.show { opacity: 1; visibility: visible; }
+        #feedback-zone.correct { background: linear-gradient(135deg, #51cf66, #38d9a9); color: white; }
+        #feedback-zone.wrong { background: linear-gradient(135deg, #ff6b6b, #ff8787); color: white; }
+        @keyframes cameraZoomIn { 0% { transform: scale(0.6); } 100% { transform: scale(1); } }
+        .game-container.camera-intro { animation: cameraZoomIn 3s cubic-bezier(0.25, 0.1, 0.25, 1) forwards; transform-origin: center center; }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div id="phase-0" class="phase active">
+            <div class="welcome-screen">
+                <h1>🏔️ A Montanha do Conhecimento</h1>
+                <div class="lume-intro">🌟</div>
+                <p><strong>Lume</strong> precisa escalar a <strong>Montanha do Saber</strong> para recuperar o <strong>Mapa Mundi</strong>!</p>
+                <p>Responda as perguntas de Geografia. A cada resposta correta, ele sobe mais alto! 🦅⭐</p>
+                <button class="btn-start" onclick="startGame()">🚀 COMEÇAR AVENTURA</button>
+            </div>
+        </div>
+        <div id="phase-1" class="phase"></div>
+        <div id="phase-2" class="phase"></div>
+        <div id="phase-3" class="phase"></div>
+        <div id="phase-4" class="phase"></div>
+        <div id="phase-5" class="phase"></div>
+        <div id="phase-6" class="phase"></div>
+        <div id="phase-7" class="phase"></div>
+        <div id="phase-8" class="phase"></div>
+        <div id="phase-9" class="phase"></div>
+    </div>
+    <div id="feedback-zone" class="feedback"></div>
+
+    <script src="../base/scripts/base.js?v=1762459230"></script>
+    <script src="../base/scripts/game-engine.js?v=1762459230"></script>
+    <script src="../mechanics/escalada.js?v=1762459230"></script>
+    <script src="../modalities/quiz.js?v=1762459230"></script>
+    <script src="../modalities/fill-blanks.js?v=1762459230"></script>
+    <script src="../modalities/true-false.js?v=1762459230"></script>
+    <script src="../modalities/sequence.js?v=1762459230"></script>
+
+    <script>
+        const gameConfig = {
+            titulo: "Lume e a Montanha do Conhecimento",
+            tema: "Geografia",
+            mecanica: "escalada",
+            cenario: "montanha-nevada",
+            fases: [
+                { numero: 0, type: 'welcome' },
+                { numero: 1, modalidade: 'quiz', dados: { pergunta: "Qual é o maior país do mundo em área?", alternativas: ["Rússia", "Canadá", "China", "Estados Unidos"], correta: 0, feedback_correto: "✅ Isso! A Rússia tem 17 milhões de km²!", feedback_errado: "❌ Era Rússia!" } },
+                { numero: 2, modalidade: 'fill-blanks', dados: { frase: "A capital do Brasil é ____", resposta: "Brasília", variacoes_aceitas: ["Brasília", "brasilia", "Brasilia"], dica: "Centro-Oeste", feedback_correto: "✅ Perfeito!", feedback_errado: "❌ Era Brasília!" } },
+                { numero: 3, modalidade: 'true-false', dados: { afirmacao: "O Rio Nilo está na África", correta: true, feedback_correto: "✅ Verdadeiro!", feedback_errado: "❌ É verdadeiro!" } },
+                { numero: 4, modalidade: 'quiz', dados: { pergunta: "Qual oceano banha a costa leste do Brasil?", alternativas: ["Atlântico", "Pacífico", "Índico", "Ártico"], correta: 0, feedback_correto: "✅ Correto!", feedback_errado: "❌ Era Atlântico!" } },
+                { numero: 5, modalidade: 'sequence', dados: { instrucao: "Ordene por população (maior → menor):", itens: ["Japão", "China", "Índia"], ordem_correta: ["China", "Índia", "Japão"], feedback_correto: "✅ Perfeito!", feedback_errado: "❌ Ordem errada" } },
+                { numero: 6, modalidade: 'fill-blanks', dados: { frase: "O continente com mais países é a ____", resposta: "África", variacoes_aceitas: ["África", "africa", "Africa"], dica: "54 países", feedback_correto: "✅ Isso!", feedback_errado: "❌ Era África!" } },
+                { numero: 7, modalidade: 'true-false', dados: { afirmacao: "A Cordilheira dos Andes fica na América do Sul", correta: true, feedback_correto: "✅ Verdadeiro!", feedback_errado: "❌ É verdadeiro!" } },
+                { numero: 8, modalidade: 'true-false', dados: { afirmacao: "O Monte Everest é a montanha mais alta do mundo", correta: true, feedback_correto: "✅ Verdadeiro!", feedback_errado: "❌ É verdadeiro!" } },
+                { numero: 9, modalidade: 'quiz', dados: { pergunta: "Qual é o maior país do mundo em área?", alternativas: ["Rússia", "Canadá", "China", "Estados Unidos"], correta: 0, feedback_correto: "🏆 CORRETO! Você conquistou o topo! 🏔️⭐", feedback_errado: "❌ Era Rússia!" } }
+            ]
+        };
+
+        function startGame() {
+            document.getElementById('phase-0').classList.remove('active');
+            setTimeout(() => {
+                const success = GAME_ENGINE.init(gameConfig);
+                if (success) {
+                    if (window.gameState && window.totalPhases) {
+                        window.gameState.totalPhases = window.totalPhases;
+                    }
+                    const gameContainer = document.querySelector('.game-container');
+                    gameContainer.classList.add('camera-intro');
+                    setTimeout(() => {
+                        gameContainer.classList.remove('camera-intro');
+                        nextPhase();
+                    }, 3000);
+                }
+            }, 500);
+        }
+    </script>
+</body>
+</html>

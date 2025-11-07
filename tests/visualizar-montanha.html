@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizar Montanha Completa</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #1a1a2e;
+            overflow: hidden;
+        }
+
+        .viewport {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #1a1a2e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .scene {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            transform-origin: center center;
+            transition: transform 0.5s ease;
+        }
+
+        .controls {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 10000;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            max-width: 300px;
+        }
+
+        .controls button {
+            padding: 10px 20px;
+            margin: 5px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .controls button:hover {
+            background: #5568d3;
+        }
+
+        /* === MONTANHA === */
+        .mountain-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        /* Montanha Central Gigante - MARROM */
+        .central-mountain {
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .central-mountain svg {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120%;
+            height: 120%;
+        }
+
+        /* === DEGRAUS === */
+        .floor {
+            position: absolute;
+            width: 80px;
+            height: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .floor-platform {
+            width: 100%;
+            height: 40px;
+            background: linear-gradient(to bottom, #8b7355, #654321);
+            border-radius: 10px 10px 0 0;
+            border: 3px solid #5a3a1a;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .floor-platform.top {
+            background: linear-gradient(to bottom, #ffd700, #ff8c00);
+            border-color: #cc6600;
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .floor-label {
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .victory-flag {
+            position: absolute;
+            top: -30px;
+            font-size: 1.5rem;
+            animation: wave 2s ease-in-out infinite;
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: rotate(-10deg); }
+            50% { transform: rotate(10deg); }
+        }
+
+        /* Cristais */
+        .crystal {
+            position: absolute;
+            left: 50%;
+            bottom: 50px;
+            transform: translateX(-50%);
+            font-size: 2rem;
+            z-index: 103;
+            animation: spin 2s linear infinite, glow 1.5s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: translateX(-50%) rotate(0deg); }
+            100% { transform: translateX(-50%) rotate(360deg); }
+        }
+
+        @keyframes glow {
+            0%, 100% { filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6)); }
+            50% { filter: drop-shadow(0 0 25px rgba(255, 215, 0, 1)); }
+        }
+
+        /* Antagonistas */
+        .antagonist {
+            position: absolute;
+            left: calc(50% + 80px);
+            bottom: 50px;
+            transform: translateX(-50%);
+            font-size: 2rem;
+            z-index: 102;
+            animation: levitate 2s ease-in-out infinite;
+        }
+
+        @keyframes levitate {
+            0%, 100% { transform: translateX(-50%) translateY(0px); }
+            50% { transform: translateX(-50%) translateY(-12px); }
+        }
+
+        /* Posicionamento dos 9 degraus (espaçados 200px) */
+        .floor[data-floor="1"] { bottom: 0px; }
+        .floor[data-floor="2"] { bottom: 200px; }
+        .floor[data-floor="3"] { bottom: 400px; }
+        .floor[data-floor="4"] { bottom: 600px; }
+        .floor[data-floor="5"] { bottom: 800px; }
+        .floor[data-floor="6"] { bottom: 1000px; }
+        .floor[data-floor="7"] { bottom: 1200px; }
+        .floor[data-floor="8"] { bottom: 1400px; }
+        .floor[data-floor="9"] { bottom: 1600px; }
+    </style>
+</head>
+<body>
+    <div class="viewport">
+        <div class="scene" id="scene">
+            <div class="mountain-container">
+                <!-- Montanha Central Marrom -->
+                <div class="central-mountain">
+                    <svg viewBox="0 0 1000 1000" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="mountainGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#8B7355;stop-opacity:1" />
+                                <stop offset="50%" style="stop-color:#6B5435;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#4A3820;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <!-- Triângulo: vértice no topo (500,0), base larga (0,1000 até 1000,1000) -->
+                        <polygon points="500,0 1000,1000 0,1000" fill="url(#mountainGradient)" />
+                    </svg>
+                </div>
+
+                <!-- 9 Degraus -->
+                <div class="floor" data-floor="1">
+                    <div class="floor-platform">
+                        <span class="floor-label">FASE 1</span>
+                    </div>
+                    <div class="crystal">💎</div>
+                    <div class="antagonist">🦇</div>
+                </div>
+
+                <div class="floor" data-floor="2">
+                    <div class="floor-platform">
+                        <span class="floor-label">FASE 2</span>
+                    </div>
+                    <div class="crystal">💎</div>
+                    <div class="antagonist">🕷️</div>
+                </div>
+
+                <div class="floor" data-floor="3">
+                    <div class="floor-platform">
+                        <span class="floor-label">FASE 3</span>
+                    </div>
+                    <div class="crystal">💎</div>
+                    <div class="antagonist">🐍</div>
+                </div>
+
+                <div class="floor" data-floor="4">
+                    <div class="floor-platform">
+                        <span class="floor-label">FASE 4</span>
+                    </div>
+                    <div class="crystal">💎</div>
+                    <div class="antagonist">🦂</div>
+                </div>
+
+                <div class="floor" data-floor="5">
+                    <div class="floor-platform">
+                        <span class="floor-label">FASE 5</span>
+                    </div>
+                    <div class="crystal">💎</div>
+                    <div class="antagonist">🐺</div>
+                </div>
+
+                <div class="floor" data-floor="6">
+                    <div class="floor-platform">
+                        <span class="floor-label">FASE 6</span>
+                    </div>
+                    <div class="crystal">💎</div>
+                    <div class="antagonist">🦉</div>
+                </div>
+
+                <div class="floor" data-floor="7">
+                    <div class="floor-platform">
+                        <span class="floor-label">FASE 7</span>
+                    </div>
+                    <div class="crystal">💎</div>
+                    <div class="antagonist">🐉</div>
+                </div>
+
+                <div class="floor" data-floor="8">
+                    <div class="floor-platform">
+                        <span class="floor-label">FASE 8</span>
+                    </div>
+                    <div class="crystal">💎</div>
+                    <div class="antagonist">👹</div>
+                </div>
+
+                <div class="floor" data-floor="9">
+                    <div class="floor-platform top">
+                        <span class="floor-label">FASE 9</span>
+                        <span class="victory-flag">🚩</span>
+                    </div>
+                    <div class="crystal">💎</div>
+                    <div class="antagonist">😈</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <h3>🔍 Visualizador de Montanha</h3>
+        <p><strong>Montanha marrom triangular</strong> com 9 degraus</p>
+        <p>Use os botões para ajustar o zoom:</p>
+        <button onclick="setZoom(0.15)">Zoom 0.15 (muito longe)</button>
+        <button onclick="setZoom(0.25)">Zoom 0.25</button>
+        <button onclick="setZoom(0.35)">Zoom 0.35</button>
+        <button onclick="setZoom(0.525)">Zoom 0.525 (intro)</button>
+        <button onclick="setZoom(1.0)">Zoom 1.0 (normal)</button>
+        <br><br>
+        <p id="info" style="color: #ffd700;">Zoom atual: 0.35</p>
+        <p style="margin-top: 10px; font-size: 12px; opacity: 0.7;">
+            • Montanha vai de bottom: 0px (base) até 1600px (topo)<br>
+            • Todos os 9 degraus espaçados 200px
+        </p>
+    </div>
+
+    <script>
+        // Função de zoom
+        function setZoom(scale) {
+            const scene = document.getElementById('scene');
+            scene.style.transform = `scale(${scale})`;
+            document.getElementById('info').textContent = `Zoom atual: ${scale}`;
+        }
+
+        // Iniciar com zoom 0.35
+        setZoom(0.35);
+
+        console.log('✅ Montanha carregada!');
+        console.log('📐 Altura total: 1600px (9 degraus × 200px)');
+        console.log('🏔️ Montanha: triângulo marrom com vértice no topo');
+    </script>
+</body>
+</html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Supabase Assets - iAlume Factory</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 3rem;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+
+        .scenery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .scenery-card {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .scenery-card h3 {
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .layer {
+            margin-bottom: 10px;
+        }
+
+        .layer img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+
+        .decorations {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .decoration-item {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            width: 200px;
+            text-align: center;
+        }
+
+        .decoration-item img {
+            width: 100%;
+            height: 100px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+
+        .audio-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .audio-item {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .audio-item audio {
+            flex: 1;
+            margin-left: 20px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+
+        .status.ok {
+            background: #51cf66;
+            color: white;
+        }
+
+        .status.error {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Teste Supabase Assets</h1>
+
+        <div id="loading" class="loading">
+            <p>⏳ Carregando assets do Supabase...</p>
+        </div>
+
+        <div id="content" style="display: none;">
+            <!-- Cenários -->
+            <div class="section">
+                <h2>🏔️ Cenários (Backgrounds)</h2>
+                <div class="scenery-grid" id="scenery-grid"></div>
+            </div>
+
+            <!-- Decorações -->
+            <div class="section">
+                <h2>🦅 Decorações</h2>
+                <div class="decorations" id="decorations"></div>
+            </div>
+
+            <!-- Áudios -->
+            <div class="section">
+                <h2>🎵 Áudios</h2>
+                <div class="audio-list" id="audio-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://snashefcgefkhyuzqpoz.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNuYXNoZWZjZ2Vma2h5dXpxcG96Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI0NzE4MDYsImV4cCI6MjA3ODA0NzgwNn0.M3Apme4fyAn8QESnLf-0IMTGoCbt4AWSiCWJ3vnYfyc';
+
+        async function fetchSupabase(table) {
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}?is_active=eq.true`, {
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                }
+            });
+            return response.json();
+        }
+
+        function checkImage(url) {
+            return new Promise(resolve => {
+                const img = new Image();
+                img.onload = () => resolve(true);
+                img.onerror = () => resolve(false);
+                img.src = url;
+            });
+        }
+
+        async function loadSceneries() {
+            const sceneries = await fetchSupabase('scenery_assets');
+            const grid = document.getElementById('scenery-grid');
+
+            for (const scenery of sceneries) {
+                const card = document.createElement('div');
+                card.className = 'scenery-card';
+
+                let html = `<h3>${scenery.name}</h3>`;
+
+                // Layer 1
+                if (scenery.layer_1_sky) {
+                    const ok = await checkImage(scenery.layer_1_sky);
+                    html += `
+                        <div class="layer">
+                            <strong>Layer 1 (Sky):</strong>
+                            <span class="status ${ok ? 'ok' : 'error'}">${ok ? '✅ OK' : '❌ ERRO'}</span>
+                            <img src="${scenery.layer_1_sky}" alt="Layer 1">
+                        </div>
+                    `;
+                }
+
+                // Layer 2
+                if (scenery.layer_2_far) {
+                    const ok = await checkImage(scenery.layer_2_far);
+                    html += `
+                        <div class="layer">
+                            <strong>Layer 2 (Far):</strong>
+                            <span class="status ${ok ? 'ok' : 'error'}">${ok ? '✅ OK' : '❌ ERRO'}</span>
+                            <img src="${scenery.layer_2_far}" alt="Layer 2">
+                        </div>
+                    `;
+                }
+
+                // Layer 3
+                if (scenery.layer_3_mid) {
+                    const ok = await checkImage(scenery.layer_3_mid);
+                    html += `
+                        <div class="layer">
+                            <strong>Layer 3 (Mid):</strong>
+                            <span class="status ${ok ? 'ok' : 'error'}">${ok ? '✅ OK' : '❌ ERRO'}</span>
+                            <img src="${scenery.layer_3_mid}" alt="Layer 3">
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = html;
+                grid.appendChild(card);
+            }
+        }
+
+        async function loadDecorations() {
+            const decorations = await fetchSupabase('scenery_decorations');
+            const container = document.getElementById('decorations');
+
+            for (const decoration of decorations) {
+                const ok = await checkImage(decoration.image_url);
+
+                const item = document.createElement('div');
+                item.className = 'decoration-item';
+                item.innerHTML = `
+                    <img src="${decoration.image_url}" alt="${decoration.decoration_name}">
+                    <strong>${decoration.decoration_name}</strong><br>
+                    <small>${decoration.scenery_id}</small><br>
+                    <span class="status ${ok ? 'ok' : 'error'}">${ok ? '✅ OK' : '❌ ERRO'}</span>
+                `;
+
+                container.appendChild(item);
+            }
+        }
+
+        async function loadAudios() {
+            const audios = await fetchSupabase('media_assets');
+            const list = document.getElementById('audio-list');
+
+            for (const audio of audios) {
+                const item = document.createElement('div');
+                item.className = 'audio-item';
+                item.innerHTML = `
+                    <div>
+                        <strong>${audio.name}</strong><br>
+                        <small>${audio.media_type} | Volume: ${audio.volume} | Loop: ${audio.loop ? 'Sim' : 'Não'}</small>
+                    </div>
+                    <audio controls src="${audio.file_url}"></audio>
+                `;
+
+                list.appendChild(item);
+            }
+        }
+
+        async function init() {
+            try {
+                await loadSceneries();
+                await loadDecorations();
+                await loadAudios();
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+
+                console.log('✅ Todos os assets carregados com sucesso!');
+            } catch (error) {
+                document.getElementById('loading').innerHTML = `
+                    <p>❌ Erro ao carregar assets:</p>
+                    <p style="color: #ff6b6b;">${error.message}</p>
+                `;
+                console.error(error);
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>

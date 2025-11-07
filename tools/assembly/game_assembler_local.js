@@ -1,40 +1,29 @@
 /**
- * 🎮 GAME ASSEMBLER V2 - PARA N8N COM CDN
- * 
- * Este arquivo gera HTML completo que aponta para arquivos no CDN
- * 
- * COMO USAR NO N8N:
- *   1. Copie este código para um Code Node
- *   2. Configure a variável CDN_BASE_URL
- *   3. Passe o config via $input.item.json
- *   4. Retorne o HTML gerado
+ * 🎮 GAME ASSEMBLER LOCAL - PARA TESTES
+ *
+ * Versão que usa arquivos locais em vez do CDN
+ * Use este para testar antes de fazer deploy
  */
 
-// ========== CONFIGURAÇÃO ==========
-const CDN_BASE_URL = 'https://brunoferrarisouza.github.io/ialume-factory';
-const VERSION = '1.0.0';
-
 /**
- * Gera HTML completo do jogo
+ * Gera HTML completo do jogo usando arquivos locais
  * @param {Object} config - Configuração do jogo
  * @returns {string} HTML completo
  */
 function gerarJogoCompleto(config) {
-  const cdnPath = `${CDN_BASE_URL}/${VERSION}`;
-  
   // ✅ Tratamento de analyzer undefined
   const safeAnalyzer = config.analyzer || null;
-  
+
   return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${config.tema || 'Jogo IAlume'}</title>
-    
-    <!-- CSS do CDN -->
-    <link rel="stylesheet" href="${cdnPath}/base.css">
-    
+
+    <!-- CSS LOCAL -->
+    <link rel="stylesheet" href="../base/styles/base.css">
+
     <style>
         /* Loader enquanto carrega scripts */
         #loading-overlay {
@@ -63,6 +52,16 @@ function gerarJogoCompleto(config) {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* ✨ CÂMERA INTRO: Zoom in suave (3s) */
+        @keyframes cameraZoomIn {
+            0% { transform: scale(0.6); }
+            100% { transform: scale(1); }
+        }
+        .game-container.camera-intro {
+            animation: cameraZoomIn 3s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+            transform-origin: center center;
+        }
     </style>
 </head>
 <body>
@@ -73,27 +72,30 @@ function gerarJogoCompleto(config) {
     </div>
 
     <!-- Container do jogo -->
-    <div id="game-container" style="display: none;"></div>
+    <div class="game-container" style="display: none;">
+        <!-- Feedback Zone -->
+        <div id="feedback-zone" class="feedback"></div>
+    </div>
 
-    <!-- Scripts do CDN -->
+    <!-- Scripts LOCAIS -->
     <!-- Core -->
-    <script src="${cdnPath}/particles.js"></script>
-    <script src="${cdnPath}/audio.js"></script>
-    <script src="${cdnPath}/decorations.js"></script>
-    <script src="${cdnPath}/base.js"></script>
-    <script src="${cdnPath}/game-engine.js"></script>
-    <script src="${cdnPath}/bubble-integration.js"></script>
+    <script src="../base/scripts/particles.js"></script>
+    <script src="../base/scripts/audio.js"></script>
+    <script src="../base/scripts/decorations.js"></script>
+    <script src="../base/scripts/base.js"></script>
+    <script src="../base/scripts/game-engine.js"></script>
+    <script src="../base/scripts/bubble-integration.js"></script>
 
     <!-- Mechanics -->
-    <script src="${cdnPath}/mechanics/escalada.js"></script>
-    <script src="${cdnPath}/mechanics/perseguicao.js"></script>
+    <script src="../mechanics/escalada.js"></script>
+    <script src="../mechanics/perseguicao.js"></script>
 
     <!-- Modalities -->
-    <script src="${cdnPath}/modalities/quiz.js"></script>
-    <script src="${cdnPath}/modalities/true-false.js"></script>
-    <script src="${cdnPath}/modalities/fill-blanks.js"></script>
-    <script src="${cdnPath}/modalities/sequence.js"></script>
-    
+    <script src="../modalities/quiz.js"></script>
+    <script src="../modalities/true-false.js"></script>
+    <script src="../modalities/fill-blanks.js"></script>
+    <script src="../modalities/sequence.js"></script>
+
     <!-- Configuração e Inicialização -->
     <script>
         // Dados do jogo injetados
@@ -187,7 +189,7 @@ function gerarJogoCompleto(config) {
 
                 // Remove loading
                 document.getElementById('loading-overlay').style.display = 'none';
-                document.getElementById('game-container').style.display = 'block';
+                document.querySelector('.game-container').style.display = 'block';
 
                 // Inicializa o jogo
                 if (typeof GAME_ENGINE !== 'undefined') {
@@ -200,8 +202,9 @@ function gerarJogoCompleto(config) {
             } catch (error) {
                 console.error('❌ Erro ao inicializar:', error);
                 document.getElementById('loading-overlay').style.display = 'none';
-                document.getElementById('game-container').style.display = 'block';
-                document.getElementById('game-container').innerHTML =
+                const container = document.querySelector('.game-container');
+                container.style.display = 'block';
+                container.innerHTML =
                     '<div style="text-align: center; padding: 40px; color: #e74c3c;">' +
                     '<h2>Erro ao carregar jogo</h2>' +
                     '<p>' + error.message + '</p>' +
@@ -225,12 +228,7 @@ function gerarJogoCompleto(config) {
 
 // ========== EXPORTAÇÃO ==========
 
-// Para uso no Node.js (N8N)
+// Para uso no Node.js
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { gerarJogoCompleto };
-}
-
-// Para uso no browser (testes locais)
-if (typeof window !== 'undefined') {
-  window.GameAssembler = { gerarJogoCompleto };
 }

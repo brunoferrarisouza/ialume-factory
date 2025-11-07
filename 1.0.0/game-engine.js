@@ -26,31 +26,55 @@ const GAME_ENGINE = {
         }
 
         // Configurar sistema base
-        window.totalPhases = gameConfig.fases.length;
-        
-        // CORREÇÃO DEFINITIVA: Total de andares = número de fases
-        // O array fases[] JÁ inclui a fase 0 (boas-vindas), então NÃO soma +1
-        const totalSteps = gameConfig.fases.length;
+        // ✅ CORREÇÃO: Fase 0 é só abertura, não conta no totalPhases
+        // totalPhases = número de fases JOGÁVEIS (não inclui fase 0)
+        window.totalPhases = gameConfig.fases.length - 1;
+
+        // Total de andares na montanha = número de fases jogáveis
+        const totalSteps = gameConfig.fases.length - 1;
         
         console.log('📊 Total de fases no array:', gameConfig.fases.length);
+        console.log('🎮 Fases jogáveis (sem contar fase 0):', totalSteps);
         console.log('🏔️ Total de andares na escalada:', totalSteps);
-        console.log('✅ Cálculo correto: fases.length =', totalSteps, '(fase 0 já está incluída)');
+        console.log('✅ window.totalPhases configurado:', window.totalPhases);
         
         // Configurar mecânica (se existir e não for 'none') - ANTES de injetar fases
         if (gameConfig.mecanica && gameConfig.mecanica !== 'none') {
             const Mechanic = this.getMechanic(gameConfig.mecanica);
             if (Mechanic) {
                 console.log('🎮 Inicializando mecânica:', gameConfig.mecanica);
-                Mechanic.init({
+
+                // ✅ NOVO: Passar cenário para mecânicas com parallax
+                const mechanicConfig = {
                     totalSteps: totalSteps
-                });
+                };
+
+                // Se tiver cenário definido, passar para a mecânica
+                if (gameConfig.cenario) {
+                    mechanicConfig.cenario = gameConfig.cenario;
+                    console.log('🎨 Cenário definido:', gameConfig.cenario);
+                }
+
+                Mechanic.init(mechanicConfig);
             } else {
                 console.warn('⚠️ Mecânica não encontrada:', gameConfig.mecanica);
             }
         } else {
             console.log('⏭️  Jogo linear (sem mecânica visual)');
         }
-        
+
+        // Inicializar sistema de áudio (se houver configuração)
+        if (gameConfig.audio && typeof window.AUDIO !== 'undefined') {
+            console.log('🎵 Inicializando sistema de áudio...');
+            window.AUDIO.init(gameConfig.audio);
+        }
+
+        // Inicializar sistema de partículas (se disponível)
+        if (typeof window.PARTICLES !== 'undefined' && typeof PARTICLES.init === 'function') {
+            console.log('✨ Inicializando sistema de partículas...');
+            PARTICLES.init();
+        }
+
         // Injetar todas as fases
         this.injectAllPhases();
 
@@ -108,25 +132,150 @@ const GAME_ENGINE = {
     // Injetar todas as fases
     injectAllPhases: function() {
         console.log('📦 Injetando fases...');
-        
+
+        const container = document.querySelector('.game-container');
+        if (!container) {
+            console.error('❌ .game-container não encontrado!');
+            return;
+        }
+
         let numeroFase = 1; // ✅ Contador separado começa em 1
-        
+
         this.config.fases.forEach((faseConfig, index) => {
-            // ✅ PULAR FASE 0 (boas-vindas) - Ela já está no HTML
+            // ✅ FASE 0 (welcome) - Renderizar tela de boas-vindas
             if (index === 0 && (faseConfig.type === 'welcome' || !faseConfig.modalidade)) {
-                console.log('⏭️ Fase 0 (boas-vindas) - usando conteúdo estático do HTML');
-                return; // Pula essa fase, numeroFase continua 1
+                console.log('🎬 Renderizando fase 0 (welcome)...');
+                this.injectWelcomeScreen(faseConfig, container);
+                return; // Pula incremento de numeroFase
             }
-            
+
+            // ✅ CRIAR elemento phase-X se não existir
+            let phaseElement = document.getElementById('phase-' + numeroFase);
+            if (!phaseElement) {
+                phaseElement = document.createElement('div');
+                phaseElement.id = 'phase-' + numeroFase;
+                phaseElement.className = 'phase'; // ✅ Classe correta para CSS funcionar
+                container.appendChild(phaseElement);
+                console.log('✅ Criado elemento phase-' + numeroFase);
+            }
+
             // ✅ Usa numeroFase (contador), não index+1
             console.log('📦 Injetando fase', index, 'no elemento phase-' + numeroFase);
             this.injectPhase(numeroFase, faseConfig);
             numeroFase++; // Incrementa só quando injeta
         });
-        
+
         console.log('✅ Todas as fases injetadas!');
     },
-    
+
+    // Injetar tela de welcome (fase 0)
+    injectWelcomeScreen: function(faseConfig, container) {
+        const welcomeDiv = document.createElement('div');
+        welcomeDiv.id = 'welcome-screen';
+        welcomeDiv.className = 'welcome-screen';
+        welcomeDiv.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            color: white;
+            padding: 40px;
+            text-align: center;
+        `;
+
+        const narrativa = faseConfig.narrativa || 'Bem-vindo ao jogo!';
+        const textoBotao = faseConfig.botao || 'Começar';
+
+        welcomeDiv.innerHTML = `
+            <div style="max-width: 600px;">
+                <h1 style="font-size: 2.5rem; margin-bottom: 30px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
+                    ${this.config.titulo || 'Jogo iAlume'}
+                </h1>
+                <p style="font-size: 1.3rem; line-height: 1.6; margin-bottom: 40px; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">
+                    ${narrativa}
+                </p>
+                <button id="start-game-btn" style="
+                    background: white;
+                    color: #667eea;
+                    border: none;
+                    padding: 18px 50px;
+                    font-size: 1.3rem;
+                    font-weight: bold;
+                    border-radius: 50px;
+                    cursor: pointer;
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                    transition: all 0.3s ease;
+                " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    ${textoBotao}
+                </button>
+            </div>
+        `;
+
+        container.appendChild(welcomeDiv);
+
+        // Adicionar evento ao botão
+        const startBtn = document.getElementById('start-game-btn');
+        startBtn.addEventListener('click', () => {
+            console.log('🚀 Botão "Começar" clicado!');
+
+            // Iniciar música (se houver)
+            if (window.AUDIO && window.AUDIO.playMusic) {
+                window.AUDIO.playMusic();
+                console.log('🎵 Música iniciada');
+            }
+
+            // Esconder welcome screen com fade out
+            welcomeDiv.style.transition = 'opacity 0.5s';
+            welcomeDiv.style.opacity = '0';
+
+            setTimeout(() => {
+                welcomeDiv.remove();
+                console.log('✅ Welcome screen removida');
+
+                // ✨ INTRO ZOOM: Zoom in em todo o jogo (igual jogo antigo)
+                const gameContainer = document.querySelector('.game-container');
+                if (gameContainer) {
+                    console.log('🎬 Iniciando câmera intro (zoom in)...');
+                    gameContainer.classList.add('camera-intro');
+
+                    // Após 3s: remover classe, iniciar vento e mostrar fase 1
+                    setTimeout(() => {
+                        console.log('✅ Zoom in completo!');
+                        gameContainer.classList.remove('camera-intro');
+
+                        // 💨 INICIAR SOM DO VENTO COM FADE IN
+                        if (window.AUDIO && typeof AUDIO.playWind === 'function') {
+                            AUDIO.playWind();
+                            console.log('💨 Som do vento iniciado!');
+                        }
+
+                        // Mostrar primeira fase
+                        if (typeof goToPhase !== 'undefined') {
+                            goToPhase(1);
+                            console.log('🎮 Indo para fase 1');
+                        } else {
+                            console.error('❌ goToPhase() não encontrado');
+                        }
+                    }, 3000); // 3s de animação
+                } else {
+                    console.warn('⚠️ .game-container não encontrado, pulando intro');
+                    if (typeof goToPhase !== 'undefined') {
+                        goToPhase(1);
+                    }
+                }
+            }, 500);
+        });
+
+        console.log('✅ Welcome screen injetada');
+    },
+
     // Injetar uma fase específica
     injectPhase: function(numeroFase, faseConfig) {
         const faseElement = document.getElementById('phase-' + numeroFase);

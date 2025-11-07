@@ -69,11 +69,20 @@ const TRUE_FALSE = {
     // Selecionar opção
     selectOption: function(selectedValue, correctValue, data) {
         const isCorrect = selectedValue === correctValue;
-        const buttons = document.querySelectorAll('.tf-button');
-        
+
+        // ✅ PEGAR SOMENTE botões da fase ATIVA (não de todas as fases!)
+        const currentPhase = document.querySelector('.phase.active');
+        if (!currentPhase) {
+            console.error('❌ Fase ativa não encontrada!');
+            return;
+        }
+
+        const buttons = currentPhase.querySelectorAll('.tf-button');
+
         console.log('🎯 Resposta:', selectedValue, '| Correta:', correctValue, '| Acertou:', isCorrect);
-        
-        // Desabilitar botões
+        console.log('🔘 Desabilitando', buttons.length, 'botões da fase atual');
+
+        // Desabilitar botões DA FASE ATUAL
         buttons.forEach(btn => {
             btn.disabled = true;
             btn.style.cursor = 'not-allowed';
@@ -135,7 +144,7 @@ const TRUE_FALSE = {
             
             /* Afirmação */
             .tf-statement {
-                background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
+                background: white;
                 border: 3px solid #667eea;
                 border-radius: 20px;
                 padding: 40px;

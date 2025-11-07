@@ -21,12 +21,12 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 // ========== CONFIGURAÇÃO ==========
-const VERSION = process.argv.includes('--version') 
+const VERSION = process.argv.includes('--version')
   ? process.argv[process.argv.indexOf('--version') + 1]
   : '1.0.0';
 
-const CDN_DIR = path.join(__dirname, '..', 'cdn');
-const VERSION_DIR = path.join(CDN_DIR, VERSION);
+// Deploy direto na pasta versionada (ex: /1.0.0/)
+const VERSION_DIR = path.join(__dirname, '..', VERSION);
 
 console.log('🚀 Deploy CDN - Versão ' + VERSION);
 console.log('=====================================\n');
@@ -156,8 +156,9 @@ console.log('   ✅ manifest.json criado');
 // ========== STEP 5: GIT ==========
 console.log('\n🔄 Preparando deploy...');
 console.log('   ℹ️  Para fazer deploy no GitHub Pages:');
-console.log('   1. Certifique-se de ter uma branch gh-pages');
-console.log('   2. Execute: npm run push-cdn');
+console.log('   1. git add ' + VERSION);
+console.log('   2. git commit -m "deploy: versão ' + VERSION + '"');
+console.log('   3. git push');
 console.log('\n✅ DEPLOY PREPARADO COM SUCESSO!');
-console.log(`\n📁 Arquivos em: ${CDN_DIR}`);
+console.log(`\n📁 Arquivos em: /${VERSION}/`);
 console.log(`🌐 Versão: ${VERSION}`);

@@ -61,36 +61,49 @@ const ESCALADA = {
 
         console.log('🎨 Injetando backgrounds REAIS com assets (cenário:', this.cenario + ')');
 
-        // Definir assets por cenário (imagens reais do OpenGameArt)
-        const cenarios = {
-            'montanha-nevada': {
-                layer1: '../assets/backgrounds/escalada/layer-1-sky.png',          // Céu
-                layer2: '../assets/backgrounds/escalada/layer-2-mountains-far.png', // Montanhas distantes
-                cliffWall: '../assets/tiles/snow/slice16_16.png',                  // Parede de gelo vertical (NOVA!)
-                layer3: '../assets/backgrounds/escalada/layer-3-mountains-mid.png'  // Montanhas próximas
-            },
-            'deserto-canyon': {
-                layer1: '../assets/backgrounds/escalada/desert-layer-1.png',  // Céu azul com nuvens
-                layer2: '../assets/backgrounds/escalada/desert-layer-3.png',  // Dunas distantes
-                cliffWall: '../assets/tiles/castle/slice16_16.png',          // Parede de pedra vertical (NOVA!)
-                layer3: '../assets/backgrounds/escalada/desert-layer-5.png'   // Cactos próximos
-            },
-            'cidade-floresta': {
-                layer1: '../assets/backgrounds/escalada/bg03-layer-1.png',  // Céu com nuvens
-                layer2: '../assets/backgrounds/escalada/bg03-layer-2.png',  // Cidade/floresta distante
-                cliffWall: '../assets/tiles/castle/slice17_17.png',         // Parede de pedra escura (NOVA!)
-                layer3: '../assets/backgrounds/escalada/bg03-layer-3.png'   // Cidade/floresta próxima
-            },
-            'vulcao': {
-                // Fallback para gradientes caso assets não existam
-                layer1: 'linear-gradient(180deg, #FF4500 0%, #8B0000 100%)',
-                layer2: 'linear-gradient(180deg, #2F4F4F 0%, #696969 60%)',
-                cliffWall: 'linear-gradient(180deg, #8B0000 0%, #4B0000 100%)',  // Gradiente vertical escuro
-                layer3: 'linear-gradient(180deg, transparent 0%, #FF6347 80%)'
-            }
-        };
+        // ✅ PRIORIDADE: Usar dados do Supabase se disponível (via game_assembler)
+        let bg;
 
-        const bg = cenarios[this.cenario] || cenarios['montanha-nevada'];
+        if (window.gameConfig && window.gameConfig.scenery && window.gameConfig.scenery.layer_1_sky) {
+            console.log('✅ Usando backgrounds do SUPABASE:', window.gameConfig.scenery);
+            const scenery = window.gameConfig.scenery;
+            bg = {
+                layer1: scenery.layer_1_sky,
+                layer2: scenery.layer_2_far,
+                layer3: scenery.layer_3_mid,
+                cliffWall: null  // Tiles ainda não estão no Supabase, usar fallback
+            };
+        } else {
+            // ⚠️ FALLBACK: Caminhos relativos (apenas para testes locais) ou gradientes
+            console.log('⚠️ Supabase scenery não disponível, usando fallback');
+            const cenarios = {
+                'montanha-nevada': {
+                    layer1: '../assets/backgrounds/escalada/layer-1-sky.png',
+                    layer2: '../assets/backgrounds/escalada/layer-2-mountains-far.png',
+                    cliffWall: '../assets/tiles/snow/slice16_16.png',
+                    layer3: '../assets/backgrounds/escalada/layer-3-mountains-mid.png'
+                },
+                'deserto-canyon': {
+                    layer1: '../assets/backgrounds/escalada/desert-layer-1.png',
+                    layer2: '../assets/backgrounds/escalada/desert-layer-3.png',
+                    cliffWall: '../assets/tiles/castle/slice16_16.png',
+                    layer3: '../assets/backgrounds/escalada/desert-layer-5.png'
+                },
+                'cidade-floresta': {
+                    layer1: '../assets/backgrounds/escalada/bg03-layer-1.png',
+                    layer2: '../assets/backgrounds/escalada/bg03-layer-2.png',
+                    cliffWall: '../assets/tiles/castle/slice17_17.png',
+                    layer3: '../assets/backgrounds/escalada/bg03-layer-3.png'
+                },
+                'vulcao': {
+                    layer1: 'linear-gradient(180deg, #FF4500 0%, #8B0000 100%)',
+                    layer2: 'linear-gradient(180deg, #2F4F4F 0%, #696969 60%)',
+                    cliffWall: 'linear-gradient(180deg, #8B0000 0%, #4B0000 100%)',
+                    layer3: 'linear-gradient(180deg, transparent 0%, #FF6347 80%)'
+                }
+            };
+            bg = cenarios[this.cenario] || cenarios['montanha-nevada'];
+        }
 
         // Criar estrutura HTML dos backgrounds
         // Se for URL de imagem, usar background-image, senão usar background (gradiente)

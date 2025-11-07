@@ -256,6 +256,18 @@ const GAME_ENGINE = {
                             console.log('💨 Som do vento iniciado!');
                         }
 
+                        // 🦅 INICIAR DECORAÇÕES (nuvens, pássaros, etc)
+                        if (window.DECORATIONS && typeof DECORATIONS.init === 'function') {
+                            // Pegar decorações do gameConfig (vem do Supabase)
+                            const decorations = window.gameConfig?.decorations || [];
+                            if (decorations.length > 0) {
+                                DECORATIONS.init(decorations);
+                                console.log('🦅 Decorações iniciadas:', decorations.length);
+                            } else {
+                                console.log('⏭️ Sem decorações configuradas para este cenário');
+                            }
+                        }
+
                         // Mostrar primeira fase
                         if (typeof goToPhase !== 'undefined') {
                             goToPhase(1);

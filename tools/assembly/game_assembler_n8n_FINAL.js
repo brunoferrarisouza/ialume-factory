@@ -225,11 +225,21 @@ const htmlGerado = `<!DOCTYPE html>
             }
         }
 
+        console.log('🔧 Script inline iniciando...');
+        console.log('📦 GAME_CONFIG:', GAME_CONFIG);
+
         async function initGame() {
-            console.log('🎮 Scripts carregados');
+            console.log('🎮 initGame() CHAMADO!');
+            console.log('🔍 GAME_ENGINE disponível?', typeof GAME_ENGINE !== 'undefined');
+
             try {
+                console.log('📋 Configuração recebida:', GAME_CONFIG);
+
                 if (GAME_CONFIG.cenario) {
+                    console.log('🎨 Carregando assets para cenário:', GAME_CONFIG.cenario);
                     const assets = await loadAssets(GAME_CONFIG.cenario);
+                    console.log('✅ Assets carregados:', assets);
+
                     window.gameConfig = {
                         ...GAME_CONFIG,
                         decorations: assets.decorations,
@@ -243,20 +253,24 @@ const htmlGerado = `<!DOCTYPE html>
                         } : undefined
                     };
                 } else {
+                    console.log('⏭️ Sem cenário configurado, usando config direto');
                     window.gameConfig = GAME_CONFIG;
                 }
 
+                console.log('🎮 Removendo loading overlay...');
                 document.getElementById('loading-overlay').style.display = 'none';
                 document.querySelector('.game-container').style.display = 'block';
 
+                console.log('🚀 Inicializando GAME_ENGINE...');
                 if (typeof GAME_ENGINE !== 'undefined') {
                     GAME_ENGINE.init(window.gameConfig);
-                    console.log('✅ Jogo inicializado!');
+                    console.log('✅ Jogo inicializado com sucesso!');
                 } else {
                     throw new Error('GAME_ENGINE não encontrado');
                 }
             } catch (error) {
-                console.error('❌ Erro:', error);
+                console.error('❌ Erro em initGame():', error);
+                console.error('Stack:', error.stack);
                 document.getElementById('loading-overlay').style.display = 'none';
                 const container = document.querySelector('.game-container');
                 container.style.display = 'block';
@@ -264,7 +278,35 @@ const htmlGerado = `<!DOCTYPE html>
             }
         }
 
-        window.addEventListener('load', initGame);
+        // ✅ MÚLTIPLAS ESTRATÉGIAS para garantir que initGame() seja chamado
+
+        // 1. Evento load (padrão)
+        window.addEventListener('load', function() {
+            console.log('🎯 Evento LOAD disparado');
+            initGame();
+        });
+
+        // 2. DOMContentLoaded (mais rápido, para iframes)
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('🎯 Evento DOMContentLoaded disparado');
+                setTimeout(initGame, 100); // 100ms para garantir que scripts carregaram
+            });
+        } else {
+            // DOM já carregado, chamar imediatamente
+            console.log('🎯 DOM já carregado, chamando initGame() em 100ms');
+            setTimeout(initGame, 100);
+        }
+
+        // 3. Fallback: tentar após 500ms
+        setTimeout(function() {
+            if (!window.gameConfig) {
+                console.log('⚠️ FALLBACK: Jogo ainda não inicializou após 500ms, tentando agora...');
+                initGame();
+            }
+        }, 500);
+
+        // Log de erros de scripts
         window.addEventListener('error', function(e) {
             if (e.target.tagName === 'SCRIPT') {
                 console.error('❌ Erro ao carregar script:', e.target.src);

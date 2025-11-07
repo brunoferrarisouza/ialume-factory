@@ -54,12 +54,18 @@ function goToPhase(phaseNumber) {
     phases.forEach(phase => {
         phase.classList.remove('active');
     });
-    
+
     const targetPhase = document.getElementById('phase-' + phaseNumber);
     if (targetPhase) {
         targetPhase.classList.add('active');
         gameState.currentPhase = phaseNumber;
         updatePhaseTitle(phaseNumber);
+
+        // ❓ TOCAR SOM DE NOVA PERGUNTA (só se não for fase 0)
+        if (phaseNumber > 0 && window.AUDIO && typeof AUDIO.playQuestion === 'function') {
+            AUDIO.playQuestion();
+            console.log('❓ Som de nova pergunta tocado!');
+        }
     } else {
         console.error('Fase ' + phaseNumber + ' nao encontrada!');
     }
@@ -152,6 +158,18 @@ function onAnswerChecked(isCorrect, phaseNumber) {
         addScore(points);
         incrementCorrect();
         console.log('📊 Score atualizado:', gameState.score, 'pontos,', gameState.correctAnswers, 'acertos');
+
+        // ✨ DISPARAR EXPLOSÃO DE PARTÍCULAS!
+        if (window.PARTICLES && typeof PARTICLES.createMultipleExplosions === 'function') {
+            PARTICLES.createMultipleExplosions();
+            console.log('✨ Explosão de partículas disparada!');
+        }
+
+        // 🎵 TOCAR SEQUÊNCIA DE SONS (moeda + voo)
+        if (window.AUDIO && typeof AUDIO.playCorrectSequence === 'function') {
+            AUDIO.playCorrectSequence();
+            console.log('🎵 Som de acerto disparado (moeda + voo)!');
+        }
     }
 
     // 3️⃣ FADEOUT DO POPUP ATUAL
@@ -198,8 +216,17 @@ function onAnswerChecked(isCorrect, phaseNumber) {
         }
 
         // 5️⃣ AGUARDAR ANIMAÇÃO DE SUBIDA + MOSTRAR PRÓXIMA FASE
-        const climbDelay = isCorrect ? 1500 : 1800; // Tempo para ver Lume subindo
-        console.log('⏱️ Aguardando', climbDelay, 'ms para ver Lume subir...');
+        // ✅ NOVO: Se for última fase, aguardar animação completa do cristal (3.5s)
+        const isLastPhase = phaseNumber === (window.totalPhases || gameState.totalPhases);
+        let climbDelay;
+
+        if (isLastPhase && isCorrect) {
+            climbDelay = 4000; // 4s para ver cristal completar animação (3.5s) antes da vitória
+            console.log('🏆 ÚLTIMA FASE! Aguardando', climbDelay, 'ms para cristal animar completamente...');
+        } else {
+            climbDelay = isCorrect ? 1500 : 1800; // Tempo normal para ver Lume subindo
+            console.log('⏱️ Aguardando', climbDelay, 'ms para ver Lume subir...');
+        }
 
         setTimeout(() => {
             nextPhase();

@@ -200,10 +200,10 @@ const SEQUENCE = {
         style.id = 'sequence-styles';
         style.textContent = `
             .sequence-container { max-width: 700px; margin: 0 auto; padding: 20px; }
-            .seq-header { text-align: center; margin-bottom: 30px; }
+            .seq-header { background: white; border: 3px solid #667eea; border-radius: 20px; padding: 30px; margin-bottom: 30px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
             .seq-icon { font-size: 3.5rem; margin-bottom: 10px; }
             .seq-title { font-size: 1.3rem; font-weight: 600; color: #495057; }
-            .seq-instruction { background: rgba(102, 126, 234, 0.1); border-left: 4px solid #667eea; border-radius: 8px; padding: 15px 20px; margin-bottom: 30px; font-size: 1rem; color: #495057; font-weight: 500; }
+            .seq-instruction { background: white; border: 3px solid #667eea; border-radius: 15px; padding: 20px; margin-bottom: 30px; font-size: 1.1rem; color: #495057; font-weight: 500; text-align: center; }
             .seq-list { display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; }
             
             .seq-item { 

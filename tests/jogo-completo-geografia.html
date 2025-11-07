@@ -6,7 +6,7 @@
     <title>Lume e a Montanha do Conhecimento - Geografia</title>
 
     <!-- Carregar CSS base -->
-    <link rel="stylesheet" href="../base/styles/base.css">
+    <link rel="stylesheet" href="../base/styles/base.css?v=1762463012">
 
     <style>
         * {
@@ -144,6 +144,21 @@
             color: #667eea;
             z-index: 10000;
         }
+
+        /* ✅ CÂMERA INTRO: Zoom in simples (3s) */
+        @keyframes cameraZoomIn {
+            0% {
+                transform: scale(0.6);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .game-container.camera-intro {
+            animation: cameraZoomIn 3s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+            transform-origin: center center;
+        }
     </style>
 </head>
 <body>
@@ -165,7 +180,7 @@
             </div>
         </div>
 
-        <!-- FASES 1-8: Serão injetadas pelo Game Engine -->
+        <!-- FASES 1-9: Serão injetadas pelo Game Engine -->
         <div id="phase-1" class="phase"></div>
         <div id="phase-2" class="phase"></div>
         <div id="phase-3" class="phase"></div>
@@ -174,19 +189,22 @@
         <div id="phase-6" class="phase"></div>
         <div id="phase-7" class="phase"></div>
         <div id="phase-8" class="phase"></div>
+        <div id="phase-9" class="phase"></div>
     </div>
 
     <!-- Toast de feedback (nome correto para base.js) -->
     <div id="feedback-zone" class="feedback"></div>
 
     <!-- Carregar todos os componentes CDN LOCAIS -->
-    <script src="../base/scripts/base.js"></script>
-    <script src="../base/scripts/game-engine.js"></script>
-    <script src="../mechanics/escalada.js"></script>
-    <script src="../modalities/quiz.js"></script>
-    <script src="../modalities/fill-blanks.js"></script>
-    <script src="../modalities/true-false.js"></script>
-    <script src="../modalities/sequence.js"></script>
+    <script src="../base/scripts/particles.js?v=1762463012"></script>
+    <script src="../base/scripts/audio.js?v=1762463012"></script>
+    <script src="../base/scripts/base.js?v=1762463012"></script>
+    <script src="../base/scripts/game-engine.js?v=1762463012"></script>
+    <script src="../mechanics/escalada.js?v=1762463012"></script>
+    <script src="../modalities/quiz.js?v=1762463012"></script>
+    <script src="../modalities/fill-blanks.js?v=1762463012"></script>
+    <script src="../modalities/true-false.js?v=1762463012"></script>
+    <script src="../modalities/sequence.js?v=1762463012"></script>
 
     <script>
         // ===== CONFIGURAÇÃO DO JOGO =====
@@ -194,7 +212,7 @@
             titulo: "Lume e a Montanha do Conhecimento",
             tema: "Geografia",
             mecanica: "escalada",
-            cenario: "montanha-nevada",  // ← ATIVA PARALLAX + CHECKPOINTS
+            cenario: "montanha-nevada",  // ← Opções: "montanha-nevada", "deserto-canyon", "cidade-floresta", "vulcao"
             fases: [
                 // FASE 0: Abertura (já no HTML)
                 {
@@ -293,15 +311,28 @@
                     }
                 },
 
-                // FASE 8: Quiz (TOPO - 8 questões!)
+                // FASE 8: True-False
                 {
                     numero: 8,
                     modalidade: 'true-false',
                     dados: {
                         afirmacao: "O Monte Everest é a montanha mais alta do mundo",
                         correta: true,
-                        feedback_correto: "✅ VERDADEIRO! E você chegou ao topo como o Everest! 🏔️⭐",
+                        feedback_correto: "✅ Verdadeiro! O Everest tem 8.848 metros!",
                         feedback_errado: "❌ É verdadeiro! O Everest tem 8.848 metros!"
+                    }
+                },
+
+                // FASE 9: Quiz (TOPO - Desafio Final!)
+                {
+                    numero: 9,
+                    modalidade: 'quiz',
+                    dados: {
+                        pergunta: "Qual é o maior país do mundo em área?",
+                        alternativas: ["Rússia", "Canadá", "China", "Estados Unidos"],
+                        correta: 0,
+                        feedback_correto: "🏆 CORRETO! Você conquistou o topo da montanha! 🏔️⭐",
+                        feedback_errado: "❌ Era Rússia! Mas tente novamente!"
                     }
                 }
             ]
@@ -310,6 +341,13 @@
         // ===== INICIAR JOGO =====
         function startGame() {
             console.log('🎮 Iniciando jogo completo...');
+
+            // 🎵 INICIALIZAR SISTEMA DE ÁUDIO (requer interação do usuário)
+            if (window.AUDIO && typeof AUDIO.init === 'function') {
+                AUDIO.init();
+                AUDIO.playMusic(); // Música de fundo começa imediatamente
+                console.log('🎵 Sistema de áudio inicializado!');
+            }
 
             // Esconder fase 0
             document.getElementById('phase-0').classList.remove('active');
@@ -331,8 +369,33 @@
                         console.log('✅ gameState.totalPhases atualizado para:', window.totalPhases);
                     }
 
-                    // Mostrar fase 1
-                    nextPhase();
+                    // ✨ INICIALIZAR SISTEMA DE PARTÍCULAS
+                    if (window.PARTICLES && typeof PARTICLES.init === 'function') {
+                        PARTICLES.init();
+                        console.log('✨ Sistema de partículas pronto!');
+                    }
+
+                    // ✅ CÂMERA INTRO SIMPLES: Zoom in (3s)
+                    const gameContainer = document.querySelector('.game-container');
+
+                    console.log('🎬 Iniciando câmera intro (zoom in simples)...');
+
+                    // 1. Adicionar classe que ativa animação de zoom in
+                    gameContainer.classList.add('camera-intro');
+
+                    // 2. Após 3s, remover classe e iniciar jogo + VENTO
+                    setTimeout(() => {
+                        console.log('✅ Zoom in completo!');
+                        gameContainer.classList.remove('camera-intro');
+
+                        // 💨 INICIAR SOM DO VENTO COM FADE IN
+                        if (window.AUDIO && typeof AUDIO.playWind === 'function') {
+                            AUDIO.playWind();
+                            console.log('💨 Som do vento iniciado!');
+                        }
+
+                        nextPhase();
+                    }, 3000);
                 } else {
                     console.error('❌ Erro ao inicializar Game Engine!');
                     alert('Erro ao carregar o jogo. Verifique o console.');

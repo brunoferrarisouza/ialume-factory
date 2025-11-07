@@ -26,15 +26,17 @@ const GAME_ENGINE = {
         }
 
         // Configurar sistema base
-        window.totalPhases = gameConfig.fases.length;
-        
-        // CORREÇÃO DEFINITIVA: Total de andares = número de fases
-        // O array fases[] JÁ inclui a fase 0 (boas-vindas), então NÃO soma +1
-        const totalSteps = gameConfig.fases.length;
+        // ✅ CORREÇÃO: Fase 0 é só abertura, não conta no totalPhases
+        // totalPhases = número de fases JOGÁVEIS (não inclui fase 0)
+        window.totalPhases = gameConfig.fases.length - 1;
+
+        // Total de andares na montanha = número de fases jogáveis
+        const totalSteps = gameConfig.fases.length - 1;
         
         console.log('📊 Total de fases no array:', gameConfig.fases.length);
+        console.log('🎮 Fases jogáveis (sem contar fase 0):', totalSteps);
         console.log('🏔️ Total de andares na escalada:', totalSteps);
-        console.log('✅ Cálculo correto: fases.length =', totalSteps, '(fase 0 já está incluída)');
+        console.log('✅ window.totalPhases configurado:', window.totalPhases);
         
         // Configurar mecânica (se existir e não for 'none') - ANTES de injetar fases
         if (gameConfig.mecanica && gameConfig.mecanica !== 'none') {

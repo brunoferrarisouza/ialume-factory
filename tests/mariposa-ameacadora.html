@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mariposa Ameaçadora - Antagonista</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #f0f0f0;
+        }
+
+        .moth-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            animation: levitate 2s ease-in-out infinite;
+        }
+
+        @keyframes levitate {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-14px); }
+        }
+
+        .moth {
+            width: 100px;
+            height: 100px;
+            position: relative;
+        }
+
+        /* Asas traseiras (mais escuras) */
+        .wing-back {
+            width: 38px;
+            height: 42px;
+            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+            border-radius: 60% 40% 70% 30%;
+            position: absolute;
+            top: 40px;
+            border: 2px solid #000;
+            z-index: 1;
+            box-shadow: inset -2px -2px 8px rgba(0,0,0,0.5);
+        }
+
+        .wing-back.left {
+            left: 6px;
+            transform: rotate(-25deg);
+            animation: flapBackLeft 1.5s ease-in-out infinite;
+        }
+
+        .wing-back.right {
+            right: 6px;
+            transform: rotate(25deg);
+            animation: flapBackRight 1.5s ease-in-out infinite;
+        }
+
+        @keyframes flapBackLeft {
+            0%, 100% { transform: rotate(-25deg) scaleX(1); }
+            50% { transform: rotate(-35deg) scaleX(0.95); }
+        }
+
+        @keyframes flapBackRight {
+            0%, 100% { transform: rotate(25deg) scaleX(1); }
+            50% { transform: rotate(35deg) scaleX(0.95); }
+        }
+
+        /* Asas frontais (maiores, com padrão de caveira) */
+        .wing-front {
+            width: 44px;
+            height: 50px;
+            background: linear-gradient(135deg, #3a3a3a 0%, #1f1f1f 100%);
+            border-radius: 50% 50% 60% 40%;
+            position: absolute;
+            top: 28px;
+            border: 3px solid #000;
+            z-index: 2;
+            box-shadow: inset -3px -3px 10px rgba(0,0,0,0.6);
+        }
+
+        .wing-front.left {
+            left: 2px;
+            animation: flapFrontLeft 1.5s ease-in-out infinite;
+        }
+
+        .wing-front.right {
+            right: 2px;
+            animation: flapFrontRight 1.5s ease-in-out infinite;
+        }
+
+        @keyframes flapFrontLeft {
+            0%, 100% { transform: rotate(-15deg) scaleX(1); }
+            50% { transform: rotate(-25deg) scaleX(0.92); }
+        }
+
+        @keyframes flapFrontRight {
+            0%, 100% { transform: rotate(15deg) scaleX(1); }
+            50% { transform: rotate(25deg) scaleX(0.92); }
+        }
+
+        /* Padrão de "caveira" nas asas (marcas ameaçadoras) */
+        .skull-pattern {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Olhos da caveira */
+        .skull-eye {
+            width: 8px;
+            height: 10px;
+            background: #ff4444;
+            border-radius: 50% 50% 40% 40%;
+            position: absolute;
+            top: 8px;
+            border: 1px solid #000;
+            box-shadow: 0 0 6px rgba(255, 68, 68, 0.8);
+        }
+
+        .skull-eye.left { left: 8px; }
+        .skull-eye.right { right: 8px; }
+
+        /* "Nariz" da caveira */
+        .skull-nose {
+            width: 0;
+            height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 6px solid #ff4444;
+            position: absolute;
+            left: 50%;
+            top: 20px;
+            transform: translateX(-50%);
+        }
+
+        /* Listras nas asas */
+        .wing-stripe {
+            width: 80%;
+            height: 2px;
+            background: rgba(255, 68, 68, 0.3);
+            position: absolute;
+            left: 10%;
+            border-radius: 50%;
+        }
+
+        .wing-stripe:nth-child(1) { top: 30%; }
+        .wing-stripe:nth-child(2) { top: 50%; }
+        .wing-stripe:nth-child(3) { top: 70%; }
+
+        /* Corpo (peludo e escuro) */
+        .body {
+            width: 16px;
+            height: 52px;
+            background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%);
+            border-radius: 50% 50% 60% 60%;
+            position: absolute;
+            left: 42px;
+            top: 30px;
+            border: 2px solid #000;
+            z-index: 3;
+            box-shadow: inset 0 2px 6px rgba(255,255,255,0.1);
+        }
+
+        /* Pelos do corpo (textura) */
+        .body-fuzz {
+            width: 100%;
+            height: 3px;
+            background: rgba(50, 50, 50, 0.5);
+            position: absolute;
+            left: 0;
+            border-radius: 50%;
+        }
+
+        .body-fuzz:nth-child(1) { top: 10%; }
+        .body-fuzz:nth-child(2) { top: 25%; }
+        .body-fuzz:nth-child(3) { top: 40%; }
+        .body-fuzz:nth-child(4) { top: 55%; }
+        .body-fuzz:nth-child(5) { top: 70%; }
+
+        /* Cabeça */
+        .head {
+            width: 18px;
+            height: 16px;
+            background: linear-gradient(135deg, #2a2a2a 0%, #0f0f0f 100%);
+            border-radius: 50%;
+            position: absolute;
+            left: 41px;
+            top: 18px;
+            border: 2px solid #000;
+            z-index: 4;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.1);
+        }
+
+        /* Olhos compostos grandes */
+        .eye {
+            width: 10px;
+            height: 10px;
+            background: radial-gradient(circle, #ff0000 30%, #8a0000 100%);
+            border-radius: 50%;
+            position: absolute;
+            top: 20px;
+            animation: blink 4s infinite;
+            z-index: 5;
+            border: 2px solid #000;
+            box-shadow: 0 0 8px rgba(255, 0, 0, 0.6);
+        }
+
+        .eye.left { left: 36px; }
+        .eye.right { right: 36px; }
+
+        @keyframes blink {
+            0%, 48%, 52%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(0.8);
+                opacity: 0.7;
+            }
+        }
+
+        /* Reflexo nos olhos */
+        .eye-shine {
+            width: 3px;
+            height: 3px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+        }
+
+        /* Antenas plumosas */
+        .antenna {
+            width: 3px;
+            height: 16px;
+            background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
+            position: absolute;
+            border-radius: 50% 50% 0 0;
+            z-index: 6;
+            border: 1px solid #000;
+        }
+
+        .antenna.left {
+            left: 38px;
+            top: 12px;
+            transform: rotate(-45deg);
+            transform-origin: bottom;
+            animation: antennaWaveLeft 2s ease-in-out infinite;
+        }
+
+        .antenna.right {
+            right: 38px;
+            top: 12px;
+            transform: rotate(45deg);
+            transform-origin: bottom;
+            animation: antennaWaveRight 2s ease-in-out infinite;
+        }
+
+        @keyframes antennaWaveLeft {
+            0%, 100% { transform: rotate(-45deg); }
+            50% { transform: rotate(-55deg); }
+        }
+
+        @keyframes antennaWaveRight {
+            0%, 100% { transform: rotate(45deg); }
+            50% { transform: rotate(55deg); }
+        }
+
+        /* "Pelos" nas antenas (plumosas) */
+        .antenna-fuzz {
+            width: 6px;
+            height: 1px;
+            background: #1a1a1a;
+            position: absolute;
+            left: -1px;
+        }
+
+        .antenna-fuzz:nth-child(1) { top: 20%; transform: rotate(-60deg); }
+        .antenna-fuzz:nth-child(2) { top: 40%; transform: rotate(-50deg); }
+        .antenna-fuzz:nth-child(3) { top: 60%; transform: rotate(-60deg); }
+        .antenna-fuzz:nth-child(4) { top: 80%; transform: rotate(-50deg); }
+
+        .antenna.right .antenna-fuzz:nth-child(1) { transform: rotate(60deg); left: auto; right: -1px; }
+        .antenna.right .antenna-fuzz:nth-child(2) { transform: rotate(50deg); left: auto; right: -1px; }
+        .antenna.right .antenna-fuzz:nth-child(3) { transform: rotate(60deg); left: auto; right: -1px; }
+        .antenna.right .antenna-fuzz:nth-child(4) { transform: rotate(50deg); left: auto; right: -1px; }
+
+        /* Probóscide enrolada */
+        .proboscis {
+            width: 4px;
+            height: 6px;
+            background: #1a1a1a;
+            border-radius: 50%;
+            position: absolute;
+            left: 48px;
+            top: 32px;
+            z-index: 4;
+            border: 1px solid #000;
+        }
+
+        /* Pernas finas (6 pernas) */
+        .leg {
+            width: 2px;
+            background: #1a1a1a;
+            position: absolute;
+            z-index: 2;
+            border-radius: 2px;
+        }
+
+        .leg.front-left {
+            height: 14px;
+            left: 40px;
+            top: 36px;
+            transform: rotate(-50deg);
+        }
+
+        .leg.front-right {
+            height: 14px;
+            right: 40px;
+            top: 36px;
+            transform: rotate(50deg);
+        }
+
+        .leg.middle-left {
+            height: 16px;
+            left: 38px;
+            top: 48px;
+            transform: rotate(-40deg);
+        }
+
+        .leg.middle-right {
+            height: 16px;
+            right: 38px;
+            top: 48px;
+            transform: rotate(40deg);
+        }
+
+        .leg.back-left {
+            height: 18px;
+            left: 36px;
+            top: 60px;
+            transform: rotate(-30deg);
+        }
+
+        .leg.back-right {
+            height: 18px;
+            right: 36px;
+            top: 60px;
+            transform: rotate(30deg);
+        }
+
+        /* Brilho sinistro */
+        @keyframes sinisterGlow {
+            0%, 100% { filter: drop-shadow(0 0 4px rgba(255, 0, 0, 0.3)); }
+            50% { filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.5)); }
+        }
+
+        .moth {
+            animation: sinisterGlow 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="moth-container">
+        <div class="moth">
+            <!-- Asas traseiras -->
+            <div class="wing-back left"></div>
+            <div class="wing-back right"></div>
+
+            <!-- Asas frontais com padrão de caveira -->
+            <div class="wing-front left">
+                <div class="skull-pattern">
+                    <div class="skull-eye left"></div>
+                    <div class="skull-eye right"></div>
+                    <div class="skull-nose"></div>
+                </div>
+                <div class="wing-stripe"></div>
+                <div class="wing-stripe"></div>
+                <div class="wing-stripe"></div>
+            </div>
+
+            <div class="wing-front right">
+                <div class="skull-pattern">
+                    <div class="skull-eye left"></div>
+                    <div class="skull-eye right"></div>
+                    <div class="skull-nose"></div>
+                </div>
+                <div class="wing-stripe"></div>
+                <div class="wing-stripe"></div>
+                <div class="wing-stripe"></div>
+            </div>
+
+            <!-- Pernas -->
+            <div class="leg front-left"></div>
+            <div class="leg front-right"></div>
+            <div class="leg middle-left"></div>
+            <div class="leg middle-right"></div>
+            <div class="leg back-left"></div>
+            <div class="leg back-right"></div>
+
+            <!-- Corpo -->
+            <div class="body">
+                <div class="body-fuzz"></div>
+                <div class="body-fuzz"></div>
+                <div class="body-fuzz"></div>
+                <div class="body-fuzz"></div>
+                <div class="body-fuzz"></div>
+            </div>
+
+            <!-- Antenas plumosas -->
+            <div class="antenna left">
+                <div class="antenna-fuzz"></div>
+                <div class="antenna-fuzz"></div>
+                <div class="antenna-fuzz"></div>
+                <div class="antenna-fuzz"></div>
+            </div>
+            <div class="antenna right">
+                <div class="antenna-fuzz"></div>
+                <div class="antenna-fuzz"></div>
+                <div class="antenna-fuzz"></div>
+                <div class="antenna-fuzz"></div>
+            </div>
+
+            <!-- Cabeça -->
+            <div class="head"></div>
+
+            <!-- Olhos -->
+            <div class="eye left">
+                <div class="eye-shine"></div>
+            </div>
+            <div class="eye right">
+                <div class="eye-shine"></div>
+            </div>
+
+            <!-- Probóscide -->
+            <div class="proboscis"></div>
+        </div>
+    </div>
+</body>
+</html>

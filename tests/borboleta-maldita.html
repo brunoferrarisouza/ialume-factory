@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Borboleta Maldita de Fogo - Antagonista</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #f0f0f0;
+        }
+
+        .butterfly-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            animation: cursedFlight 2.5s ease-in-out infinite;
+        }
+
+        @keyframes cursedFlight {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-6px) rotate(-3deg); }
+            50% { transform: translateY(-10px) rotate(0deg); }
+            75% { transform: translateY(-6px) rotate(3deg); }
+        }
+
+        .butterfly {
+            width: 100px;
+            height: 100px;
+            position: relative;
+        }
+
+        /* Corpo central (mais fino e alongado) */
+        .body {
+            width: 8px;
+            height: 50px;
+            background: linear-gradient(180deg, #8b0000 0%, #4a0000 50%, #2d0000 100%);
+            border-radius: 40% 40% 50% 50%;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 28px;
+            border: 2px solid #1a0000;
+            z-index: 10;
+            box-shadow:
+                inset 0 2px 4px rgba(0,0,0,0.8),
+                0 0 15px rgba(255, 50, 0, 0.6);
+        }
+
+        /* Segmentos do corpo */
+        .body-segment {
+            width: 100%;
+            height: 2px;
+            background: rgba(255, 100, 0, 0.4);
+            position: absolute;
+            left: 0;
+        }
+
+        .body-segment:nth-child(1) { top: 20%; }
+        .body-segment:nth-child(2) { top: 40%; }
+        .body-segment:nth-child(3) { top: 60%; }
+        .body-segment:nth-child(4) { top: 80%; }
+
+        /* Cabeça pequena */
+        .head {
+            width: 24px;
+            height: 20px;
+            background: radial-gradient(circle, #a00000 0%, #5a0000 100%);
+            border-radius: 50%;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 14px;
+            border: 2px solid #2d0000;
+            z-index: 11;
+            box-shadow: 0 0 10px rgba(255, 50, 0, 0.7);
+        }
+
+        /* Olhos malignos */
+        .eye {
+            width: 8px;
+            height: 9px;
+            background: radial-gradient(circle, #ffffff 0%, #e0e0e0 100%);
+            border-radius: 50%;
+            position: absolute;
+            top: 12px;
+            animation: eyeGlow 1.5s ease-in-out infinite;
+            z-index: 12;
+            border: 2px solid #000;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+        }
+
+        .eye.left {
+            left: 50%;
+            margin-left: -9px;
+        }
+        .eye.right {
+            left: 50%;
+            margin-left: 1px;
+        }
+
+        @keyframes eyeGlow {
+            0%, 100% {
+                box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 15px rgba(255, 100, 100, 0.8);
+                transform: scale(1.15);
+            }
+        }
+
+        /* Pupila vermelha */
+        .pupil {
+            width: 4px;
+            height: 4px;
+            background: radial-gradient(circle, #ff0000 0%, #8b0000 100%);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 13;
+            animation: pupilGlow 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pupilGlow {
+            0%, 100% {
+                box-shadow: 0 0 4px rgba(255, 0, 0, 0.8);
+            }
+            50% {
+                box-shadow: 0 0 8px rgba(255, 0, 0, 1);
+            }
+        }
+
+        /* Brilho no olho */
+        .eye-shine {
+            width: 2px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            z-index: 14;
+        }
+
+        /* Boca brava aberta */
+        .mouth {
+            width: 8px;
+            height: 6px;
+            background: #000;
+            border-radius: 0 0 50% 50%;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 25px;
+            z-index: 12;
+            border: 2px solid #2d0000;
+            border-top: none;
+            animation: mouthRoar 2s ease-in-out infinite;
+        }
+
+        @keyframes mouthRoar {
+            0%, 100% {
+                height: 6px;
+                transform: translateX(-50%) scaleY(1);
+            }
+            50% {
+                height: 7px;
+                transform: translateX(-50%) scaleY(1.1);
+            }
+        }
+
+        /* Dentes afiados */
+        .tooth {
+            width: 0;
+            height: 0;
+            border-left: 2px solid transparent;
+            border-right: 2px solid transparent;
+            border-bottom: 3px solid #fff;
+            position: absolute;
+            top: 0;
+        }
+
+        .tooth:nth-child(1) {
+            left: 1px;
+        }
+
+        .tooth:nth-child(2) {
+            right: 1px;
+        }
+
+        /* Antenas onduladas */
+        .antenna {
+            width: 3px;
+            height: 16px;
+            background: linear-gradient(180deg, #8b0000 0%, #4a0000 100%);
+            position: absolute;
+            border-radius: 50% 50% 0 0;
+            z-index: 10;
+            border: 1px solid #2d0000;
+            transform-origin: bottom;
+        }
+
+        .antenna.left {
+            left: 50%;
+            margin-left: -8px;
+            top: 5px;
+            animation: antennaWaveLeft 2s ease-in-out infinite;
+        }
+
+        .antenna.right {
+            left: 50%;
+            margin-left: 5px;
+            top: 5px;
+            animation: antennaWaveRight 2s ease-in-out infinite;
+        }
+
+        @keyframes antennaWaveLeft {
+            0%, 100% { transform: rotate(-50deg); }
+            50% { transform: rotate(-65deg); }
+        }
+
+        @keyframes antennaWaveRight {
+            0%, 100% { transform: rotate(50deg); }
+            50% { transform: rotate(65deg); }
+        }
+
+        /* Ponta da antena (bola) */
+        .antenna-tip {
+            width: 5px;
+            height: 5px;
+            background: radial-gradient(circle, #ff6600 0%, #8b0000 100%);
+            border-radius: 50%;
+            position: absolute;
+            top: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 1px solid #000;
+            box-shadow: 0 0 6px rgba(255, 100, 0, 0.8);
+        }
+
+        /* ASA SUPERIOR ESQUERDA */
+        .wing.upper-left {
+            width: 38px;
+            height: 42px;
+            background:
+                radial-gradient(ellipse at 30% 40%, rgba(255, 100, 0, 0.9) 0%, transparent 60%),
+                radial-gradient(ellipse at 60% 70%, rgba(255, 150, 0, 0.7) 0%, transparent 50%),
+                linear-gradient(135deg, rgba(139, 0, 0, 0.95) 0%, rgba(74, 0, 0, 0.9) 100%);
+            border-radius: 60% 40% 45% 55%;
+            position: absolute;
+            left: 50%;
+            margin-left: -42px;
+            top: 24px;
+            border: 3px solid rgba(139, 0, 0, 0.9);
+            transform-origin: right center;
+            z-index: 8;
+            box-shadow:
+                0 4px 15px rgba(255, 50, 0, 0.5),
+                inset 2px 2px 8px rgba(255, 100, 0, 0.3);
+            animation: wingFlapUpperLeft 1.2s ease-in-out infinite;
+        }
+
+        @keyframes wingFlapUpperLeft {
+            0%, 100% { transform: rotate(-15deg) scaleX(1); }
+            50% { transform: rotate(-25deg) scaleX(0.95); }
+        }
+
+        /* ASA SUPERIOR DIREITA */
+        .wing.upper-right {
+            width: 38px;
+            height: 42px;
+            background:
+                radial-gradient(ellipse at 70% 40%, rgba(255, 100, 0, 0.9) 0%, transparent 60%),
+                radial-gradient(ellipse at 40% 70%, rgba(255, 150, 0, 0.7) 0%, transparent 50%),
+                linear-gradient(45deg, rgba(139, 0, 0, 0.95) 0%, rgba(74, 0, 0, 0.9) 100%);
+            border-radius: 40% 60% 55% 45%;
+            position: absolute;
+            left: 50%;
+            margin-left: 4px;
+            top: 24px;
+            border: 3px solid rgba(139, 0, 0, 0.9);
+            transform-origin: left center;
+            z-index: 8;
+            box-shadow:
+                0 4px 15px rgba(255, 50, 0, 0.5),
+                inset -2px 2px 8px rgba(255, 100, 0, 0.3);
+            animation: wingFlapUpperRight 1.2s ease-in-out infinite;
+        }
+
+        @keyframes wingFlapUpperRight {
+            0%, 100% { transform: rotate(15deg) scaleX(1); }
+            50% { transform: rotate(25deg) scaleX(0.95); }
+        }
+
+        /* ASA INFERIOR ESQUERDA */
+        .wing.lower-left {
+            width: 30px;
+            height: 34px;
+            background:
+                radial-gradient(ellipse at 40% 30%, rgba(255, 150, 0, 0.8) 0%, transparent 50%),
+                linear-gradient(135deg, rgba(139, 0, 0, 0.9) 0%, rgba(74, 0, 0, 0.85) 100%);
+            border-radius: 50% 45% 60% 40%;
+            position: absolute;
+            left: 50%;
+            margin-left: -34px;
+            top: 50px;
+            border: 3px solid rgba(139, 0, 0, 0.8);
+            transform-origin: right top;
+            z-index: 7;
+            box-shadow:
+                0 4px 12px rgba(255, 50, 0, 0.4),
+                inset 2px 2px 6px rgba(255, 100, 0, 0.2);
+            animation: wingFlapLowerLeft 1.2s ease-in-out infinite;
+        }
+
+        @keyframes wingFlapLowerLeft {
+            0%, 100% { transform: rotate(-5deg) scaleX(1); }
+            50% { transform: rotate(-12deg) scaleX(0.98); }
+        }
+
+        /* ASA INFERIOR DIREITA */
+        .wing.lower-right {
+            width: 30px;
+            height: 34px;
+            background:
+                radial-gradient(ellipse at 60% 30%, rgba(255, 150, 0, 0.8) 0%, transparent 50%),
+                linear-gradient(45deg, rgba(139, 0, 0, 0.9) 0%, rgba(74, 0, 0, 0.85) 100%);
+            border-radius: 45% 50% 40% 60%;
+            position: absolute;
+            left: 50%;
+            margin-left: 4px;
+            top: 50px;
+            border: 3px solid rgba(139, 0, 0, 0.8);
+            transform-origin: left top;
+            z-index: 7;
+            box-shadow:
+                0 4px 12px rgba(255, 50, 0, 0.4),
+                inset -2px 2px 6px rgba(255, 100, 0, 0.2);
+            animation: wingFlapLowerRight 1.2s ease-in-out infinite;
+        }
+
+        @keyframes wingFlapLowerRight {
+            0%, 100% { transform: rotate(5deg) scaleX(1); }
+            50% { transform: rotate(12deg) scaleX(0.98); }
+        }
+
+        /* Padrões nas asas (manchas de fogo) */
+        .wing-pattern {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 200, 0, 0.6) 0%, transparent 70%);
+        }
+
+        .upper-left .wing-pattern:nth-child(1) {
+            width: 12px;
+            height: 12px;
+            top: 15%;
+            left: 25%;
+        }
+
+        .upper-left .wing-pattern:nth-child(2) {
+            width: 8px;
+            height: 8px;
+            top: 50%;
+            left: 50%;
+        }
+
+        .upper-right .wing-pattern:nth-child(1) {
+            width: 12px;
+            height: 12px;
+            top: 15%;
+            right: 25%;
+        }
+
+        .upper-right .wing-pattern:nth-child(2) {
+            width: 8px;
+            height: 8px;
+            top: 50%;
+            right: 50%;
+        }
+
+        .lower-left .wing-pattern {
+            width: 10px;
+            height: 10px;
+            top: 30%;
+            left: 35%;
+        }
+
+        .lower-right .wing-pattern {
+            width: 10px;
+            height: 10px;
+            top: 30%;
+            right: 35%;
+        }
+
+        /* Aura de fogo maldita */
+        @keyframes cursedAura {
+            0%, 100% {
+                filter: drop-shadow(0 0 8px rgba(255, 100, 0, 0.5));
+            }
+            50% {
+                filter: drop-shadow(0 0 18px rgba(255, 50, 0, 0.8));
+            }
+        }
+
+        .butterfly {
+            animation: cursedAura 2s ease-in-out infinite;
+        }
+
+        /* Chamas flutuantes */
+        .flame {
+            position: absolute;
+            width: 6px;
+            height: 8px;
+            background: linear-gradient(180deg, #ffff00 0%, #ff6600 50%, #ff0000 100%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            animation: floatFlame 3s ease-in-out infinite;
+            z-index: 6;
+            box-shadow: 0 0 10px rgba(255, 150, 0, 0.8);
+        }
+
+        .flame:nth-child(1) {
+            left: 15%;
+            top: 20%;
+            animation-delay: 0s;
+        }
+
+        .flame:nth-child(2) {
+            right: 18%;
+            top: 35%;
+            animation-delay: 1s;
+        }
+
+        .flame:nth-child(3) {
+            left: 20%;
+            top: 65%;
+            animation-delay: 2s;
+        }
+
+        .flame:nth-child(4) {
+            right: 15%;
+            top: 70%;
+            animation-delay: 1.5s;
+        }
+
+        @keyframes floatFlame {
+            0%, 100% {
+                transform: translateY(0px) scale(1);
+                opacity: 0.6;
+            }
+            50% {
+                transform: translateY(-20px) scale(1.3);
+                opacity: 1;
+            }
+        }
+
+        /* Ondas de calor */
+        .heat-wave {
+            position: absolute;
+            width: 80px;
+            height: 40px;
+            border: 2px solid rgba(255, 100, 0, 0.3);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: expandHeat 3s ease-out infinite;
+            z-index: 5;
+        }
+
+        .heat-wave:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .heat-wave:nth-child(2) {
+            animation-delay: 1s;
+        }
+
+        .heat-wave:nth-child(3) {
+            animation-delay: 2s;
+        }
+
+        @keyframes expandHeat {
+            0% {
+                width: 80px;
+                height: 40px;
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.5;
+            }
+            100% {
+                width: 160px;
+                height: 80px;
+                opacity: 0;
+            }
+        }
+
+        /* Partículas de cinza */
+        .ash {
+            width: 2px;
+            height: 2px;
+            background: rgba(100, 100, 100, 0.6);
+            border-radius: 50%;
+            position: absolute;
+            animation: floatAsh 4s linear infinite;
+            z-index: 6;
+        }
+
+        .ash:nth-child(1) {
+            left: 25%;
+            top: 80%;
+            animation-delay: 0s;
+        }
+
+        .ash:nth-child(2) {
+            right: 30%;
+            top: 75%;
+            animation-delay: 1.5s;
+        }
+
+        .ash:nth-child(3) {
+            left: 35%;
+            top: 70%;
+            animation-delay: 3s;
+        }
+
+        @keyframes floatAsh {
+            0% {
+                transform: translateY(0px) translateX(0px);
+                opacity: 0.4;
+            }
+            100% {
+                transform: translateY(-80px) translateX(10px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="butterfly-container">
+        <!-- Ondas de calor -->
+        <div class="heat-wave"></div>
+        <div class="heat-wave"></div>
+        <div class="heat-wave"></div>
+
+        <!-- Chamas flutuantes -->
+        <div class="flame"></div>
+        <div class="flame"></div>
+        <div class="flame"></div>
+        <div class="flame"></div>
+
+        <!-- Partículas de cinza -->
+        <div class="ash"></div>
+        <div class="ash"></div>
+        <div class="ash"></div>
+
+        <div class="butterfly">
+            <!-- Asas -->
+            <div class="wing upper-left">
+                <div class="wing-pattern"></div>
+                <div class="wing-pattern"></div>
+            </div>
+            <div class="wing upper-right">
+                <div class="wing-pattern"></div>
+                <div class="wing-pattern"></div>
+            </div>
+            <div class="wing lower-left">
+                <div class="wing-pattern"></div>
+            </div>
+            <div class="wing lower-right">
+                <div class="wing-pattern"></div>
+            </div>
+
+            <!-- Corpo -->
+            <div class="body">
+                <div class="body-segment"></div>
+                <div class="body-segment"></div>
+                <div class="body-segment"></div>
+                <div class="body-segment"></div>
+            </div>
+
+            <!-- Antenas -->
+            <div class="antenna left">
+                <div class="antenna-tip"></div>
+            </div>
+            <div class="antenna right">
+                <div class="antenna-tip"></div>
+            </div>
+
+            <!-- Cabeça -->
+            <div class="head"></div>
+
+            <!-- Boca -->
+            <div class="mouth">
+                <div class="tooth"></div>
+                <div class="tooth"></div>
+            </div>
+
+            <!-- Olhos -->
+            <div class="eye left">
+                <div class="pupil"></div>
+                <div class="eye-shine"></div>
+            </div>
+            <div class="eye right">
+                <div class="pupil"></div>
+                <div class="eye-shine"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vespa Ameaçadora - Antagonista</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #f0f0f0;
+        }
+
+        .wasp-container {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            animation: levitate 1.2s ease-in-out infinite;
+        }
+
+        @keyframes levitate {
+            0%, 100% { transform: translateY(0px) rotate(-8deg); }
+            50% { transform: translateY(-10px) rotate(-8deg); }
+        }
+
+        .wasp {
+            width: 100px;
+            height: 100px;
+            position: relative;
+        }
+
+        /* Cabeça */
+        .head {
+            width: 22px;
+            height: 20px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);
+            border-radius: 50%;
+            position: absolute;
+            left: 39px;
+            top: 12px;
+            border: 2px solid #000;
+            z-index: 5;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.1);
+        }
+
+        /* Olhos compostos grandes e ameaçadores */
+        .eye {
+            width: 10px;
+            height: 12px;
+            background: radial-gradient(circle, #ffaa00 30%, #ff4400 100%);
+            border-radius: 50%;
+            position: absolute;
+            top: 4px;
+            animation: blink 3s infinite;
+            z-index: 6;
+            border: 2px solid #000;
+            box-shadow: 0 0 8px rgba(255, 68, 0, 0.8);
+        }
+
+        .eye.left { left: 34px; }
+        .eye.right { right: 34px; }
+
+        @keyframes blink {
+            0%, 48%, 52%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(0.85);
+                opacity: 0.7;
+            }
+        }
+
+        /* Pupila preta */
+        .pupil {
+            width: 4px;
+            height: 4px;
+            background: #000;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 7;
+        }
+
+        /* Reflexo nos olhos */
+        .eye-shine {
+            width: 2px;
+            height: 2px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            z-index: 8;
+        }
+
+        /* Antenas retas e agressivas */
+        .antenna {
+            width: 3px;
+            height: 14px;
+            background: linear-gradient(180deg, #1a1a1a 0%, #000 100%);
+            position: absolute;
+            border-radius: 50% 50% 0 0;
+            z-index: 7;
+            border: 1px solid #000;
+        }
+
+        .antenna.left {
+            left: 36px;
+            top: 8px;
+            transform: rotate(-50deg);
+            transform-origin: bottom;
+        }
+
+        .antenna.right {
+            right: 36px;
+            top: 8px;
+            transform: rotate(50deg);
+            transform-origin: bottom;
+        }
+
+        /* Mandíbulas proeminentes */
+        .mandible {
+            width: 6px;
+            height: 8px;
+            background: #1a1a1a;
+            position: absolute;
+            top: 24px;
+            border: 2px solid #000;
+            z-index: 6;
+            box-shadow: inset 0 1px 2px rgba(255,100,0,0.3);
+        }
+
+        .mandible.left {
+            left: 37px;
+            border-radius: 50% 20% 0 50%;
+            transform: rotate(-25deg);
+        }
+
+        .mandible.right {
+            right: 37px;
+            border-radius: 20% 50% 50% 0;
+            transform: rotate(25deg);
+        }
+
+        /* Tórax robusto */
+        .thorax {
+            width: 26px;
+            height: 28px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);
+            border-radius: 45% 45% 50% 50%;
+            position: absolute;
+            left: 37px;
+            top: 26px;
+            border: 3px solid #000;
+            z-index: 4;
+            box-shadow: inset 0 3px 6px rgba(255,255,255,0.1);
+        }
+
+        /* Listras amarelas do tórax */
+        .thorax-stripe {
+            width: 90%;
+            height: 4px;
+            background: linear-gradient(90deg, #ff9900 0%, #ffaa00 100%);
+            position: absolute;
+            left: 5%;
+            border-radius: 50%;
+            box-shadow: 0 0 4px rgba(255, 153, 0, 0.6);
+        }
+
+        .thorax-stripe:nth-child(1) { top: 8px; }
+        .thorax-stripe:nth-child(2) { top: 16px; }
+
+        /* Abdômen alongado e pontudo */
+        .abdomen {
+            width: 20px;
+            height: 46px;
+            background: linear-gradient(180deg, #1a1a1a 0%, #000 100%);
+            border-radius: 40% 40% 65% 65%;
+            position: absolute;
+            left: 40px;
+            top: 44px;
+            border: 3px solid #000;
+            z-index: 3;
+            transform: rotate(12deg);
+            box-shadow: inset 2px 2px 6px rgba(255,255,255,0.1);
+        }
+
+        /* Listras amarelas do abdômen (irregulares e agressivas) */
+        .abdomen-stripe {
+            width: 100%;
+            background: linear-gradient(90deg, #ff9900 0%, #ffaa00 100%);
+            position: absolute;
+            left: 0;
+            box-shadow: 0 0 3px rgba(255, 153, 0, 0.5);
+        }
+
+        .abdomen-stripe:nth-child(1) {
+            top: 8px;
+            height: 5px;
+        }
+        .abdomen-stripe:nth-child(2) {
+            top: 16px;
+            height: 6px;
+        }
+        .abdomen-stripe:nth-child(3) {
+            top: 25px;
+            height: 5px;
+        }
+        .abdomen-stripe:nth-child(4) {
+            top: 33px;
+            height: 4px;
+            width: 90%;
+            left: 5%;
+        }
+
+        /* Ferrão longo e perigoso */
+        .stinger {
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 16px solid #ff4400;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 86px;
+            filter: drop-shadow(0 0 8px #ff6600);
+            z-index: 5;
+            animation: stingerThreat 1.5s ease-in-out infinite;
+        }
+
+        @keyframes stingerThreat {
+            0%, 100% {
+                filter: drop-shadow(0 0 8px #ff6600);
+                transform: translateX(-50%) translateY(0px);
+            }
+            50% {
+                filter: drop-shadow(0 0 12px #ff0000);
+                transform: translateX(-50%) translateY(-2px);
+            }
+        }
+
+        /* Asas rápidas e translúcidas */
+        .wing {
+            width: 36px;
+            height: 44px;
+            background: linear-gradient(135deg, rgba(255,200,100,0.3) 0%, rgba(200,200,230,0.4) 100%);
+            border-radius: 50% 50% 45% 50%;
+            position: absolute;
+            top: 30px;
+            border: 2px solid rgba(150, 150, 180, 0.8);
+            transform-origin: 50% 20%;
+            z-index: 1;
+        }
+
+        .wing.left {
+            left: 2px;
+            animation: flapLeft 0.08s ease-in-out infinite;
+        }
+
+        .wing.right {
+            right: 2px;
+            animation: flapRight 0.08s ease-in-out infinite;
+            opacity: 0.85;
+        }
+
+        @keyframes flapLeft {
+            0%, 100% { transform: rotate(0deg) scaleY(1); }
+            50% { transform: rotate(-10deg) scaleY(0.95); }
+        }
+
+        @keyframes flapRight {
+            0%, 100% { transform: rotate(0deg) scaleY(1); }
+            50% { transform: rotate(10deg) scaleY(0.95); }
+        }
+
+        /* Nervuras nas asas */
+        .wing-vein {
+            width: 1px;
+            height: 80%;
+            background: rgba(100, 100, 120, 0.4);
+            position: absolute;
+            top: 10%;
+        }
+
+        .wing-vein:nth-child(1) { left: 30%; }
+        .wing-vein:nth-child(2) { left: 50%; }
+        .wing-vein:nth-child(3) { left: 70%; }
+
+        /* Pernas longas e espinhosas */
+        .leg {
+            width: 3px;
+            background: linear-gradient(180deg, #1a1a1a 0%, #000 100%);
+            position: absolute;
+            z-index: 2;
+            border-radius: 2px;
+            border: 1px solid #000;
+        }
+
+        /* Par frontal - SIMÉTRICO */
+        .leg.front-left {
+            height: 22px;
+            left: 50%;
+            margin-left: -15px;
+            top: 36px;
+            transform: rotate(-60deg);
+            transform-origin: top;
+        }
+
+        .leg.front-right {
+            height: 22px;
+            left: 50%;
+            margin-left: 12px;
+            top: 36px;
+            transform: rotate(60deg);
+            transform-origin: top;
+        }
+
+        /* Par do meio - SIMÉTRICO */
+        .leg.middle-left {
+            height: 24px;
+            left: 50%;
+            margin-left: -14px;
+            top: 46px;
+            transform: rotate(-45deg);
+            transform-origin: top;
+        }
+
+        .leg.middle-right {
+            height: 24px;
+            left: 50%;
+            margin-left: 11px;
+            top: 46px;
+            transform: rotate(45deg);
+            transform-origin: top;
+        }
+
+        /* Par traseiro - SIMÉTRICO */
+        .leg.back-left {
+            height: 26px;
+            left: 50%;
+            margin-left: -13px;
+            top: 56px;
+            transform: rotate(-30deg);
+            transform-origin: top;
+        }
+
+        .leg.back-right {
+            height: 26px;
+            left: 50%;
+            margin-left: 10px;
+            top: 56px;
+            transform: rotate(30deg);
+            transform-origin: top;
+        }
+
+        /* Espinhos nas pernas */
+        .leg-spike {
+            width: 3px;
+            height: 1px;
+            background: #1a1a1a;
+            position: absolute;
+            left: -1px;
+        }
+
+        .leg-spike:nth-child(1) { top: 30%; }
+        .leg-spike:nth-child(2) { top: 60%; }
+
+        /* Brilho agressivo */
+        @keyframes aggressiveGlow {
+            0%, 100% { filter: drop-shadow(0 0 3px rgba(255, 68, 0, 0.4)); }
+            50% { filter: drop-shadow(0 0 8px rgba(255, 68, 0, 0.7)); }
+        }
+
+        .wasp {
+            animation: aggressiveGlow 2s ease-in-out infinite;
+        }
+
+        /* Vibração ameaçadora */
+        @keyframes vibrate {
+            0%, 100% { transform: translateX(0px); }
+            25% { transform: translateX(-1px); }
+            75% { transform: translateX(1px); }
+        }
+
+        .abdomen {
+            animation: vibrate 0.15s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="wasp-container">
+        <div class="wasp">
+            <!-- Asas -->
+            <div class="wing left">
+                <div class="wing-vein"></div>
+                <div class="wing-vein"></div>
+                <div class="wing-vein"></div>
+            </div>
+            <div class="wing right">
+                <div class="wing-vein"></div>
+                <div class="wing-vein"></div>
+                <div class="wing-vein"></div>
+            </div>
+
+            <!-- Pernas com espinhos -->
+            <div class="leg front-left">
+                <div class="leg-spike"></div>
+                <div class="leg-spike"></div>
+            </div>
+            <div class="leg front-right">
+                <div class="leg-spike"></div>
+                <div class="leg-spike"></div>
+            </div>
+            <div class="leg middle-left">
+                <div class="leg-spike"></div>
+                <div class="leg-spike"></div>
+            </div>
+            <div class="leg middle-right">
+                <div class="leg-spike"></div>
+                <div class="leg-spike"></div>
+            </div>
+            <div class="leg back-left">
+                <div class="leg-spike"></div>
+                <div class="leg-spike"></div>
+            </div>
+            <div class="leg back-right">
+                <div class="leg-spike"></div>
+                <div class="leg-spike"></div>
+            </div>
+
+            <!-- Abdômen -->
+            <div class="abdomen">
+                <div class="abdomen-stripe"></div>
+                <div class="abdomen-stripe"></div>
+                <div class="abdomen-stripe"></div>
+                <div class="abdomen-stripe"></div>
+            </div>
+
+            <!-- Ferrão -->
+            <div class="stinger"></div>
+
+            <!-- Tórax -->
+            <div class="thorax">
+                <div class="thorax-stripe"></div>
+                <div class="thorax-stripe"></div>
+            </div>
+
+            <!-- Antenas -->
+            <div class="antenna left"></div>
+            <div class="antenna right"></div>
+
+            <!-- Mandíbulas -->
+            <div class="mandible left"></div>
+            <div class="mandible right"></div>
+
+            <!-- Cabeça -->
+            <div class="head"></div>
+
+            <!-- Olhos -->
+            <div class="eye left">
+                <div class="pupil"></div>
+                <div class="eye-shine"></div>
+            </div>
+            <div class="eye right">
+                <div class="pupil"></div>
+                <div class="eye-shine"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -61,25 +61,28 @@ const ESCALADA = {
 
         console.log('🎨 Injetando backgrounds REAIS com assets (cenário:', this.cenario + ')');
 
+        // ✅ CDN Base URL (GitHub Pages) - URLs absolutas funcionam em qualquer domínio
+        const CDN_BASE = 'https://brunoferrarisouza.github.io/ialume-factory/1.0.0';
+
         // Definir assets por cenário (imagens reais do OpenGameArt)
         const cenarios = {
             'montanha-nevada': {
-                layer1: '../assets/backgrounds/escalada/layer-1-sky.png',          // Céu
-                layer2: '../assets/backgrounds/escalada/layer-2-mountains-far.png', // Montanhas distantes
-                cliffWall: '../assets/tiles/snow/slice16_16.png',                  // Parede de gelo vertical (NOVA!)
-                layer3: '../assets/backgrounds/escalada/layer-3-mountains-mid.png'  // Montanhas próximas
+                layer1: `${CDN_BASE}/assets/backgrounds/escalada/layer-1-sky.png`,          // Céu
+                layer2: `${CDN_BASE}/assets/backgrounds/escalada/layer-2-mountains-far.png`, // Montanhas distantes
+                cliffWall: `${CDN_BASE}/assets/tiles/snow/slice16_16.png`,                  // Parede de gelo vertical (NOVA!)
+                layer3: `${CDN_BASE}/assets/backgrounds/escalada/layer-3-mountains-mid.png`  // Montanhas próximas
             },
             'deserto-canyon': {
-                layer1: '../assets/backgrounds/escalada/desert-layer-1.png',  // Céu azul com nuvens
-                layer2: '../assets/backgrounds/escalada/desert-layer-3.png',  // Dunas distantes
-                cliffWall: '../assets/tiles/castle/slice16_16.png',          // Parede de pedra vertical (NOVA!)
-                layer3: '../assets/backgrounds/escalada/desert-layer-5.png'   // Cactos próximos
+                layer1: `${CDN_BASE}/assets/backgrounds/escalada/desert-layer-1.png`,  // Céu azul com nuvens
+                layer2: `${CDN_BASE}/assets/backgrounds/escalada/desert-layer-3.png`,  // Dunas distantes
+                cliffWall: `${CDN_BASE}/assets/tiles/castle/slice16_16.png`,          // Parede de pedra vertical (NOVA!)
+                layer3: `${CDN_BASE}/assets/backgrounds/escalada/desert-layer-5.png`   // Cactos próximos
             },
             'cidade-floresta': {
-                layer1: '../assets/backgrounds/escalada/bg03-layer-1.png',  // Céu com nuvens
-                layer2: '../assets/backgrounds/escalada/bg03-layer-2.png',  // Cidade/floresta distante
-                cliffWall: '../assets/tiles/castle/slice17_17.png',         // Parede de pedra escura (NOVA!)
-                layer3: '../assets/backgrounds/escalada/bg03-layer-3.png'   // Cidade/floresta próxima
+                layer1: `${CDN_BASE}/assets/backgrounds/escalada/bg03-layer-1.png`,  // Céu com nuvens
+                layer2: `${CDN_BASE}/assets/backgrounds/escalada/bg03-layer-2.png`,  // Cidade/floresta distante
+                cliffWall: `${CDN_BASE}/assets/tiles/castle/slice17_17.png`,         // Parede de pedra escura (NOVA!)
+                layer3: `${CDN_BASE}/assets/backgrounds/escalada/bg03-layer-3.png`   // Cidade/floresta próxima
             },
             'vulcao': {
                 // Fallback para gradientes caso assets não existam

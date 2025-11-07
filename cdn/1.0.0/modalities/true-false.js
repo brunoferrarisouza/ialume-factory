@@ -144,7 +144,7 @@ const TRUE_FALSE = {
             
             /* Afirmação */
             .tf-statement {
-                background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
+                background: white;
                 border: 3px solid #667eea;
                 border-radius: 20px;
                 padding: 40px;

@@ -283,27 +283,27 @@ const TRUE_FALSE = {
             /* Responsivo */
             @media (max-width: 768px) {
                 .true-false-container {
-                    padding: 15px;
+                    padding: 8px;
                 }
-                
+
                 .tf-statement {
-                    padding: 25px;
+                    padding: 8px;
                 }
-                
+
                 .statement-icon {
                     font-size: 3rem;
                 }
-                
+
                 .statement-text {
                     font-size: 1.2rem;
                 }
-                
+
                 .tf-buttons {
                     gap: 20px;
                 }
-                
+
                 .tf-button {
-                    padding: 30px 20px;
+                    padding: 8px;
                 }
                 
                 .tf-icon {

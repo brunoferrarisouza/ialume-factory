@@ -124,7 +124,7 @@ const FILL_BLANKS = {
 
             /* Mobile: input menor e responsivo */
             @media (max-width: 768px) {
-                .fb-sentence { font-size: 1.4rem; padding: 20px; }
+                .fb-sentence { font-size: 1.4rem; padding: 8px; }
                 .fb-input { min-width: 120px; max-width: 80%; font-size: 1.4rem; padding: 8px 15px; }
             }
         `;

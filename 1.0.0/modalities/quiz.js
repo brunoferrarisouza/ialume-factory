@@ -277,23 +277,23 @@ const QUIZ = {
             /* Responsivo */
             @media (max-width: 768px) {
                 .quiz-container {
-                    padding: 15px;
+                    padding: 8px;
                 }
-                
+
                 .quiz-question {
-                    padding: 20px;
+                    padding: 8px;
                 }
-                
+
                 .question-icon {
                     font-size: 2.5rem;
                 }
-                
+
                 .question-text {
                     font-size: 1.1rem;
                 }
-                
+
                 .quiz-option {
-                    padding: 15px 20px;
+                    padding: 8px;
                 }
                 
                 .option-letter {

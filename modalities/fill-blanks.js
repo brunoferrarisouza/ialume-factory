@@ -105,7 +105,7 @@ const FILL_BLANKS = {
         style.id = 'fill-blanks-styles';
         style.textContent = `
             .fill-blanks-container { max-width: 700px; margin: 0 auto; padding: 20px; }
-            .fb-header { background: white; border: 3px solid #667eea; border-radius: 20px; padding: 20px; margin-bottom: 15px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+            .fb-header { background: #f8f9ff; border: 3px solid #a8b3d6; border-radius: 20px; padding: 20px; margin-bottom: 15px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
             .fb-icon { font-size: 3.5rem; margin-bottom: 10px; }
             .fb-title { font-size: 1.3rem; font-weight: 600; color: #495057; }
             .fb-sentence { background: white; border: 3px solid #667eea; border-radius: 20px; padding: 20px; margin-bottom: 15px; font-size: 1.8rem; font-weight: 600; color: #212529; line-height: 1.4; text-align: center; box-sizing: border-box; overflow-wrap: break-word; word-break: break-word; }

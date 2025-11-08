@@ -200,7 +200,7 @@ const SEQUENCE = {
         style.id = 'sequence-styles';
         style.textContent = `
             .sequence-container { max-width: 700px; margin: 0 auto; padding: 20px; }
-            .seq-header { background: white; border: 3px solid #667eea; border-radius: 20px; padding: 30px; margin-bottom: 30px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+            .seq-header { background: #f8f9ff; border: 3px solid #a8b3d6; border-radius: 20px; padding: 20px; margin-bottom: 15px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
             .seq-icon { font-size: 3.5rem; margin-bottom: 10px; }
             .seq-title { font-size: 1.3rem; font-weight: 600; color: #495057; }
             .seq-instruction { background: white; border: 3px solid #667eea; border-radius: 15px; padding: 20px; margin-bottom: 30px; font-size: 1.1rem; color: #495057; font-weight: 500; text-align: center; }

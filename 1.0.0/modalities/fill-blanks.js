@@ -104,11 +104,18 @@ const FILL_BLANKS = {
         const style = document.createElement('style');
         style.id = 'fill-blanks-styles';
         style.textContent = `
-            .fill-blanks-container { max-width: 700px; margin: 0 auto; padding: 8px; }
-            .fb-header { background: #f8f9ff; border: 3px solid #a8b3d6; border-radius: 20px; padding: 8px; margin-bottom: 15px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+            .fill-blanks-container {
+                max-width: 700px;
+                margin: 0 auto;
+                padding: 16px;
+                background: rgba(255, 255, 255, 0.5);
+                backdrop-filter: blur(10px);
+                border-radius: 0;
+            }
+            .fb-header { background: #f8f9ff; border: 3px solid #a8b3d6; border-radius: 20px; padding: 8px; margin-bottom: 15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
             .fb-icon { font-size: 3.5rem; margin-bottom: 10px; }
             .fb-title { font-size: 1.3rem; font-weight: 600; color: #495057; }
-            .fb-sentence { background: white; border: 3px solid #667eea; border-radius: 20px; padding: 8px; margin-bottom: 15px; font-size: 1.8rem; font-weight: 600; color: #212529; text-align: center; box-sizing: border-box; overflow-wrap: break-word; word-break: break-word; }
+            .fb-sentence { background: white; border: 3px solid #667eea; border-radius: 20px; padding: 8px; margin-bottom: 15px; font-size: 1.8rem; font-weight: 600; color: #212529; text-align: center; box-sizing: border-box; overflow-wrap: break-word; word-break: break-word; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
             .fb-input { display: inline-block; min-width: 150px; max-width: 90%; padding: 10px 20px; font-size: 1.8rem; font-weight: 700; text-align: center; border: 3px solid #667eea; border-radius: 10px; background: white; color: #212529; outline: none; }
             .fb-input:focus { border-color: #5a67d8; box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2); transform: scale(1.05); }
             .fb-input.correct { background: linear-gradient(135deg, #51cf66, #38d9a9); border-color: #37b24d; color: white; }

@@ -139,7 +139,10 @@ const TRUE_FALSE = {
             .true-false-container {
                 max-width: 700px;
                 margin: 0 auto;
-                padding: 8px;
+                padding: 16px;
+                background: rgba(255, 255, 255, 0.5);
+                backdrop-filter: blur(10px);
+                border-radius: 0;
             }
             
             /* Afirmação */
@@ -150,7 +153,7 @@ const TRUE_FALSE = {
                 padding: 8px;
                 margin-bottom: 15px;
                 text-align: center;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             }
             
             .statement-icon {
@@ -184,7 +187,7 @@ const TRUE_FALSE = {
                 border-radius: 20px;
                 cursor: pointer;
                 transition: all 0.3s ease;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
                 display: flex;
                 flex-direction: column;
                 align-items: center;
@@ -283,7 +286,7 @@ const TRUE_FALSE = {
             /* Responsivo */
             @media (max-width: 768px) {
                 .true-false-container {
-                    padding: 8px;
+                    padding: 16px;
                 }
 
                 .tf-statement {

@@ -75,8 +75,8 @@ body {
 .phase {
     position: absolute;
     top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.8);
+    left: 0;
+    transform: translateY(-50%) scale(0.8);
 
     background: rgba(255, 255, 255, 0.5);
     border-radius: 0;
@@ -98,7 +98,7 @@ body {
 .phase.active {
     opacity: 1;
     visibility: visible;
-    transform: translate(-50%, -50%) scale(1);
+    transform: translateY(-50%) scale(1);
 }
 
 /* Scrollbar customizada para popup */

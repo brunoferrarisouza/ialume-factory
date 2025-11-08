@@ -140,7 +140,7 @@ const QUIZ = {
             .quiz-container {
                 max-width: 700px;
                 margin: 0 auto;
-                padding: 20px;
+                padding: 8px;
             }
             
             /* Pergunta */
@@ -169,7 +169,6 @@ const QUIZ = {
                 font-size: 1.4rem;
                 font-weight: 600;
                 color: #212529;
-                line-height: 1.4;
             }
 
             /* Alternativas */

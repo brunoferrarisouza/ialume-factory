@@ -139,7 +139,7 @@ const TRUE_FALSE = {
             .true-false-container {
                 max-width: 700px;
                 margin: 0 auto;
-                padding: 20px;
+                padding: 8px;
             }
             
             /* Afirmação */
@@ -168,7 +168,6 @@ const TRUE_FALSE = {
                 font-size: 1.6rem;
                 font-weight: 600;
                 color: #212529;
-                line-height: 1.8;
             }
             
             /* Botões */

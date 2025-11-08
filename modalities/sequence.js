@@ -199,7 +199,7 @@ const SEQUENCE = {
         const style = document.createElement('style');
         style.id = 'sequence-styles';
         style.textContent = `
-            .sequence-container { max-width: 700px; margin: 0 auto; padding: 20px; }
+            .sequence-container { max-width: 700px; margin: 0 auto; padding: 8px; }
             .seq-header { background: #f8f9ff; border: 3px solid #a8b3d6; border-radius: 20px; padding: 20px; margin-bottom: 15px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
             .seq-icon { font-size: 3.5rem; margin-bottom: 10px; }
             .seq-title { font-size: 1.3rem; font-weight: 600; color: #495057; }

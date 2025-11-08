@@ -148,40 +148,40 @@ const QUIZ = {
                 background: white;
                 border: 3px solid #667eea;
                 border-radius: 20px;
-                padding: 30px;
-                margin-bottom: 30px;
+                padding: 20px;
+                margin-bottom: 15px;
                 text-align: center;
                 box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             }
-            
+
             .question-icon {
                 font-size: 3rem;
-                margin-bottom: 15px;
+                margin-bottom: 10px;
                 animation: bounce 2s ease-in-out infinite;
             }
-            
+
             @keyframes bounce {
                 0%, 100% { transform: translateY(0); }
                 50% { transform: translateY(-10px); }
             }
-            
+
             .question-text {
                 font-size: 1.4rem;
                 font-weight: 600;
                 color: #212529;
-                line-height: 1.6;
+                line-height: 1.4;
             }
-            
+
             /* Alternativas */
             .quiz-options {
                 display: grid;
                 gap: 15px;
             }
-            
+
             .quiz-option {
                 display: flex;
                 align-items: center;
-                padding: 20px 25px;
+                padding: 12px 20px;
                 background: white;
                 border: 3px solid #dee2e6;
                 border-radius: 15px;

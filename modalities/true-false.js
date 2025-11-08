@@ -147,8 +147,8 @@ const TRUE_FALSE = {
                 background: white;
                 border: 3px solid #667eea;
                 border-radius: 20px;
-                padding: 40px;
-                margin-bottom: 40px;
+                padding: 8px;
+                margin-bottom: 15px;
                 text-align: center;
                 box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             }
@@ -178,7 +178,7 @@ const TRUE_FALSE = {
             }
             
             .tf-button {
-                padding: 40px 30px;
+                padding: 8px;
                 background: white;
                 border: 4px solid #dee2e6;
                 border-radius: 20px;

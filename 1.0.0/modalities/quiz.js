@@ -148,7 +148,7 @@ const QUIZ = {
                 background: white;
                 border: 3px solid #667eea;
                 border-radius: 20px;
-                padding: 20px;
+                padding: 8px;
                 margin-bottom: 15px;
                 text-align: center;
                 box-shadow: 0 4px 15px rgba(0,0,0,0.1);
@@ -180,7 +180,7 @@ const QUIZ = {
             .quiz-option {
                 display: flex;
                 align-items: center;
-                padding: 12px 20px;
+                padding: 8px;
                 background: white;
                 border: 3px solid #dee2e6;
                 border-radius: 15px;

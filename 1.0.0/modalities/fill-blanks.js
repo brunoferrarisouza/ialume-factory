@@ -108,9 +108,6 @@ const FILL_BLANKS = {
                 max-width: 700px;
                 margin: 0 auto;
                 padding: 16px;
-                background: rgba(255, 255, 255, 0.5);
-                backdrop-filter: blur(10px);
-                border-radius: 0;
             }
             .fb-header { background: #f8f9ff; border: 3px solid #a8b3d6; border-radius: 20px; padding: 8px; margin-bottom: 15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
             .fb-icon { font-size: 3.5rem; margin-bottom: 10px; }

@@ -199,11 +199,15 @@ const SEQUENCE = {
         const style = document.createElement('style');
         style.id = 'sequence-styles';
         style.textContent = `
-            .sequence-container { max-width: 700px; margin: 0 auto; padding: 8px; }
-            .seq-header { background: #f8f9ff; border: 3px solid #a8b3d6; border-radius: 20px; padding: 8px; margin-bottom: 15px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+            .sequence-container {
+                max-width: 700px;
+                margin: 0 auto;
+                padding: 16px;
+            }
+            .seq-header { background: #f8f9ff; border: 3px solid #a8b3d6; border-radius: 20px; padding: 8px; margin-bottom: 15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
             .seq-icon { font-size: 3.5rem; margin-bottom: 10px; }
             .seq-title { font-size: 1.3rem; font-weight: 600; color: #495057; }
-            .seq-instruction { background: white; border: 3px solid #667eea; border-radius: 15px; padding: 8px; margin-bottom: 15px; font-size: 1.1rem; color: #495057; font-weight: 500; text-align: center; }
+            .seq-instruction { background: white; border: 3px solid #667eea; border-radius: 15px; padding: 8px; margin-bottom: 15px; font-size: 1.1rem; color: #495057; font-weight: 500; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
             .seq-list { display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; }
             
             .seq-item {
@@ -214,7 +218,7 @@ const SEQUENCE = {
                 display: flex;
                 align-items: center;
                 gap: 15px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
                 cursor: grab;
                 transition: all 0.2s ease;
                 user-select: none;

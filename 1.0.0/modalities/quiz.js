@@ -141,9 +141,6 @@ const QUIZ = {
                 max-width: 700px;
                 margin: 0 auto;
                 padding: 16px;
-                background: rgba(255, 255, 255, 0.5);
-                backdrop-filter: blur(10px);
-                border-radius: 0;
             }
             
             /* Pergunta */

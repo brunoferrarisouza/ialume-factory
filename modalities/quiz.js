@@ -140,7 +140,7 @@ const QUIZ = {
             .quiz-container {
                 max-width: 700px;
                 margin: 0 auto;
-                padding: 8px;
+                padding: 16px;
             }
             
             /* Pergunta */
@@ -151,7 +151,7 @@ const QUIZ = {
                 padding: 8px;
                 margin-bottom: 15px;
                 text-align: center;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             }
 
             .question-icon {
@@ -187,7 +187,7 @@ const QUIZ = {
                 cursor: pointer;
                 transition: all 0.3s ease;
                 text-align: left;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             }
             
             .quiz-option:hover:not(:disabled) {
@@ -277,21 +277,21 @@ const QUIZ = {
             /* Responsivo */
             @media (max-width: 768px) {
                 .quiz-container {
-                    padding: 15px;
+                    padding: 16px;
                 }
-                
+
                 .quiz-question {
                     padding: 20px;
                 }
-                
+
                 .question-icon {
                     font-size: 2.5rem;
                 }
-                
+
                 .question-text {
                     font-size: 1.1rem;
                 }
-                
+
                 .quiz-option {
                     padding: 15px 20px;
                 }

@@ -281,7 +281,7 @@ const QUIZ = {
                 }
 
                 .quiz-question {
-                    padding: 8px;
+                    padding: 20px;
                 }
 
                 .question-icon {
@@ -293,7 +293,7 @@ const QUIZ = {
                 }
 
                 .quiz-option {
-                    padding: 8px;
+                    padding: 15px 20px;
                 }
                 
                 .option-letter {

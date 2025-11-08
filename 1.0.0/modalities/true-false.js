@@ -287,7 +287,7 @@ const TRUE_FALSE = {
                 }
 
                 .tf-statement {
-                    padding: 8px;
+                    padding: 25px;
                 }
 
                 .statement-icon {
@@ -303,7 +303,7 @@ const TRUE_FALSE = {
                 }
 
                 .tf-button {
-                    padding: 8px;
+                    padding: 30px 20px;
                 }
                 
                 .tf-icon {

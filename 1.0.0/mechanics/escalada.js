@@ -298,21 +298,29 @@ const ESCALADA = {
 
         // Verificar se já existe
         if (document.getElementById('escalada-progress')) {
-            console.log('⏭️ Barra de progresso já injetada');
+            console.log('⏭️ Top bar já injetada');
             return;
         }
 
-        const progressHTML = `
-            <div id="escalada-progress" class="progress-bar">
-                <div class="progress-track">
-                    <div class="progress-fill" id="progress-fill"></div>
+        // ✅ NOVO: Criar container flexbox com barra de progresso + contador de cristais
+        const topBarHTML = `
+            <div class="top-bar-container">
+                <div id="escalada-progress" class="progress-bar">
+                    <div class="progress-track">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <span class="progress-text" id="progress-text">Fase 1/${this.totalSteps}</span>
                 </div>
-                <span class="progress-text" id="progress-text">Fase 1/${this.totalSteps}</span>
+
+                <div id="crystal-counter" class="score-display">
+                    <span class="score-display-icon">💎</span>
+                    <span id="crystal-count" class="score-display-text">0</span>
+                </div>
             </div>
         `;
 
-        container.insertAdjacentHTML('beforeend', progressHTML);
-        console.log('✅ Barra de progresso injetada');
+        container.insertAdjacentHTML('beforeend', topBarHTML);
+        console.log('✅ Top bar injetada (progresso + cristais em flexbox)');
     },
 
     updateProgressBar: function() {
@@ -459,11 +467,6 @@ const ESCALADA = {
                 <div id="lume-climber" class="lume-climber">
                     🌟
                 </div>
-            </div>
-
-            <!-- ✅ Contador de Cristais (canto superior direito) -->
-            <div id="crystal-counter" class="crystal-counter">
-                💎 x <span id="crystal-count">0</span>/${this.totalSteps}
             </div>
         `;
 
@@ -1081,33 +1084,6 @@ const ESCALADA = {
                 50% { transform: translateX(-50%) translateY(-12px); }
             }
 
-            /* ===== CONTADOR DE CRISTAIS (Canto superior direito) ===== */
-            .crystal-counter {
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                z-index: 9999; /* Acima de tudo */
-                background: rgba(0, 0, 0, 0.7);
-                color: white;
-                padding: 12px 20px;
-                border-radius: 25px;
-                font-size: 1.5rem;
-                font-weight: bold;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-                backdrop-filter: blur(5px);
-                transition: transform 0.3s ease;
-            }
-
-            /* Animação pulse ao coletar */
-            .crystal-counter.pulse {
-                animation: counterPulse 0.3s ease;
-            }
-
-            @keyframes counterPulse {
-                0%, 100% { transform: scale(1); }
-                50% { transform: scale(1.15); }
-            }
-
             /* Responsivo - Cristais e antagonistas menores em mobile */
             @media (max-width: 768px) {
                 .crystal {
@@ -1120,13 +1096,16 @@ const ESCALADA = {
                     bottom: 40px;
                     left: calc(50% + 60px);
                 }
+            }
 
-                .crystal-counter {
-                    font-size: 1.2rem;
-                    padding: 8px 16px;
-                    top: 15px;
-                    right: 15px;
-                }
+            /* ===== ANIMAÇÃO PULSE (para .score-display quando cristal é coletado) ===== */
+            .score-display.pulse {
+                animation: scorePulse 0.3s ease;
+            }
+
+            @keyframes scorePulse {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.15); }
             }
 
             /* ===== UMBRA - CORUJA ANTAGONISTA (REMOVIDA - substituída por emoji) ===== */

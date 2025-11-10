@@ -465,7 +465,67 @@ const ESCALADA = {
 
                 <!-- Lume escalador -->
                 <div id="lume-climber" class="lume-climber">
-                    🌟
+                    <div class="lume-wrapper">
+                        <div class="lume-body-container">
+                            <!-- Antenas -->
+                            <div class="lume-antenna left">
+                                <div class="lume-antenna-tip"></div>
+                            </div>
+                            <div class="lume-antenna right">
+                                <div class="lume-antenna-tip"></div>
+                            </div>
+
+                            <!-- Asas com partículas -->
+                            <div class="lume-wing left">
+                                <div class="lume-wing-particle"></div>
+                            </div>
+                            <div class="lume-wing right">
+                                <div class="lume-wing-particle"></div>
+                            </div>
+
+                            <!-- Braços -->
+                            <div class="lume-arm left">
+                                <div class="lume-hand"></div>
+                            </div>
+                            <div class="lume-arm right">
+                                <div class="lume-hand"></div>
+                            </div>
+
+                            <!-- Cabeça -->
+                            <div class="lume-head">
+                                <!-- Olhos -->
+                                <div class="lume-eye left">
+                                    <div class="lume-pupil"></div>
+                                    <div class="lume-eyelid"></div>
+                                </div>
+                                <div class="lume-eye right">
+                                    <div class="lume-pupil"></div>
+                                    <div class="lume-eyelid"></div>
+                                </div>
+                                <!-- Boca -->
+                                <div class="lume-mouth"></div>
+                            </div>
+
+                            <!-- Corpo -->
+                            <div class="lume-body">
+                                <div class="lume-stripe"></div>
+                                <div class="lume-stripe"></div>
+                                <div class="lume-stripe"></div>
+
+                                <!-- Perninhas -->
+                                <div class="lume-leg left">
+                                    <div class="lume-foot"></div>
+                                </div>
+                                <div class="lume-leg right">
+                                    <div class="lume-foot"></div>
+                                </div>
+
+                                <!-- Luz entre as pernas -->
+                                <div class="lume-glow"></div>
+                                <div class="lume-light-core"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
@@ -749,18 +809,358 @@ const ESCALADA = {
             /* Lume escalador - COM TRANSIÇÃO HORIZONTAL + OPACITY */
             .lume-climber {
                 position: absolute;
-                left: 50%;
                 bottom: 0;
-                transform: translateX(-50%);
-                font-size: 3rem;
+                width: 217px;  /* 200px × 1.086 aspect ratio */
+                height: 200px;
                 filter: drop-shadow(0 0 20px #fff8dc);
                 transition: bottom 1s cubic-bezier(0.68, -0.55, 0.265, 1.55),
                             left 1s cubic-bezier(0.68, -0.55, 0.265, 1.55),
-                            opacity 0.6s ease,
-                            transform 0.3s ease;
+                            opacity 0.6s ease;
                 z-index: 101;
                 pointer-events: none;
                 opacity: 1;
+            }
+
+            /* Wrapper do Lume - escala de 380px para 217px */
+            .lume-wrapper {
+                position: relative;
+                width: 380px;
+                height: 350px;
+                transform: scale(0.57);  /* 350px × 0.57 = 199.5px ≈ 200px */
+                transform-origin: center center;
+            }
+
+            .lume-body-container {
+                position: absolute;
+                top: 30px;
+                width: 110%;
+                height: 270px;
+                animation: lumeFloat 3s ease-in-out infinite;
+            }
+
+            @keyframes lumeFloat {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(-15px); }
+            }
+
+            /* Asas */
+            .lume-wing {
+                position: absolute;
+                width: 30.36%;
+                height: 36.67%;
+                background: linear-gradient(135deg, rgba(144, 238, 144, 0.5) 0%, rgba(135, 206, 250, 0.45) 50%, rgba(173, 216, 230, 0.4) 100%);
+                border-radius: 50% 50% 40% 60%;
+                top: 16.67%;
+                filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+                opacity: 0.5;
+            }
+
+            .lume-wing.left {
+                left: 55%;
+                transform-origin: center left;
+                animation: lumeWingFlapLeft 0.4s ease-in-out infinite;
+            }
+
+            .lume-wing.right {
+                right: 27.5%;
+                transform-origin: center left;
+                animation: lumeWingFlapRight 0.4s ease-in-out infinite;
+            }
+
+            @keyframes lumeWingFlapLeft {
+                0%, 100% { transform: rotateY(0deg); }
+                50% { transform: rotateY(-75deg); }
+            }
+
+            @keyframes lumeWingFlapRight {
+                0%, 100% { transform: rotateY(0deg) scaleX(-1); }
+                50% { transform: rotateY(-75deg) scaleX(-1); }
+            }
+
+            .lume-wing-particle {
+                position: absolute;
+                width: 5px;
+                height: 5px;
+                background: #FFD700;
+                border-radius: 50%;
+                box-shadow: 0 0 8px #FFD700;
+                animation: lumeWingParticleFloat 2s ease-in-out infinite;
+            }
+
+            .lume-wing.left .lume-wing-particle {
+                top: 27.27%;
+                right: 11.76%;
+            }
+
+            .lume-wing.right .lume-wing-particle {
+                top: 27.27%;
+                left: 70.59%;
+            }
+
+            @keyframes lumeWingParticleFloat {
+                0%, 100% {
+                    opacity: 0.4;
+                    transform: translateY(0px) scale(1);
+                }
+                50% {
+                    opacity: 1;
+                    transform: translateY(-8px) scale(1.3);
+                }
+            }
+
+            /* Antenas */
+            .lume-antenna {
+                position: absolute;
+                width: 3px;
+                height: 11.67%;
+                background: linear-gradient(180deg, #8B4513 0%, #A0522D 100%);
+                border-radius: 3px;
+                top: 3.33%;
+            }
+
+            .lume-antenna.left {
+                left: 41.07%;
+                transform: rotate(-15deg);
+                transform-origin: bottom center;
+            }
+
+            .lume-antenna.right {
+                right: 41.07%;
+                transform: rotate(15deg);
+                transform-origin: bottom center;
+            }
+
+            .lume-antenna-tip {
+                position: absolute;
+                width: 10px;
+                height: 10px;
+                background: #FFD700;
+                border-radius: 50%;
+                top: -4px;
+                left: 50%;
+                transform: translateX(-50%);
+                box-shadow: 0 0 8px #FFD700;
+            }
+
+            /* Cabeça */
+            .lume-head {
+                position: absolute;
+                width: 28.57%;
+                height: 23.33%;
+                background: linear-gradient(180deg, #FF8C00 0%, #FFA500 100%);
+                border-radius: 50% 50% 45% 45%;
+                top: 10%;
+                left: 35.71%;
+                z-index: 2;
+            }
+
+            /* Olhos */
+            .lume-eye {
+                position: absolute;
+                width: 33.75%;
+                height: 40%;
+                background: white;
+                border-radius: 50%;
+                top: 28.57%;
+                box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+            .lume-eye.left { left: 15%; }
+            .lume-eye.right { right: 15%; }
+
+            .lume-pupil {
+                position: absolute;
+                width: 59.26%;
+                height: 57.14%;
+                background: #1b1b1b;
+                border-radius: 50%;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            .lume-pupil::after {
+                content: '';
+                position: absolute;
+                width: 31.25%;
+                height: 31.25%;
+                background: white;
+                border-radius: 50%;
+                top: 18.75%;
+                left: 31.25%;
+            }
+
+            .lume-eyelid {
+                position: absolute;
+                width: 100%;
+                height: 0%;
+                background: linear-gradient(180deg, #FF8C00 0%, #FFA500 100%);
+                border-radius: 50%;
+                top: 0;
+                left: 0;
+                animation: lumeBlink 4s ease-in-out infinite;
+                z-index: 1;
+            }
+
+            @keyframes lumeBlink {
+                0%, 42%, 52%, 96%, 100% { height: 0%; }
+                50% { height: 100%; }
+            }
+
+            /* Boca */
+            .lume-mouth {
+                position: absolute;
+                width: 25%;
+                height: 7.14%;
+                border: 1px solid #8B4513;
+                border-top: none;
+                border-radius: 0 0 50% 50%;
+                top: 77.14%;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            /* Braços */
+            .lume-arm {
+                position: absolute;
+                width: 2.86%;
+                height: 15%;
+                background: linear-gradient(180deg, #FFA500 0%, #FF8C00 100%);
+                border-radius: 4px;
+                top: 31.67%;
+                z-index: 1;
+            }
+
+            .lume-arm.left {
+                left: 28.57%;
+                transform: rotate(-45deg);
+                transform-origin: top center;
+            }
+
+            .lume-arm.right {
+                right: 28.57%;
+                transform: rotate(45deg);
+                transform-origin: top center;
+            }
+
+            .lume-hand {
+                position: absolute;
+                width: 12px;
+                height: 12px;
+                background: #FF8C00;
+                border-radius: 50%;
+                bottom: -6px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            /* Corpo */
+            .lume-body {
+                position: absolute;
+                width: 25%;
+                height: 33.33%;
+                background: linear-gradient(180deg, #FFA500 0%, #FF8C00 50%, #8B4513 100%);
+                border-radius: 45% 45% 50% 50%;
+                top: 30%;
+                left: 37.5%;
+                z-index: 1;
+            }
+
+            .lume-stripe {
+                position: absolute;
+                width: 100%;
+                height: 8%;
+                background: rgba(139, 69, 19, 0.3);
+                border-radius: 50%;
+            }
+
+            .lume-stripe:nth-child(1) { top: 20%; }
+            .lume-stripe:nth-child(2) { top: 45%; }
+            .lume-stripe:nth-child(3) { top: 70%; }
+
+            /* Pernas */
+            .lume-leg {
+                position: absolute;
+                width: 0%;
+                height: 30%;
+                background: #FF8C00;
+                border-radius: 9px;
+                bottom: -20%;
+                z-index: 3;
+            }
+
+            .lume-leg.left {
+                left: 25.71%;
+                transform: rotate(-8deg);
+            }
+
+            .lume-leg.right {
+                right: 25.71%;
+                transform: rotate(8deg);
+            }
+
+            .lume-foot {
+                position: absolute;
+                width: 0px;
+                height: 0px;
+                background: #FF8C00;
+                border-radius: 50%;
+                bottom: 60%;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            /* Brilho */
+            .lume-glow {
+                position: absolute;
+                width: 157.14%;
+                height: 110%;
+                background: radial-gradient(circle, #FFFF00 0%, #FFD700 35%, #FFA500 90%, rgba(255, 165, 0, 0.5) 70%, transparent 100%);
+                border-radius: 50%;
+                bottom: -55%;
+                left: 50%;
+                transform: translateX(-50%);
+                animation: lumeGlowPulse 1.5s ease-in-out infinite;
+                filter: blur(4px);
+                z-index: 0;
+            }
+
+            @keyframes lumeGlowPulse {
+                0%, 100% {
+                    opacity: 1;
+                    transform: translateX(-50%) scale(1);
+                    box-shadow: 0 0 30px #FFD700, 0 0 60px #FFA500, 0 0 90px rgba(255, 215, 0, 0.6);
+                }
+                50% {
+                    opacity: 0.8;
+                    transform: translateX(-50%) scale(1.15);
+                    box-shadow: 0 0 40px #FFD700, 0 0 80px #FFA500, 0 0 120px rgba(255, 215, 0, 0.7);
+                }
+            }
+
+            .lume-light-core {
+                position: absolute;
+                width: 85.71%;
+                height: 60%;
+                background: radial-gradient(circle, #FFFF99 0%, #FFD700 100%);
+                border-radius: 50%;
+                bottom: -30%;
+                left: 50%;
+                transform: translateX(-50%);
+                animation: lumeCorePulse 1.5s ease-in-out infinite;
+                box-shadow: 0 0 20px #FFFF00;
+                z-index: 0;
+            }
+
+            @keyframes lumeCorePulse {
+                0%, 100% {
+                    opacity: 1;
+                    transform: translateX(-50%) scale(1);
+                }
+                50% {
+                    opacity: 0.9;
+                    transform: translateX(-50%) scale(1.1);
+                }
             }
             
             /* Animação de subida */
@@ -769,33 +1169,33 @@ const ESCALADA = {
             }
             
             @keyframes climb {
-                0%, 100% { transform: translateX(-50%) scale(1); }
-                25% { transform: translateX(-50%) scale(1.2) rotate(-10deg); }
-                50% { transform: translateX(-50%) scale(1.1) rotate(5deg); }
-                75% { transform: translateX(-50%) scale(1.2) rotate(-5deg); }
+                0%, 100% { transform: scale(1); }
+                25% { transform: scale(1.2) rotate(-10deg); }
+                50% { transform: scale(1.1) rotate(5deg); }
+                75% { transform: scale(1.2) rotate(-5deg); }
             }
-            
+
             /* Shake animation */
             @keyframes shake {
-                0%, 100% { transform: translateX(-50%) translateY(0); }
-                25% { transform: translateX(-50%) translateY(-10px); }
-                50% { transform: translateX(-50%) translateY(5px); }
-                75% { transform: translateX(-50%) translateY(-5px); }
+                0%, 100% { transform: translateY(0); }
+                25% { transform: translateY(-10px); }
+                50% { transform: translateY(5px); }
+                75% { transform: translateY(-5px); }
             }
 
             /* Animação de pulo ao reaparecer (truque de mágica) */
             @keyframes jumpIn {
                 0% {
                     opacity: 0;
-                    transform: translateX(-50%) translateY(100px) scale(0.5);
+                    transform: translateY(100px) scale(0.5);
                 }
                 50% {
                     opacity: 1;
-                    transform: translateX(-50%) translateY(-20px) scale(1.1);
+                    transform: translateY(-20px) scale(1.1);
                 }
                 100% {
                     opacity: 1;
-                    transform: translateX(-50%) translateY(0) scale(1);
+                    transform: translateY(0) scale(1);
                 }
             }
 
@@ -920,24 +1320,14 @@ const ESCALADA = {
                     left: 50%;
                     transform: translateX(-50%);
                     right: auto;
-                    top: 80px;
-                    bottom: 80px;
                     width: 60%;
                     max-width: 300px;
                 }
-                
-                .floor-platform {
-                    height: 30px;
-                }
-                
+
                 .floor-label {
                     font-size: 0.6rem;
                 }
-                
-                .lume-climber {
-                    font-size: 2rem;
-                }
-                
+
                 .victory-flag {
                     font-size: 1.5rem;
                     top: -25px;
@@ -1084,19 +1474,7 @@ const ESCALADA = {
                 50% { transform: translateX(-50%) translateY(-12px); }
             }
 
-            /* Responsivo - Cristais e antagonistas menores em mobile */
-            @media (max-width: 768px) {
-                .crystal {
-                    font-size: 1.8rem;
-                    bottom: 40px;
-                }
-
-                .antagonist {
-                    font-size: 1.8rem;
-                    bottom: 40px;
-                    left: calc(50% + 60px);
-                }
-            }
+            /* Responsivo - Cristais e antagonistas (mantém mesmo tamanho em todas as telas) */
 
             /* ===== ANIMAÇÃO PULSE (para .score-display quando cristal é coletado) ===== */
             .score-display.pulse {
@@ -1340,7 +1718,8 @@ const ESCALADA = {
         if (!lume) return;
 
         // ✅ NOVO: Lume SEMPRE à esquerda do degrau
-        const horizontalPosition = 'calc(50% - 80px)'; // 80px à esquerda do centro
+        // 217px (largura Lume) + 80px offset = 297px à esquerda
+        const horizontalPosition = 'calc(50% - 297px)';
 
         // ✅ JANELA MÓVEL: Calcular posição dentro do grupo atual
         // Posição dentro do grupo (0=inferior, 1=meio, 2=superior)
@@ -1366,7 +1745,6 @@ const ESCALADA = {
         // Posicionar Lume
         lume.style.bottom = targetBottom;
         lume.style.left = horizontalPosition;
-        lume.style.transform = 'translateX(-50%)'; // Centralizar em relação à própria largura
 
         const currentFloor = this.currentStep + 1;
         console.log(`🏔️ Lume no degrau ${currentFloor} (${positionName}, à esquerda)`);
@@ -1474,16 +1852,16 @@ const ESCALADA = {
     // Descer um andar (quando erra) - opcional
     fall: function() {
         if (this.currentStep <= 0) return;
-        
+
         this.currentStep--;
-        
+
         const lume = document.getElementById('lume-climber');
-        lume.style.transform = 'translateX(-50%) scale(0.8)';
-        
+        lume.style.transform = 'scale(0.8)';
+
         this.updatePosition();
-        
+
         setTimeout(() => {
-            lume.style.transform = 'translateX(-50%) scale(1)';
+            lume.style.transform = 'scale(1)';
         }, 300);
     },
     
@@ -1516,10 +1894,10 @@ const ESCALADA = {
     // Quando chega no topo
     onReachTop: function() {
         console.log('🎉 Lume chegou no topo!');
-        
+
         const lume = document.getElementById('lume-climber');
-        lume.style.transform = 'translateX(-50%) scale(1.5)';
-        
+        lume.style.transform = 'scale(1.5)';
+
         // Efeito de vitória
         this.createVictoryEffect();
     },
@@ -1583,7 +1961,7 @@ const ESCALADA = {
 
         const lume = document.getElementById('lume-climber');
         if (lume) {
-            lume.style.transform = 'translateX(-50%) scale(1)';
+            lume.style.transform = 'scale(1)';
         }
 
         // Remover todos os elementos checkpoint

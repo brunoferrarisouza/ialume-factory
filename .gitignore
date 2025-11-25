@@ -143,3 +143,10 @@ vite.config.ts.timestamp-*
 audio/
 assets/
 .env.supabase
+
+# Prompts privados (não subir)
+Prompts and Codes entire project/
+ASSET-FARMING-*.md
+INDICE-ASSET-FARMING.md
+INSTRUCOES-USO.md
+PROMPTS-PRONTOS.md

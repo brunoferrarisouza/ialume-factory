@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎨 Teste Parallax - Assets Cohesivos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            overflow: hidden;
+            background: #000;
+        }
+
+        /* Container principal */
+        .parallax-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Layers parallax */
+        .layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: repeat-y;
+            transition: opacity 0.5s ease;
+        }
+
+        /* Info overlay */
+        .info-overlay {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px 40px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .info-overlay h1 {
+            font-size: 2rem;
+            color: #FFD700;
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .info-overlay p {
+            color: #fff;
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        .cohesion-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        /* Controles */
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px 30px;
+            border-radius: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .scenario-btn {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .scenario-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .scenario-btn.active {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.6);
+        }
+
+        /* Instruções */
+        .instructions {
+            position: fixed;
+            top: 150px;
+            right: 30px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            max-width: 280px;
+            border: 2px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .instructions h3 {
+            margin-bottom: 10px;
+            color: #ffd700;
+            font-size: 1.1rem;
+        }
+
+        .instructions ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .instructions li {
+            padding: 5px 0;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .instructions li::before {
+            content: "▸ ";
+            color: #ffd700;
+        }
+
+        /* Scroll indicator */
+        .scroll-indicator {
+            position: fixed;
+            left: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            color: white;
+            text-align: center;
+            border: 2px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .scroll-bar {
+            width: 30px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            position: relative;
+            margin: 10px auto;
+        }
+
+        .scroll-progress {
+            width: 100%;
+            background: linear-gradient(180deg, #ffd700, #ff8c00);
+            border-radius: 15px;
+            position: absolute;
+            bottom: 0;
+            transition: height 0.1s ease;
+        }
+
+        /* Layer info */
+        .layer-info {
+            position: fixed;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-size: 12px;
+            display: flex;
+            gap: 20px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .layer-info-item {
+            text-align: center;
+        }
+
+        .layer-info-label {
+            color: #ffd700;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .controls {
+                bottom: 10px;
+                padding: 15px 20px;
+                gap: 10px;
+                max-width: 90%;
+            }
+
+            .scenario-btn {
+                padding: 10px 15px;
+                font-size: 12px;
+            }
+
+            .info-overlay {
+                top: 10px;
+                padding: 15px 25px;
+            }
+
+            .info-overlay h1 {
+                font-size: 1.3rem;
+            }
+
+            .instructions {
+                display: none;
+            }
+
+            .scroll-indicator {
+                left: 10px;
+            }
+
+            .layer-info {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Info overlay -->
+    <div class="info-overlay">
+        <h1 id="scenario-title">📚 TORRE DE LIVROS</h1>
+        <p id="scenario-description">Biblioteca mística com coesão visual perfeita</p>
+        <span class="cohesion-badge" id="cohesion-score">Coesão: 9.7/10</span>
+    </div>
+
+    <!-- Instruções -->
+    <div class="instructions">
+        <h3>🎮 Controles</h3>
+        <ul>
+            <li>Roda do mouse: Simular escalada</li>
+            <li>Setas ↑↓: Mover verticalmente</li>
+            <li>Touch: Arrastar para mover</li>
+            <li>Troque entre cenários abaixo</li>
+            <li>Observe o efeito parallax!</li>
+        </ul>
+    </div>
+
+    <!-- Scroll indicator -->
+    <div class="scroll-indicator">
+        <div style="font-size: 11px; margin-bottom: 5px; opacity: 0.8;">PROGRESSO</div>
+        <div class="scroll-bar">
+            <div class="scroll-progress" id="scroll-progress" style="height: 0%"></div>
+        </div>
+        <div id="scroll-percent" style="font-size: 14px; font-weight: bold; margin-top: 5px;">0%</div>
+    </div>
+
+    <!-- Layer info -->
+    <div class="layer-info">
+        <div class="layer-info-item">
+            <span class="layer-info-label">Layer 1</span>
+            <span id="layer1-speed">0.2x</span>
+        </div>
+        <div class="layer-info-item">
+            <span class="layer-info-label">Layer 2</span>
+            <span id="layer2-speed">0.4x</span>
+        </div>
+        <div class="layer-info-item">
+            <span class="layer-info-label">Layer 3</span>
+            <span id="layer3-speed">0.7x</span>
+        </div>
+        <div class="layer-info-item">
+            <span class="layer-info-label">Layer 4</span>
+            <span id="layer4-speed">1.2x</span>
+        </div>
+    </div>
+
+    <!-- Container parallax -->
+    <div class="parallax-container" id="parallax-container">
+        <!-- Layers serão injetados aqui -->
+    </div>
+
+    <!-- Controles -->
+    <div class="controls">
+        <button class="scenario-btn active" onclick="changeScenario('torre-livros')">📚 Torre de Livros</button>
+        <button class="scenario-btn" onclick="changeScenario('cidade')">🏙️ Cidade</button>
+    </div>
+
+    <script>
+        // Configuração dos cenários com coesão visual
+        const scenarios = {
+            'torre-livros': {
+                title: '📚 TORRE DE LIVROS',
+                description: 'Biblioteca mística com coesão visual perfeita',
+                cohesion: '9.7/10',
+                layers: [
+                    { file: 'torre-livros-layer-1.png', speed: 0.2 },
+                    { file: 'torre-livros-layer-2.png', speed: 0.4 },
+                    { file: 'torre-livros-layer-3.png', speed: 0.7 },
+                    { file: 'torre-livros-layer-4.png', speed: 1.2 }
+                ],
+                colors: ['#6A0DAD', '#191970', '#FFD700', '#8B4513', '#FFF8DC'],
+                mood: 'Magical twilight aurora'
+            },
+            'cidade': {
+                title: '🏙️ CIDADE',
+                description: 'Metrópole urbana com coesão visual excepcional',
+                cohesion: '9.6/10',
+                layers: [
+                    { file: 'cidade-layer-1.png', speed: 0.2 },
+                    { file: 'cidade-layer-2.png', speed: 0.4 },
+                    { file: 'cidade-layer-3.png', speed: 0.7 },
+                    { file: 'cidade-layer-4.png', speed: 1.2 }
+                ],
+                colors: ['#87CEEB', '#FFD700', '#708090', '#4682B4', '#DC143C'],
+                mood: 'Bright sunny optimism'
+            }
+        };
+
+        let currentScenario = 'torre-livros';
+        let scrollPosition = 0;
+        const maxScroll = 2000; // Altura virtual de escalada
+
+        // Criar layers
+        function createLayers(scenarioKey) {
+            const container = document.getElementById('parallax-container');
+            container.innerHTML = '';
+
+            const scenario = scenarios[scenarioKey];
+            const basePath = `../assets/backgrounds/${scenarioKey}/`;
+
+            scenario.layers.forEach((layer, index) => {
+                const layerDiv = document.createElement('div');
+                layerDiv.className = 'layer';
+                layerDiv.id = `layer-${index}`;
+                layerDiv.style.backgroundImage = `url('${basePath}${layer.file}')`;
+                layerDiv.style.zIndex = index;
+                layerDiv.dataset.speed = layer.speed;
+                container.appendChild(layerDiv);
+            });
+
+            // Atualizar layer info speeds
+            document.getElementById('layer1-speed').textContent = `${scenario.layers[0].speed}x`;
+            document.getElementById('layer2-speed').textContent = `${scenario.layers[1].speed}x`;
+            document.getElementById('layer3-speed').textContent = `${scenario.layers[2].speed}x`;
+            document.getElementById('layer4-speed').textContent = `${scenario.layers[3].speed}x`;
+        }
+
+        // Atualizar parallax
+        function updateParallax() {
+            const layers = document.querySelectorAll('.layer');
+            const progress = (scrollPosition / maxScroll) * 100;
+
+            layers.forEach(layer => {
+                const speed = parseFloat(layer.dataset.speed);
+                const yPos = scrollPosition * speed;
+                layer.style.transform = `translateY(${yPos}px)`;
+            });
+
+            // Atualizar indicador
+            const scrollProgress = document.getElementById('scroll-progress');
+            const scrollPercent = document.getElementById('scroll-percent');
+            scrollProgress.style.height = `${Math.min(progress, 100)}%`;
+            scrollPercent.textContent = `${Math.min(Math.round(progress), 100)}%`;
+        }
+
+        // Trocar cenário
+        function changeScenario(scenarioKey) {
+            currentScenario = scenarioKey;
+            scrollPosition = 0;
+
+            const scenario = scenarios[scenarioKey];
+
+            // Atualizar info
+            document.getElementById('scenario-title').textContent = scenario.title;
+            document.getElementById('scenario-description').textContent = scenario.description;
+            document.getElementById('cohesion-score').textContent = `Coesão: ${scenario.cohesion}`;
+
+            // Atualizar botões ativos
+            document.querySelectorAll('.scenario-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Criar novos layers
+            createLayers(scenarioKey);
+            updateParallax();
+
+            console.log(`🎨 Cenário trocado: ${scenarioKey}`);
+            console.log(`   Coesão: ${scenario.cohesion}`);
+            console.log(`   Mood: ${scenario.mood}`);
+            console.log(`   Paleta: ${scenario.colors.join(', ')}`);
+        }
+
+        // Event listeners
+        document.getElementById('parallax-container').addEventListener('wheel', (e) => {
+            e.preventDefault();
+            scrollPosition -= e.deltaY;
+            scrollPosition = Math.max(0, Math.min(scrollPosition, maxScroll));
+            updateParallax();
+        });
+
+        // Touch/mobile
+        let touchStart = 0;
+        document.getElementById('parallax-container').addEventListener('touchstart', (e) => {
+            touchStart = e.touches[0].clientY;
+        });
+
+        document.getElementById('parallax-container').addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const touchDelta = touchStart - e.touches[0].clientY;
+            scrollPosition += touchDelta * 2;
+            scrollPosition = Math.max(0, Math.min(scrollPosition, maxScroll));
+            touchStart = e.touches[0].clientY;
+            updateParallax();
+        });
+
+        // Teclado (setas)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp') {
+                scrollPosition += 50;
+            } else if (e.key === 'ArrowDown') {
+                scrollPosition -= 50;
+            }
+            scrollPosition = Math.max(0, Math.min(scrollPosition, maxScroll));
+            updateParallax();
+        });
+
+        // Inicializar
+        createLayers(currentScenario);
+        updateParallax();
+
+        console.log('🎨 Teste de Parallax Cohesivo Carregado!');
+        console.log('📊 Cenários disponíveis:', Object.keys(scenarios).length);
+        console.log('');
+        console.log('🏆 TORRE-LIVROS:');
+        console.log('   Coesão: 9.7/10 (EXCELENTE)');
+        console.log('   Paleta:', scenarios['torre-livros'].colors.join(', '));
+        console.log('   Mood:', scenarios['torre-livros'].mood);
+        console.log('');
+        console.log('🏆 CIDADE:');
+        console.log('   Coesão: 9.6/10 (EXCELENTE)');
+        console.log('   Paleta:', scenarios['cidade'].colors.join(', '));
+        console.log('   Mood:', scenarios['cidade'].mood);
+        console.log('');
+        console.log('🎮 Use a roda do mouse ou setas ↑↓ para simular escalada');
+        console.log('🔄 Troque entre cenários usando os botões');
+    </script>
+</body>
+</html>

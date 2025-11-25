@@ -143,3 +143,4 @@ vite.config.ts.timestamp-*
 audio/
 assets/
 .env.supabase
+.env.openai
